@@ -1,4 +1,7 @@
-#### Blank vlaues ####
+#Reverse groups for specifics
+#reverse labels for non-inherent orders
+#corrected: all inherent group/label for rev groups and rev labels
+#### Blank values ####
 blank_values <- function(
   dataset
 ){
@@ -56,7 +59,7 @@ add_group <- function(
   group_var,
   label_var
 ){
-  #Frequencies with a grouping variable must be grouped for this section
+  #Frequencies with a grouping variable must be grouped for following section
   if(grouped == T){
     flag2 <- dplyr::enquo(label_var)
     dataset <- add_label(dataset, !!flag2)
@@ -69,9 +72,9 @@ add_group <- function(
         group_var
       )
   } else{
-    dataset <- dataset
+    flag2 <- dplyr::enquo(label_var)
+    dataset <- add_label(dataset, !!flag2)
   }
-  return(dataset)
 }
 
 #### Factors ####
@@ -651,10 +654,10 @@ section_grouped_specifics_nolab <- function(
         group_var = as.character.factor(group_var)
       )
 
-      dataset <- grouped_specific5(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label)
-      dataset <- grouped_specific6(dataset, inherent_order_label, inherent_order_group, group_specific)
-      dataset <- grouped_specific7(dataset, inherent_order_label, inherent_order_group, group_specific)
-      dataset <- grouped_specific8(dataset, inherent_order_label, inherent_order_group, group_specific)
+      dataset <- grouped_specific5(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+      dataset <- grouped_specific6(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+      dataset <- grouped_specific7(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+      dataset <- grouped_specific8(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
   } else {
     dataset <- dataset
   }
@@ -668,7 +671,8 @@ grouped_specific5 <- function(
   inherent_order_label,
   inherent_order_group,
   group_specific,
-  rev_label
+  rev_label,
+  rev_group
 ){
   if(inherent_order_label == F &
      inherent_order_group == F){
@@ -717,7 +721,8 @@ grouped_specific6 <- function(
   inherent_order_label,
   inherent_order_group,
   group_specific,
-  rev_label
+  rev_label,
+  rev_group
 ){
   if(inherent_order_label == T & #No inherent order for group/label
      inherent_order_group == F){
@@ -765,7 +770,9 @@ grouped_specific7 <- function(
   dataset,
   inherent_order_label,
   inherent_order_group,
-  group_specific
+  group_specific,
+  rev_label,
+  rev_group
 ){
   if(inherent_order_label == T &
      inherent_order_group == T){
@@ -805,7 +812,8 @@ grouped_specific8 <- function(
   inherent_order_label,
   inherent_order_group,
   group_specific,
-  rev_label
+  rev_label,
+  rev_group
 ){
   if(inherent_order_label == F &
      inherent_order_group == T){
@@ -847,7 +855,8 @@ section_grouped_ordered <- function(
   inherent_order_group,
   group_specific,
   specifically_ordered_group,
-  rev_group
+  rev_group,
+  rev_label
 ) {
   if(specifically_ordered_group == F &
      inherent_order_group == T
@@ -857,8 +866,8 @@ section_grouped_ordered <- function(
       dplyr::mutate(group_var = forcats::fct_inorder(group_var))
 
     dataset <- grouped_ordered1(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group)
-    dataset <- grouped_ordered2(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group)
-    dataset <- grouped_ordered3(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group)
+    dataset <- grouped_ordered2(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group, rev_label)
+    dataset <- grouped_ordered3(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group, rev_label)
     dataset <- grouped_ordered4(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group)
   } else {
     dataset <- dataset
@@ -914,7 +923,8 @@ grouped_ordered2 <- function(
   inherent_order_group,
   specifically_ordered,
   label_specific,
-  rev_group
+  rev_group,
+  rev_label
 ){
   if(specifically_ordered == T &
      inherent_order_label == F){ #Arranging for specific label first
@@ -934,7 +944,8 @@ grouped_ordered2 <- function(
       ) %>%
       dplyr::arrange(
         desc(result)
-      )
+      ) %>%
+      reverse_label_unordered(rev_label)
     freqs3 <- dataset %>%
       dplyr::filter(
         group_var != group_var[1]
@@ -963,7 +974,8 @@ grouped_ordered3 <- function(
   inherent_order_label,
   inherent_order_group,
   specifically_ordered,
-  rev_group
+  rev_group,
+  rev_label
 ){
   if(inherent_order_label == F &
      specifically_ordered == F){
@@ -971,6 +983,7 @@ grouped_ordered3 <- function(
       dplyr::arrange(
         group_var, desc(result)
       ) %>%
+      reverse_label_unordered(rev_label) %>%
         reverse_group(rev_group) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
@@ -1031,7 +1044,8 @@ section_grouped_unordered <- function(
   inherent_order_group,
   group_specific,
   specifically_ordered_group,
-  rev_group
+  rev_group,
+  rev_label
 ) {
   if(specifically_ordered_group == F &
     inherent_order_group == F
@@ -1043,9 +1057,9 @@ section_grouped_unordered <- function(
         group_var = as.character.factor(group_var)
       )
 
-    dataset <- grouped_unordered1(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group)
+    dataset <- grouped_unordered1(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group, rev_label)
     dataset <- grouped_unordered2(dataset, inherent_order_label, inherent_order_group, specifically_ordered, label_specific, rev_group)
-    dataset <- grouped_unordered3(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group)
+    dataset <- grouped_unordered3(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group, rev_label)
     dataset <- grouped_unordered4(dataset, inherent_order_label, inherent_order_group, specifically_ordered, rev_group)
   } else {
     dataset <- dataset
@@ -1060,7 +1074,8 @@ grouped_unordered1 <- function(
   inherent_order_group,
   specifically_ordered,
   label_specific,
-  rev_group
+  rev_group,
+  rev_label
 ){
   if(specifically_ordered == T &
      inherent_order_label == F){
@@ -1070,7 +1085,9 @@ grouped_unordered1 <- function(
       ) %>%
       dplyr::arrange(
         desc(result)
-      ) %>% reverse_group(rev_group)
+      ) %>%
+      reverse_label_unordered(rev_label) %>%
+      reverse_group(rev_group)
     group1 <- freqs1$group_var[1]
     freqs2 <- dataset %>%
       dplyr::filter(
@@ -1157,7 +1174,8 @@ grouped_unordered3 <- function(
   inherent_order_label,
   inherent_order_group,
   specifically_ordered,
-  rev_group
+  rev_group,
+  rev_label
 ){
   if(inherent_order_label == F &
      specifically_ordered == F
@@ -1169,6 +1187,7 @@ grouped_unordered3 <- function(
       dplyr::mutate(
         label = forcats::fct_inorder(label)
       ) %>%
+      reverse_label_unordered(rev_label) %>%
       dplyr::filter(
         label == label[1]
       ) %>% reverse_group(rev_group)
@@ -1182,7 +1201,7 @@ grouped_unordered3 <- function(
       ) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label)
-      )
+      ) %>% reverse_label_unordered(rev_label)
     dataset <- dplyr::bind_rows(freqs1, freqs2) %>%
       dplyr::mutate(
         group_var = forcats::fct_inorder(group_var),
@@ -1406,9 +1425,9 @@ options(warn = -1)
 ### (3) Grouped Section: arranging for specific group to be first
     dataset <- section_grouped_specifics_nolab(dataset, specifically_ordered, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
 ### (4) Grouped Section: inherent order of grouping variables
-    dataset <- section_grouped_ordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group)
+    dataset <- section_grouped_ordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
 ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
-    dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group)
+    dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
   }
 ### Horizontal
   dataset <- horizontal_chart(dataset, horizontal, grouped)
