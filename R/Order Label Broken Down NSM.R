@@ -5,15 +5,6 @@
 blank_values <- function(
   dataset
 ){
-  #If no variable, add in place filler
-  if(
-    any(names(dataset) == 'variable') == F
-  ) {
-    dataset$variable <- 'x'
-  } else{
-    dataset <- dataset
-  }
-
   #If no value, add in place filler
   if(
     any(names(dataset) == 'value') == F
@@ -78,7 +69,7 @@ add_group <- function(
 }
 
 #### Factors ####
-#When inherent_order == T, labels are ordered by value #s and variable #s
+#When inherent_order == T, labels are ordered by value #s
 #But factored variables won't have #s in value column. Let's give them some
 factors <- function(
   dataset,
@@ -90,9 +81,9 @@ factors <- function(
   flag3 <- dplyr::enquo(group_var)
 dataset <- add_group(dataset, grouped, !!flag3, !!flag2)
 #When "value" is factored, value needs to be changed to .number
-#When "value" was completely missing, value needs to be changed to .number
+#When "value" was completely missing or all the same, values needs to be changed to distinct .number
 if(dataset$value == dataset$label |
-   dataset$value == 'x'
+   length(unique(dataset$value)) == 1
 ){
   max_lab <- length(unique(dataset$label))
   dataset <- dataset %>%
@@ -104,12 +95,10 @@ if(dataset$value == dataset$label |
       dataset <- dataset %>% dplyr::ungroup()
     }
 
-#Now convert both values and variables to numerics for inherent_orders
+#Now convert value to numeric for inherent_orders
 dataset <- dataset %>%
   dplyr::mutate(
-    variable = gsub("[^0-9.]", "", variable) %>% as.character() %>% as.numeric(),
-    value = gsub("[^0-9.]", "", value) %>% as.character() %>% as.numeric(),
-    variable = ifelse(is.na(variable), 1, variable)
+    value = gsub("[^0-9.]", "", value) %>% as.character() %>% as.numeric()
   )
 return(dataset)
 }
@@ -127,20 +116,13 @@ reverse_label <- function(
   dataset <- factors(dataset, grouped, !!flag3, !!flag2)
 if(rev_label == T){
   max_val <- max(dataset$value)
-  max_val2 <- max(dataset$variable)
   min_val <- min(dataset$value)
-  min_val2 <- min(dataset$variable)
   dataset <- dataset %>%
     dplyr::mutate(
       value = mapvalues(
         value,
         from = c(min_val:max_val),
         to = c(max_val:min_val)
-      ),
-      variable = mapvalues(
-        variable,
-        from = c(min_val2:max_val2),
-        to = c(max_val2:min_val2)
       )
     )
 } else {
@@ -239,7 +221,7 @@ ungrouped2 <- function(
     freqs2 <- dataset %>%
       dplyr::filter(label != label_specific) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     dataset <- dplyr::bind_rows(freqs1, freqs2) %>%
       dplyr::mutate(
@@ -263,7 +245,7 @@ ungrouped3 <- function(
   if(stacked == T){
     dataset <- dataset %>%
       dplyr::arrange(
-        value, variable, result
+        value, result
       ) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
@@ -319,7 +301,7 @@ ungrouped5 <- function(
   ){ #Arranging for inherent order labels
     dataset <- dataset %>%
       dplyr::arrange(
-        value, variable, result
+        value, result
       ) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
@@ -495,7 +477,7 @@ grouped_specific2 <- function(
           label == label_specific
       ) %>%
       dplyr::arrange(
-        value, variable, desc(result)
+        value, desc(result)
       )
     freqs3 <- dataset %>%
       dplyr::filter(
@@ -503,7 +485,7 @@ grouped_specific2 <- function(
           label != label_specific
       ) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     freqs4 <- dataset %>%
       dplyr::filter(
@@ -511,7 +493,7 @@ grouped_specific2 <- function(
           label != label_specific
       ) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     dataset <- dplyr::bind_rows(freqs1, freqs2, freqs3, freqs4) %>%
       dplyr::mutate(
@@ -551,13 +533,13 @@ grouped_specific3 <- function(
           group_var == group_specific
       ) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     freqs3 <- dataset %>%
       dplyr::filter(
         group_var != group_specific
       ) %>% dplyr::arrange(
-        value, variable, group_var
+        value, group_var
       )
     dataset <- dplyr::bind_rows(freqs1, freqs2, freqs3) %>%
       dplyr::mutate(
@@ -731,7 +713,7 @@ grouped_specific6 <- function(
         group_var == group_specific
       ) %>%
       dplyr::arrange(
-        value, variable, desc(result)
+        value, desc(result)
       )
     group1 <- freqs1$label[1]
     freqs2 <- dataset %>%
@@ -781,13 +763,13 @@ grouped_specific7 <- function(
         group_var == group_specific
       ) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     freqs2 <- dataset %>%
       dplyr::filter(
         group_var != group_specific
       ) %>% dplyr::arrange(
-        value, variable, group_var
+        value, group_var
       )
     dataset <- dplyr::bind_rows(freqs1, freqs2) %>%
       dplyr::mutate(
@@ -897,7 +879,7 @@ grouped_ordered1 <- function(
       dplyr::filter(
         label != label_specific
       ) %>% dplyr::arrange(
-        value, variable, group_var
+        value, group_var
       )
     dataset <- dplyr::bind_rows(freqs1, freqs2) %>%
       dplyr::mutate(
@@ -1014,7 +996,7 @@ grouped_ordered4 <- function(
   ){
     dataset <- dataset %>%
       dplyr::arrange(
-        group_var, value, variable, result
+        group_var, value, result
       ) %>%
         reverse_group(rev_group) %>%
       dplyr::mutate(
@@ -1135,7 +1117,7 @@ grouped_unordered2 <- function(
         label == label_specific
       ) %>%
       dplyr::arrange(
-        value, variable, desc(result), group_var
+        value, desc(result), group_var
       ) %>% reverse_group(rev_group)
     group1 <- freqs1$group_var[1]
     freqs2 <- dataset %>%
@@ -1144,7 +1126,7 @@ grouped_unordered2 <- function(
           group_var == group1
       ) %>%
       dplyr::arrange(
-        value, variable
+        value
       )
     freqs3 <- dataset %>%
       dplyr::filter(
@@ -1233,7 +1215,7 @@ grouped_unordered4 <- function(
   {
     dataset <- dataset %>%
       dplyr::arrange(
-        value, variable, desc(result), group_var
+        value, desc(result), group_var
       ) %>% reverse_group(rev_group) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
