@@ -1,6 +1,6 @@
 Package: orderlabel
 Title: Order Your Tables and Add Percent Labels
-Version: 0.0.2.9000
+Version: 0.0.3.9000
 Authors@R: person("Nick", "Moffitt", email = "nicksmoffitt@gmail.com", role = c("aut", "cre"))
 Description: Order Your Tables and Add Percent Labels
 Depends: R (>= 3.5.2)
@@ -9,5 +9,8 @@ Encoding: UTF-8
 LazyData: true
 Imports:
 	dplyr,
-	forcats
+	forcats,
+	tidyr,
+	readxl,
+	stringr
 RoxygenNote: 6.1.1

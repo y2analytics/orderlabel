@@ -22,6 +22,8 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 
 \item{label_specific}{DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
 
+\item{group_specific}{DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
+
 \item{stacked}{DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)}
 
 \item{ms_stacked}{DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T}
@@ -31,8 +33,6 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 \item{rev_label}{DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T}
 
 \item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
-
-\item{label_specific}{DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 }
 \description{
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.

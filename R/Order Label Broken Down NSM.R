@@ -1,6 +1,6 @@
 #Reverse groups for specifics
 #reverse labels for non-inherent orders
-#corrected: all inherent group/label for rev groups and rev labels
+#### ***** ORDER LABEL FUNCTION ***** ####
 #### Blank values ####
 blank_values <- function(
   dataset
@@ -1316,7 +1316,7 @@ stacked_chart_ms <- function(
 #' @param group_var DEFAULT = F; Add the name of the grouping variable if your data is grouped
 #' @param inherent_order_group DEFAULT = F; If F, puts groups in descending order. If T, puts groups in the order they are factored (District 1, District 2...)
 #' @param label_specific DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels
-#' @param label_specific DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups
+#' @param group_specific DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups
 #' @param stacked DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)
 #' @param ms_stacked DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T
 #' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T
@@ -1337,7 +1337,7 @@ stacked_chart_ms <- function(
 #' )
 
 
-#### Final Function ####
+#### Final order_label Function ####
 order_label <- function(
   dataset, #will likely be frequencies
   label_var = label,
@@ -1417,3 +1417,155 @@ options(warn = -1)
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, ms_stacked, grouped, inherent_order_group, specifically_ordered_group)
 }
+
+#### ***** TOPLINE FUNCTION ***** ####
+#### var_sep ####
+var_sep <- function(dataset) {
+  dataset %>%
+    dplyr::mutate(
+      var = variable
+    ) %>%
+    tidyr::separate(
+      var,
+      into = str_c('variable', 1:4),
+      sep = "_"
+    ) %>%
+    dplyr::mutate(
+      variable3 = dplyr::case_when(
+        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == F ~ NA_character_,
+        T ~ variable3
+      ),
+      variable2 = dplyr::case_when(
+        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == F ~ NA_character_,
+        T ~ variable2
+      ),
+      sort_var = dplyr::case_when(
+        is.na(variable2) ~ variable1,
+        is.na(variable3) ~ stringr::str_c(variable1, "_", variable2),
+        is.na(variable4) ~ stringr::str_c(variable1, "_", variable2, '_', variable3),
+        T ~ stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
+      )
+    )
+}
+
+#### add_percent ####
+add_percent <- function(dataset) {
+  dataset %>%
+    dplyr::group_by(sort_var) %>%
+    dplyr::mutate(
+    percent_label = dplyr::case_when(
+      label == label[1] & variable == variable[1] ~ stringr::str_c(result * 100, '%'),
+      T ~ stringr::str_c(result * 100)
+    )
+  )
+}
+
+#### add_lessthan ####
+add_lessthan <- function(dataset) {
+  dataset %>%
+    dplyr::mutate(
+    percent_label = dplyr::case_when(
+      percent_label =='0%' & n >= 1 ~ '<1%',
+      percent_label == '0' & n >= 1 ~ '<1',
+      T ~ percent_label
+    )
+  ) %>%
+    dplyr::ungroup() %>%
+    dplyr::select(
+      -variable1,
+      -variable2,
+      -variable3,
+      -variable4,
+      -sort_var
+    )
+}
+
+#### whole numbers ####
+whole_numbers <- function(
+  dataset,
+  var_list
+  ) {
+  dataset %>%
+    dplyr::mutate(
+      percent_label = dplyr::case_when(
+        str_detect(variable, var_list) ~ as.character(result),
+        T ~ percent_label
+    )
+  )
+}
+
+#### Final topline Function ####
+#' Add %s to a topline report
+#'
+#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a %. Also changes all 0 to <1 if n >=1
+#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
+#' @param var_list If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name. A unique portion of the var name will work as well.
+#' @keywords topline percent label
+#' @export
+#' @examples
+#' frequencies %>% topline()
+#' OR
+#' frequencies %>% topline(
+#' 'DOLLARS_GIVEN|DONATIONS_RECEIVED')
+#'
+
+
+topline <- function(
+  dataset,
+  var_list = 'place your variable names here with a "|" between them '
+  ) {
+  dataset %>%
+    var_sep() %>%
+    add_percent() %>%
+    add_lessthan() %>%
+    whole_numbers(var_list)
+}
+
+#### ***** OTHER FUNCTIONS ***** ####
+#### other_rm ####
+#' Auto change those pesky "Other please specify"s into "Other"
+#'
+#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other.
+#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
+#' @param var DEFAULT = label; Ideally, you never need any input in this function
+#' @keywords other
+#' @export
+#' @examples
+#' frequencies %>% other_rm()
+#
+
+other_rm <- function(
+  dataset,
+  var = label
+) {
+  flag <- dplyr::enquo(var)
+  dataset %>%
+    mutate(
+      label = as.character(!!flag),
+      label = dplyr::case_when(
+        stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
+        T ~ label
+      )
+    )
+}
+
+#### read_excel_allsheets ####
+#' Reading in lots of excel sheets in a workbook & turning it into one tibble
+#'
+#' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
+#' @param filename The file path to the .xlsx you want to pull all sheets from
+#' @param tibble DEFAULT = TRUE; You will likely never change this
+#' @keywords
+#' @export
+#' @examples
+#' responses <- read_excel_allsheets('~/filepath.xlsx')
+#
+
+read_excel_allsheets <- function(filename, tibble = TRUE) {
+  sheets <- readxl::excel_sheets(filename)
+  x <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
+  if(!tibble) x <- lapply(x, as.data.frame)
+  names(x) <- sheets
+  x %>% dplyr::bind_rows()
+}
+
