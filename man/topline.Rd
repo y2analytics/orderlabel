@@ -2,7 +2,7 @@
 % Please edit documentation in R/Order Label Broken Down NSM.R
 \name{topline}
 \alias{topline}
-\title{Add %s to a topline report}
+\title{Add \%s to a topline report}
 \usage{
 topline(dataset,
   var_list = "place your variable names here with a \\"|\\" between them ")
@@ -13,7 +13,7 @@ topline(dataset,
 \item{var_list}{If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name. A unique portion of the var name will work as well.}
 }
 \description{
-Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a %. Also changes all 0 to <1 if n >=1
+Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 }
 \examples{
 frequencies \%>\% topline()
