@@ -1495,9 +1495,9 @@ whole_numbers <- function(
 }
 
 #### Final topline Function ####
-#' Add %s to a topline report
+#' Add \\%s to a topline report
 #'
-#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a %. Also changes all 0 to <1 if n >=1
+#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \\%. Also changes all 0 to <1 if n >=1
 #' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
 #' @param var_list If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name. A unique portion of the var name will work as well.
 #' @keywords topline percent label
