@@ -10,7 +10,7 @@ topline(dataset,
 \arguments{
 \item{dataset}{The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"}
 
-\item{var_list}{If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name. A unique portion of the var name will work as well.}
+\item{var_list}{If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name or each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().}
 }
 \description{
 Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1

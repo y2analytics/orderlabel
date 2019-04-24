@@ -1306,6 +1306,37 @@ stacked_chart_ms <- function(
 }
 
 
+#### None / Other ####
+none_other <- function(
+  dataset,
+  none_other,
+  grouped
+){
+  if(none_other == T){
+      dataset <- dataset %>%
+        dplyr::arrange(
+          label = forcats::fct_relevel(
+            label,
+            "Other",
+            'None of the above',
+            after = Inf
+          )
+        ) %>%
+        dplyr::mutate(
+          label = forcats::fct_inorder(label)
+        )
+  } else{
+    dataset <- dataset
+  }
+  #For grouped
+  if(grouped == T & none_other == T){
+    dataset <- dataset %>%
+      dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+  } else{
+    dataset <- dataset
+  }
+}
+
 #### Description of Final Function ####
 #' Order your data and add percent labels
 #'
@@ -1322,7 +1353,8 @@ stacked_chart_ms <- function(
 #' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T
 #' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
 #' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
-#' @keywords order label dplyr::arrange
+#' @param none_other DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
+#' @keywords order label arrange
 #' @export
 #' @examples
 #' frequencies %>% order_label(
@@ -1351,6 +1383,7 @@ order_label <- function(
   horizontal = F,
   rev_label = F,
   rev_group = F,
+  none_other = T,
   l1= label[1],
   g1 = group_var[1]
 ) {
@@ -1411,6 +1444,8 @@ options(warn = -1)
 ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
     dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
   }
+### Put "None" & "Other" at bottom
+  dataset <- none_other(dataset, none_other, grouped)
 ### Horizontal
   dataset <- horizontal_chart(dataset, horizontal, grouped)
 ### Stacked
@@ -1499,7 +1534,7 @@ whole_numbers <- function(
 #'
 #' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 #' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
-#' @param var_list If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name. A unique portion of the var name will work as well.
+#' @param var_list If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name or each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
 #' @keywords topline percent label
 #' @export
 #' @examples
@@ -1525,7 +1560,7 @@ topline <- function(
 #### other_rm ####
 #' Auto change those pesky "Other please specify"s into "Other"
 #'
-#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other.
+#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
 #' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
 #' @param var DEFAULT = label; Ideally, you never need any input in this function
 #' @keywords other
@@ -1544,6 +1579,8 @@ other_rm <- function(
       label = as.character(!!flag),
       label = dplyr::case_when(
         stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
+        stringr::str_detect(label, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+        label == 'None' ~ 'None of the above',
         T ~ label
       )
     )

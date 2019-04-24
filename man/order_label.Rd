@@ -7,7 +7,8 @@
 order_label(dataset, label_var = label, inherent_order_label = F,
   group_var = F, inherent_order_group = F, label_specific = NA,
   group_specific = NA, stacked = F, ms_stacked = F, horizontal = F,
-  rev_label = F, rev_group = F, l1 = label[1], g1 = group_var[1])
+  rev_label = F, rev_group = F, none_other = T, l1 = label[1],
+  g1 = group_var[1])
 }
 \arguments{
 \item{dataset}{The name of the data frame that the mscharts pulls from, usually piped in after running freqs.}
@@ -33,6 +34,8 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 \item{rev_label}{DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T}
 
 \item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
+
+\item{none_other}{DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
 }
 \description{
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
@@ -49,6 +52,6 @@ stacked = T,
 group_specific = 'Y2 Analytics'
 )
 }
-\keyword{dplyr::arrange}
+\keyword{arrange}
 \keyword{label}
 \keyword{order}

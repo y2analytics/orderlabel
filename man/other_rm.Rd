@@ -12,7 +12,7 @@ other_rm(dataset, var = label)
 \item{var}{DEFAULT = label; Ideally, you never need any input in this function}
 }
 \description{
-Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other.
+Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
 }
 \examples{
 frequencies \%>\% other_rm()
