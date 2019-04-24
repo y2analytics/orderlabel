@@ -2,17 +2,17 @@
 % Please edit documentation in R/Order Label Broken Down NSM.R
 \name{read_excel_allsheets}
 \alias{read_excel_allsheets}
-\title{Reading in lots of excel sheets in a workbook & turning it into one tibble}
+\title{2+ excel sheets -> 1 data frame}
 \usage{
 read_excel_allsheets(filename, tibble = TRUE)
 }
 \arguments{
 \item{filename}{The file path to the .xlsx you want to pull all sheets from}
 
-\item{tibble}{DEFAULT = TRUE; You will likely never change this}
+\item{tibble}{DEFAULT = TRUE}
 }
 \description{
-Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
+Read in multiple excel sheets in a workbook & turn them into one tibble. Each excel sheet should have matching column names and orders to ensure correct row binding occurs
 }
 \examples{
 responses <- read_excel_allsheets('~/filepath.xlsx')

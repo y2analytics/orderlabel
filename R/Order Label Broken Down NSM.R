@@ -1518,12 +1518,12 @@ add_lessthan <- function(dataset) {
 #### whole numbers ####
 whole_numbers <- function(
   dataset,
-  var_list
+  whole_numbers
   ) {
   dataset %>%
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        str_detect(variable, var_list) ~ as.character(result),
+        str_detect(variable, whole_numbers) ~ as.character(result),
         T ~ percent_label
     )
   )
@@ -1534,7 +1534,7 @@ whole_numbers <- function(
 #'
 #' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 #' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
-#' @param var_list If you only have variables that are percentages, you can leave this argument blank. Otherwise, add the names of you variables that are not percentages here separated by a "|". You do not have to type out the whole variable name or each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
+#' @param whole_numbers DEFAULT = If you have only variables that are percentages, and no whole number variables, you can leave this argument blank. Otherwise, add the names of the variables that are not percentages here separated by a "|" (OR sign). You do not have to type out the whole variable name/each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
 #' @keywords topline percent label
 #' @export
 #' @examples
@@ -1547,13 +1547,13 @@ whole_numbers <- function(
 
 topline <- function(
   dataset,
-  var_list = 'place your variable names here with a "|" between them '
+  whole_numbers = 'place your variable names here with a | (OR sign) between them'
   ) {
   dataset %>%
     var_sep() %>%
     add_percent() %>%
     add_lessthan() %>%
-    whole_numbers(var_list)
+    whole_numbers(whole_numbers)
 }
 
 #### ***** OTHER FUNCTIONS ***** ####
@@ -1561,7 +1561,7 @@ topline <- function(
 #' Auto change those pesky "Other please specify"s into "Other"
 #'
 #' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
-#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
+#' @param dataset The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs.
 #' @param var DEFAULT = label; Ideally, you never need any input in this function
 #' @keywords other
 #' @export
@@ -1587,11 +1587,11 @@ other_rm <- function(
 }
 
 #### read_excel_allsheets ####
-#' Reading in lots of excel sheets in a workbook & turning it into one tibble
+#' 2+ excel sheets -> 1 data frame
 #'
-#' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
+#' Read in multiple excel sheets in a workbook & turn them into one tibble. Each excel sheet should have matching column names and orders to ensure correct row binding occurs
 #' @param filename The file path to the .xlsx you want to pull all sheets from
-#' @param tibble DEFAULT = TRUE; You will likely never change this
+#' @param tibble DEFAULT = TRUE
 #' @keywords
 #' @export
 #' @examples

@@ -7,7 +7,7 @@
 other_rm(dataset, var = label)
 }
 \arguments{
-\item{dataset}{The name of the data frame that the mscharts pulls from, usually piped in after running freqs.}
+\item{dataset}{The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs.}
 
 \item{var}{DEFAULT = label; Ideally, you never need any input in this function}
 }
