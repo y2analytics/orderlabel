@@ -1,5 +1,175 @@
-#Reverse groups for specifics
-#reverse labels for non-inherent orders
+#### ***** EXECUTIVE FUNCTIONS ***** ####
+#### Final order_label Function ####
+### Description of order_label
+#' Order your data and add percent labels
+#'
+#' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
+#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
+#' @param label_var DEFAULT = label; name of variable to be ordered
+#' @param inherent_order_label DEFAULT = F; If F, puts labels in descending order. If T, puts labels in the inherent order from survey (Strongly agree to strongly disagree)
+#' @param group_var DEFAULT = F; Add the name of the grouping variable if your data is grouped
+#' @param inherent_order_group DEFAULT = F; If F, puts groups in descending order. If T, puts groups in the order they are factored (District 1, District 2...)
+#' @param label_specific DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels
+#' @param group_specific DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups
+#' @param stacked DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)
+#' @param ms_stacked DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T
+#' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T
+#' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
+#' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
+#' @param none_other DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
+#' @keywords order label arrange
+#' @export
+#' @examples
+#' frequencies %>% order_label(
+#' horizontal = T,
+#' inherent_order_label = T
+#' )
+#' OR
+#' frequencies %>% order_label(
+#' group_var = brand,
+#' stacked = T,
+#' group_specific = 'Y2 Analytics'
+#' )
+
+### Final Function
+order_label <- function(
+  dataset, #will likely be frequencies
+  label_var = label,
+  inherent_order_label = F,
+  group_var = F,
+  inherent_order_group = F,
+  label_specific = NA,
+  group_specific = NA,
+  stacked = F,
+  ms_stacked = F,
+  horizontal = F,
+  rev_label = F,
+  rev_group = F,
+  none_other = T
+) {
+  options(warn = -1)
+
+  ###Flags
+  #Enquo flags
+  label_var_flag <- dplyr::enquo(label_var)
+  group_var_flag <- dplyr::enquo(group_var)
+  #Stacked flags: bars always inherently ordered
+  inherent_order_label = ifelse(
+    stacked == T | ms_stacked == T,
+    T,
+    inherent_order_label
+  )
+  #Grouping flags
+  group_test <- dataset %>%
+    dplyr::mutate(
+      test = ifelse(
+        !!group_var_flag == F,
+        F,
+        T
+      )
+    )
+  grouped = ifelse(
+    group_test$test == T,
+    T,
+    F
+  )
+  #Flags for putting a specific label/group first
+  specifically_ordered = ifelse(
+    is.character(label_specific) == T,
+    T,
+    F
+  )
+  specifically_ordered_group = ifelse(
+    is.character(group_specific) == T,
+    T,
+    F
+  )
+
+  ### Prep work
+  dataset <- reverse_label(dataset, grouped, !!group_var_flag, !!label_var_flag, rev_label)
+
+  ### (1) ungrouped Section
+  if(grouped == F){
+    dataset <- section_ungrouped(dataset, grouped, specifically_ordered, inherent_order_label, stacked, label_specific)
+    ### Arranging WITH grouping variables
+  } else{
+    ### (2) Grouped Section: arranging for specific group and label to be first
+    dataset <- section_grouped_specifics(dataset, specifically_ordered, label_specific,inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group)
+    ### (3) Grouped Section: arranging for specific group to be first
+    dataset <- section_grouped_specifics_nolab(dataset, specifically_ordered, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
+    ### (4) Grouped Section: inherent order of grouping variables
+    dataset <- section_grouped_ordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
+    ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
+    dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
+  }
+  ### Put "None" & "Other" at bottom
+  dataset <- none_other(dataset, none_other, grouped)
+  ### Horizontal
+  dataset <- horizontal_chart(dataset, horizontal, grouped)
+  ### Stacked
+  dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
+  dataset <- stacked_chart_ms(dataset, ms_stacked, grouped, inherent_order_group, specifically_ordered_group)
+}
+
+
+#### Final topline Function ####
+#' Add \%s to a topline report
+#'
+#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
+#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
+#' @param whole_numbers DEFAULT = If you have only variables that are percentages, and no whole number variables, you can leave this argument blank. Otherwise, add the names of the variables that are not percentages here separated by a "|" (OR sign). You do not have to type out the whole variable name/each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
+#' @keywords topline percent label
+#' @export
+#' @examples
+#' frequencies %>% topline()
+#' OR
+#' frequencies %>% topline(
+#' 'DOLLARS_GIVEN|DONATIONS_RECEIVED')
+#'
+
+
+topline <- function(
+  dataset,
+  whole_numbers = 'place your variable names here with a | (OR sign) between them'
+) {
+  dataset %>%
+    var_sep() %>%
+    add_percent() %>%
+    add_lessthan() %>%
+    whole_numbers(whole_numbers)
+}
+
+
+#### other_rm ####
+#' Auto change those pesky "Other please specify"s into "Other"
+#'
+#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
+#' @param dataset The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs.
+#' @param var DEFAULT = label; Ideally, you never need any input in this function
+#' @keywords other
+#' @export
+#' @examples
+#' frequencies %>% other_rm()
+#
+
+other_rm <- function(
+  dataset,
+  var = label
+) {
+  var_flag <- dplyr::enquo(var)
+  dataset %>%
+    mutate(
+      label = as.character(!!var_flag),
+      label = dplyr::case_when(
+        stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
+        stringr::str_detect(label, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+        label == 'None' ~ 'None of the above',
+        T ~ label
+      )
+    )
+}
+
+
 #### ***** ORDER LABEL FUNCTION ***** ####
 #### Blank values ####
 blank_values <- function(
@@ -31,12 +201,12 @@ add_label <- function(
   label_var
 ){
   dataset <- blank_values(dataset)
-  flag2 <- dplyr::enquo(label_var)
+  label_var_flag <- dplyr::enquo(label_var)
   if(dataset$label == 'x'
   ) {
     dataset <- dataset %>%
       dplyr::mutate(
-        label = !!flag2
+        label = !!label_var_flag
       ) } else{
         dataset <- dataset
       }
@@ -52,19 +222,19 @@ add_group <- function(
 ){
   #Frequencies with a grouping variable must be grouped for following section
   if(grouped == T){
-    flag2 <- dplyr::enquo(label_var)
-    dataset <- add_label(dataset, !!flag2)
-    flag3 <- dplyr::enquo(group_var)
+    label_var_flag <- dplyr::enquo(label_var)
+    dataset <- add_label(dataset, !!label_var_flag)
+    group_var_flag <- dplyr::enquo(group_var)
     dataset <- dataset %>%
       dplyr::mutate(
-        group_var = !!flag3
+        group_var = !!group_var_flag
       ) %>%
       group_by(
         group_var
       )
   } else{
-    flag2 <- dplyr::enquo(label_var)
-    dataset <- add_label(dataset, !!flag2)
+    label_var_flag <- dplyr::enquo(label_var)
+    dataset <- add_label(dataset, !!label_var_flag)
   }
 }
 
@@ -77,9 +247,9 @@ factors <- function(
   group_var,
   label_var
 ){
-  flag2 <- dplyr::enquo(label_var)
-  flag3 <- dplyr::enquo(group_var)
-dataset <- add_group(dataset, grouped, !!flag3, !!flag2)
+  label_var_flag <- dplyr::enquo(label_var)
+  group_var_flag <- dplyr::enquo(group_var)
+dataset <- add_group(dataset, grouped, !!group_var_flag, !!label_var_flag)
 #When "value" is factored, value needs to be changed to .number
 #When "value" was completely missing or all the same, values needs to be changed to distinct .number
 if(dataset$value == dataset$label |
@@ -111,9 +281,9 @@ reverse_label <- function(
   label_var,
   rev_label = F
 ) {
-  flag2 <- dplyr::enquo(label_var)
-  flag3 <- dplyr::enquo(group_var)
-  dataset <- factors(dataset, grouped, !!flag3, !!flag2)
+  label_var_flag <- dplyr::enquo(label_var)
+  group_var_flag <- dplyr::enquo(group_var)
+  dataset <- factors(dataset, grouped, !!group_var_flag, !!label_var_flag)
 if(rev_label == T){
   max_val <- max(dataset$value)
   min_val <- min(dataset$value)
@@ -1337,122 +1507,6 @@ none_other <- function(
   }
 }
 
-#### Description of Final Function ####
-#' Order your data and add percent labels
-#'
-#' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
-#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
-#' @param label_var DEFAULT = label; name of variable to be ordered
-#' @param inherent_order_label DEFAULT = F; If F, puts labels in descending order. If T, puts labels in the inherent order from survey (Strongly agree to strongly disagree)
-#' @param group_var DEFAULT = F; Add the name of the grouping variable if your data is grouped
-#' @param inherent_order_group DEFAULT = F; If F, puts groups in descending order. If T, puts groups in the order they are factored (District 1, District 2...)
-#' @param label_specific DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels
-#' @param group_specific DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups
-#' @param stacked DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)
-#' @param ms_stacked DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T
-#' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T
-#' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
-#' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
-#' @param none_other DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
-#' @keywords order label arrange
-#' @export
-#' @examples
-#' frequencies %>% order_label(
-#' horizontal = T,
-#' inherent_order_label = T
-#' )
-#' OR
-#' frequencies %>% order_label(
-#' group_var = brand,
-#' stacked = T,
-#' group_specific = 'Y2 Analytics'
-#' )
-
-
-#### Final order_label Function ####
-order_label <- function(
-  dataset, #will likely be frequencies
-  label_var = label,
-  inherent_order_label = F,
-  group_var = F,
-  inherent_order_group = F,
-  label_specific = NA,
-  group_specific = NA,
-  stacked = F,
-  ms_stacked = F,
-  horizontal = F,
-  rev_label = F,
-  rev_group = F,
-  none_other = T,
-  l1= label[1],
-  g1 = group_var[1]
-) {
-options(warn = -1)
-
-###Flags
-  #Enquo flags
-  flag <- dplyr::enquo(l1)
-  flag2 <- dplyr::enquo(label_var)
-  flag3 <- dplyr::enquo(group_var)
-  flag4 <- dplyr::enquo(g1)
-  #Stacked flags: bars always inherently ordered
-  inherent_order_label = ifelse(
-    stacked == T | ms_stacked == T,
-    T,
-    inherent_order_label
-  )
-  #Grouping flags
-  group_test <- dataset %>%
-    dplyr::mutate(
-      test = ifelse(
-        !!flag3 == F,
-        F,
-        T
-      )
-    )
-  grouped = ifelse(
-    group_test$test == T,
-    T,
-    F
-  )
-  #Flags for putting a specific label/group first
-  specifically_ordered = ifelse(
-    is.character(label_specific) == T,
-    T,
-    F
-  )
-  specifically_ordered_group = ifelse(
-    is.character(group_specific) == T,
-    T,
-    F
-  )
-
-### Prep work
-  dataset <- reverse_label(dataset, grouped, !!flag3, !!flag2, rev_label)
-
-### (1) ungrouped Section
-  if(grouped == F){
-      dataset <- section_ungrouped(dataset, grouped, specifically_ordered, inherent_order_label, stacked, label_specific)
-### Arranging WITH grouping variables
-  } else{
-### (2) Grouped Section: arranging for specific group and label to be first
-    dataset <- section_grouped_specifics(dataset, specifically_ordered, label_specific,inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group)
-### (3) Grouped Section: arranging for specific group to be first
-    dataset <- section_grouped_specifics_nolab(dataset, specifically_ordered, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
-### (4) Grouped Section: inherent order of grouping variables
-    dataset <- section_grouped_ordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
-### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
-    dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
-  }
-### Put "None" & "Other" at bottom
-  dataset <- none_other(dataset, none_other, grouped)
-### Horizontal
-  dataset <- horizontal_chart(dataset, horizontal, grouped)
-### Stacked
-  dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
-  dataset <- stacked_chart_ms(dataset, ms_stacked, grouped, inherent_order_group, specifically_ordered_group)
-}
-
 #### ***** TOPLINE FUNCTION ***** ####
 #### var_sep ####
 var_sep <- function(dataset) {
@@ -1529,63 +1583,7 @@ whole_numbers <- function(
   )
 }
 
-#### Final topline Function ####
-#' Add \%s to a topline report
-#'
-#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
-#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
-#' @param whole_numbers DEFAULT = If you have only variables that are percentages, and no whole number variables, you can leave this argument blank. Otherwise, add the names of the variables that are not percentages here separated by a "|" (OR sign). You do not have to type out the whole variable name/each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
-#' @keywords topline percent label
-#' @export
-#' @examples
-#' frequencies %>% topline()
-#' OR
-#' frequencies %>% topline(
-#' 'DOLLARS_GIVEN|DONATIONS_RECEIVED')
-#'
-
-
-topline <- function(
-  dataset,
-  whole_numbers = 'place your variable names here with a | (OR sign) between them'
-  ) {
-  dataset %>%
-    var_sep() %>%
-    add_percent() %>%
-    add_lessthan() %>%
-    whole_numbers(whole_numbers)
-}
-
 #### ***** OTHER FUNCTIONS ***** ####
-#### other_rm ####
-#' Auto change those pesky "Other please specify"s into "Other"
-#'
-#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
-#' @param dataset The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs.
-#' @param var DEFAULT = label; Ideally, you never need any input in this function
-#' @keywords other
-#' @export
-#' @examples
-#' frequencies %>% other_rm()
-#
-
-other_rm <- function(
-  dataset,
-  var = label
-) {
-  flag <- dplyr::enquo(var)
-  dataset %>%
-    mutate(
-      label = as.character(!!flag),
-      label = dplyr::case_when(
-        stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(label, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
-        label == 'None' ~ 'None of the above',
-        T ~ label
-      )
-    )
-}
-
 #### read_excel_allsheets ####
 #' 2+ excel sheets -> 1 data frame
 #'
