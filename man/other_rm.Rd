@@ -4,17 +4,17 @@
 \alias{other_rm}
 \title{Auto change those pesky "Other please specify"s into "Other"}
 \usage{
-other_rm(dataset, var = label)
+other_rm(dataset)
 }
 \arguments{
-\item{dataset}{The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs.}
-
-\item{var}{DEFAULT = label; Ideally, you never need any input in this function}
+\item{dataset}{The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs. You almost never need any arguments in this function.}
 }
 \description{
-Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also converts all "None of the above" variations into only "None of the above".
+Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
 }
 \examples{
 frequencies \%>\% other_rm()
 }
+\keyword{extra}
+\keyword{none}
 \keyword{other}
