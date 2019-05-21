@@ -1364,34 +1364,34 @@ top2box <- function(
 ### spreading_top2
 spreading_top2 <- function(dataset) {
   test1 <- dataset %>%
-    select(
+    dplyr::select(
       -result
     )
 
   test2 <- dataset %>%
-    mutate(value1 = value) %>%
-    select(
+    dplyr::mutate(value1 = value) %>%
+    dplyr::select(
       group_var,
       value1,
       result
     ) %>%
-    spread(
+    tidyr::spread(
       key = value1,
       value = result
     ) %>%
-    mutate(
+    dplyr::mutate(
       top2box = `1` + `2`
     ) %>%
-    gather(
+    tidyr::gather(
       key = value,
       value = result,
       -group_var,
       -top2box
     ) %>%
-    mutate(
+    dplyr::mutate(
       value = as.numeric(value)
     )
-  dataset <- left_join(
+  dataset <- dplyr::left_join(
     test1,
     test2
   )
@@ -1401,20 +1401,20 @@ spreading_top2 <- function(dataset) {
 ### ordering_top2
 ordering_top2 <- function(dataset) {
   dataset <- dataset %>%
-    arrange(
+    dplyr::arrange(
       top2box %>% desc
     ) %>%
-    mutate(
-      group_var = fct_inorder(group_var)
+    dplyr::mutate(
+      group_var = forcats::fct_inorder(group_var)
     ) %>%
-    mutate(
-      label = fct_inorder(label)
+    dplyr::mutate(
+      label = forcats::fct_inorder(label)
     ) %>%
-    mutate(
+    dplyr::mutate(
       percent_label = ifelse(
         label == label[1] & group_var == group_var[1],
-        str_c(result * 100, '%'),
-        str_c(result * 100)
+        stringr::str_c(result * 100, '%'),
+        stringr::str_c(result * 100)
       )
     )
 }
@@ -1523,4 +1523,5 @@ none_other <- function(
     dataset <- dataset
   }
 }
+
 
