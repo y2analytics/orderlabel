@@ -1,4 +1,3 @@
-#### ***** EXECUTIVE FUNCTIONS ***** ####
 #### Final order_label Function ####
 ### Description of order_label
 #' Order your data and add percent labels
@@ -17,6 +16,7 @@
 #' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
 #' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
 #' @param none_other DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
+#' @param top2box DEFAULT = F; Can be set to T for stacked bars. If T, it will order the stacked bars by top2box instead of topbox
 #' @keywords order label arrange
 #' @export
 #' @examples
@@ -45,7 +45,8 @@ order_label <- function(
   horizontal = F,
   rev_label = F,
   rev_group = F,
-  none_other = T
+  none_other = T,
+  top2box = F
 ) {
   options(warn = -1)
 
@@ -102,6 +103,8 @@ order_label <- function(
     ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
     dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
   }
+  ### top2box
+  dataset <- top2box(dataset, top2box)
   ### Put "None" & "Other" at bottom
   dataset <- none_other(dataset, none_other, grouped)
   ### Horizontal
@@ -112,76 +115,7 @@ order_label <- function(
 }
 
 
-#### Final topline Function ####
-#' Add \%s to a topline report
-#'
-#' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
-#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"
-#' @param whole_numbers DEFAULT = If you have only variables that are percentages, and no whole number variables, you can leave this argument blank. Otherwise, add the names of the variables that are not percentages here separated by a "|" (OR sign). You do not have to type out the whole variable name/each option of a multiple select. A unique portion of the var name will work as well because this argument uses str_detect().
-#' @keywords topline percent label
-#' @export
-#' @examples
-#' frequencies %>% topline()
-#' OR
-#' frequencies %>% topline(
-#' 'DOLLARS_GIVEN|DONATIONS_RECEIVED')
-#'
-
-
-topline <- function(
-  dataset,
-  whole_numbers = 'place your variable names here with a | (OR sign) between them'
-) {
-  dataset %>%
-    var_sep() %>%
-    add_percent() %>%
-    add_lessthan() %>%
-    whole_numbers(whole_numbers)
-}
-
-
-#### other_rm ####
-#' Auto change those pesky "Other please specify"s into "Other"
-#'
-#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
-#' @param dataset The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs. You almost never need any arguments in this function.
-#' @keywords other none extra
-#' @export
-#' @examples
-#' frequencies %>% other_rm()
-#
-
-other_rm <- function(
-  dataset
-) {
-  #Remove for 'label' var
-  dataset <- dataset %>%
-    mutate(
-      label = as.character(label),
-      label = dplyr::case_when(
-        stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(label, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
-        label == 'None' ~ 'None of the above',
-        T ~ label
-      ),
-      label = str_remove_all(label, ' \\(.*')
-    )
-  #Remove for 'variable' var
-  dataset <- dataset %>%
-    mutate(
-      variable = as.character(variable),
-      variable = dplyr::case_when(
-        stringr::str_detect(variable, regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(variable, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
-        variable == 'None' ~ 'None of the above',
-        T ~ variable
-      ),
-      variable = str_remove_all(variable, ' \\(.*')
-    )
-}
-
-
-#### ***** ORDER LABEL FUNCTION ***** ####
+#### ***** Hidden order_label Functions ***** ####
 #### Blank values ####
 blank_values <- function(
   dataset
@@ -260,28 +194,28 @@ factors <- function(
 ){
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
-dataset <- add_group(dataset, grouped, !!group_var_flag, !!label_var_flag)
-#When "value" is factored, value needs to be changed to .number
-#When "value" was completely missing or all the same, values needs to be changed to distinct .number
-if(dataset$value == dataset$label |
-   length(unique(dataset$value)) == 1
-){
-  max_lab <- length(unique(dataset$label))
+  dataset <- add_group(dataset, grouped, !!group_var_flag, !!label_var_flag)
+  #When "value" is factored, value needs to be changed to .number
+  #When "value" was completely missing or all the same, values needs to be changed to distinct .number
+  if(dataset$value == dataset$label |
+     length(unique(dataset$value)) == 1
+  ){
+    max_lab <- length(unique(dataset$label))
+    dataset <- dataset %>%
+      dplyr::mutate(
+        value = 1:max_lab
+      ) %>%
+      dplyr::ungroup()
+  } else {
+    dataset <- dataset %>% dplyr::ungroup()
+  }
+
+  #Now convert value to numeric for inherent_orders
   dataset <- dataset %>%
     dplyr::mutate(
-      value = 1:max_lab
-    ) %>%
-    dplyr::ungroup()
-} else {
-      dataset <- dataset %>% dplyr::ungroup()
-    }
-
-#Now convert value to numeric for inherent_orders
-dataset <- dataset %>%
-  dplyr::mutate(
-    value = gsub("[^0-9.]", "", value) %>% as.character() %>% as.numeric()
-  )
-return(dataset)
+      value = gsub("[^0-9.]", "", value) %>% as.character() %>% as.numeric()
+    )
+  return(dataset)
 }
 
 #### Reverse label inherent order ####
@@ -295,20 +229,20 @@ reverse_label <- function(
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
   dataset <- factors(dataset, grouped, !!group_var_flag, !!label_var_flag)
-if(rev_label == T){
-  max_val <- max(dataset$value)
-  min_val <- min(dataset$value)
-  dataset <- dataset %>%
-    dplyr::mutate(
-      value = mapvalues(
-        value,
-        from = c(min_val:max_val),
-        to = c(max_val:min_val)
+  if(rev_label == T){
+    max_val <- max(dataset$value)
+    min_val <- min(dataset$value)
+    dataset <- dataset %>%
+      dplyr::mutate(
+        value = mapvalues(
+          value,
+          from = c(min_val:max_val),
+          to = c(max_val:min_val)
+        )
       )
-    )
-} else {
-  dataset <- dataset
-}
+  } else {
+    dataset <- dataset
+  }
 }
 
 #### Reverse label unordered ####
@@ -564,7 +498,7 @@ section_grouped_specifics <- function(
 ) {
   if(specifically_ordered_group == T &
      specifically_ordered == T
-     ) {
+  ) {
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
@@ -572,10 +506,10 @@ section_grouped_specifics <- function(
         group_var = as.character.factor(group_var)
       )
 
-      dataset <- grouped_specific1(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
-      dataset <- grouped_specific2(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
-      dataset <- grouped_specific3(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
-      dataset <- grouped_specific4(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
+    dataset <- grouped_specific1(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
+    dataset <- grouped_specific2(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
+    dataset <- grouped_specific3(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
+    dataset <- grouped_specific4(dataset, inherent_order_label, inherent_order_group, label_specific, group_specific)
   } else {
     dataset <- dataset
   }
@@ -809,7 +743,7 @@ section_grouped_specifics_nolab <- function(
 ) {
   if(specifically_ordered_group == T &
      specifically_ordered == F
-     ) {
+  ) {
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
@@ -817,10 +751,10 @@ section_grouped_specifics_nolab <- function(
         group_var = as.character.factor(group_var)
       )
 
-      dataset <- grouped_specific5(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
-      dataset <- grouped_specific6(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
-      dataset <- grouped_specific7(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
-      dataset <- grouped_specific8(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+    dataset <- grouped_specific5(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+    dataset <- grouped_specific6(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+    dataset <- grouped_specific7(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
+    dataset <- grouped_specific8(dataset, inherent_order_label, inherent_order_group, group_specific, rev_label, rev_group)
   } else {
     dataset <- dataset
   }
@@ -1147,7 +1081,7 @@ grouped_ordered3 <- function(
         group_var, desc(result)
       ) %>%
       reverse_label_unordered(rev_label) %>%
-        reverse_group(rev_group) %>%
+      reverse_group(rev_group) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
@@ -1179,7 +1113,7 @@ grouped_ordered4 <- function(
       dplyr::arrange(
         group_var, value, result
       ) %>%
-        reverse_group(rev_group) %>%
+      reverse_group(rev_group) %>%
       dplyr::mutate(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
@@ -1211,8 +1145,8 @@ section_grouped_unordered <- function(
   rev_label
 ) {
   if(specifically_ordered_group == F &
-    inherent_order_group == F
-    ){
+     inherent_order_group == F
+  ){
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
@@ -1414,6 +1348,78 @@ grouped_unordered4 <- function(
   }
 }
 
+#### top2box ####
+top2box <- function(
+  dataset,
+  top2box
+) {
+  if(top2box == T){
+    dataset <- spreading_top2(dataset)
+    dataset <- ordering_top2(dataset)
+  } else{ #top2box == F
+    dataset <- dataset
+  }
+}
+
+### spreading_top2
+spreading_top2 <- function(dataset) {
+  test1 <- dataset %>%
+    select(
+      -result
+    )
+
+  test2 <- dataset %>%
+    mutate(value1 = value) %>%
+    select(
+      group_var,
+      value1,
+      result
+    ) %>%
+    spread(
+      key = value1,
+      value = result
+    ) %>%
+    mutate(
+      top2box = `1` + `2`
+    ) %>%
+    gather(
+      key = value,
+      value = result,
+      -group_var,
+      -top2box
+    ) %>%
+    mutate(
+      value = as.numeric(value)
+    )
+  dataset <- left_join(
+    test1,
+    test2
+  )
+}
+
+
+### ordering_top2
+ordering_top2 <- function(dataset) {
+  dataset <- dataset %>%
+    arrange(
+      top2box %>% desc
+    ) %>%
+    mutate(
+      group_var = fct_inorder(group_var)
+    ) %>%
+    mutate(
+      label = fct_inorder(label)
+    ) %>%
+    mutate(
+      percent_label = ifelse(
+        label == label[1] & group_var == group_var[1],
+        str_c(result * 100, '%'),
+        str_c(result * 100)
+      )
+    )
+}
+
+
 #### Horizontal ####
 horizontal_chart <- function(
   dataset,
@@ -1455,13 +1461,13 @@ stacked_chart <- function(
       )
   } else if(stacked == T &
             grouped == T){
-      dataset <- dataset %>%
-        dplyr::mutate(
-          label = forcats::fct_rev(label)
-        ) %>%
-        dplyr::mutate(
-          group_var = forcats::fct_rev(group_var)
-        )
+    dataset <- dataset %>%
+      dplyr::mutate(
+        label = forcats::fct_rev(label)
+      ) %>%
+      dplyr::mutate(
+        group_var = forcats::fct_rev(group_var)
+      )
   } else{
     dataset <- dataset
   }
@@ -1494,18 +1500,18 @@ none_other <- function(
   grouped
 ){
   if(none_other == T){
-      dataset <- dataset %>%
-        dplyr::arrange(
-          label = forcats::fct_relevel(
-            label,
-            "Other",
-            'None of the above',
-            after = Inf
-          )
-        ) %>%
-        dplyr::mutate(
-          label = forcats::fct_inorder(label)
+    dataset <- dataset %>%
+      dplyr::arrange(
+        label = forcats::fct_relevel(
+          label,
+          "Other",
+          'None of the above',
+          after = Inf
         )
+      ) %>%
+      dplyr::mutate(
+        label = forcats::fct_inorder(label)
+      )
   } else{
     dataset <- dataset
   }
@@ -1516,102 +1522,5 @@ none_other <- function(
   } else{
     dataset <- dataset
   }
-}
-
-#### ***** TOPLINE FUNCTION ***** ####
-#### var_sep ####
-var_sep <- function(dataset) {
-  dataset %>%
-    dplyr::mutate(
-      var = variable
-    ) %>%
-    tidyr::separate(
-      var,
-      into = str_c('variable', 1:4),
-      sep = "_"
-    ) %>%
-    dplyr::mutate(
-      variable3 = dplyr::case_when(
-        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == F ~ NA_character_,
-        T ~ variable3
-      ),
-      variable2 = dplyr::case_when(
-        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == F ~ NA_character_,
-        T ~ variable2
-      ),
-      sort_var = dplyr::case_when(
-        is.na(variable2) ~ variable1,
-        is.na(variable3) ~ stringr::str_c(variable1, "_", variable2),
-        is.na(variable4) ~ stringr::str_c(variable1, "_", variable2, '_', variable3),
-        T ~ stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
-      )
-    )
-}
-
-#### add_percent ####
-add_percent <- function(dataset) {
-  dataset %>%
-    dplyr::group_by(sort_var) %>%
-    dplyr::mutate(
-    percent_label = dplyr::case_when(
-      label == label[1] & variable == variable[1] ~ stringr::str_c(result * 100, '%'),
-      T ~ stringr::str_c(result * 100)
-    )
-  )
-}
-
-#### add_lessthan ####
-add_lessthan <- function(dataset) {
-  dataset %>%
-    dplyr::mutate(
-    percent_label = dplyr::case_when(
-      percent_label =='0%' & n >= 1 ~ '<1%',
-      percent_label == '0' & n >= 1 ~ '<1',
-      T ~ percent_label
-    )
-  ) %>%
-    dplyr::ungroup() %>%
-    dplyr::select(
-      -variable1,
-      -variable2,
-      -variable3,
-      -variable4,
-      -sort_var
-    )
-}
-
-#### whole numbers ####
-whole_numbers <- function(
-  dataset,
-  whole_numbers
-  ) {
-  dataset %>%
-    dplyr::mutate(
-      percent_label = dplyr::case_when(
-        str_detect(variable, whole_numbers) ~ as.character(result),
-        T ~ percent_label
-    )
-  )
-}
-
-#### ***** OTHER FUNCTIONS ***** ####
-#### read_excel_allsheets ####
-#' 2+ excel sheets -> 1 data frame
-#'
-#' Read in multiple excel sheets in a workbook & turn them into one tibble. Each excel sheet should have matching column names and orders to ensure correct row binding occurs
-#' @param filename The file path to the .xlsx you want to pull all sheets from
-#' @param tibble DEFAULT = TRUE
-#' @keywords
-#' @export
-#' @examples
-#' responses <- read_excel_allsheets('~/filepath.xlsx')
-#
-
-read_excel_allsheets <- function(filename, tibble = TRUE) {
-  sheets <- readxl::excel_sheets(filename)
-  x <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
-  if(!tibble) x <- lapply(x, as.data.frame)
-  names(x) <- sheets
-  x %>% dplyr::bind_rows()
 }
 
