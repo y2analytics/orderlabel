@@ -17,6 +17,7 @@ Takes a dataframe (frequencies) and replaces the usual variations of "Other plea
 \examples{
 frequencies \%>\% order_same()
 }
-\keyword{extra}
-\keyword{none}
-\keyword{other}
+\keyword{equal}
+\keyword{label}
+\keyword{order}
+\keyword{same}
