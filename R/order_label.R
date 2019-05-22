@@ -198,7 +198,8 @@ factors <- function(
   #When "value" is factored, value needs to be changed to .number
   #When "value" was completely missing or all the same, values needs to be changed to distinct .number
   if(dataset$value == dataset$label |
-     length(unique(dataset$value)) == 1
+     length(unique(dataset$value)) == 1 |
+     dataset$value[1] != '1'
   ){
     max_lab <- length(unique(dataset$label))
     dataset <- dataset %>%
