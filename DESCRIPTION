@@ -13,5 +13,5 @@ Imports:
 	tidyr,
 	readxl,
 	stringr,
-        purr
+        purrr
 RoxygenNote: 6.1.1
