@@ -14,12 +14,12 @@ order_same <- function(
   dataset,
   orders = ordered_df
   ) {
-  label_flag <- purr::as_vector(orders$label) %>% levels()
+  label_flag <- purrr::as_vector(orders$label) %>% levels()
 
   #run ordering functions
  if(any(names(orders) == 'group_var') == T) {
    dataset <- group_names(dataset)
-   group_flag <- purr::as_vector(orders$group_var) %>% levels()
+   group_flag <- purrr::as_vector(orders$group_var) %>% levels()
    dataset <- grouped_vector(dataset, label_flag1 = label_flag, group_flag1 = group_flag)
  } else{ #NOT grouped
    dataset <- ungrouped_vector(dataset, label_flag1 = label_flag)

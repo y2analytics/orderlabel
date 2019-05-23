@@ -25,7 +25,7 @@ other_rm <- function(
       label = str_remove_all(label, ' \\(.*')
     )
   #Remove for 'variable' var
-  if(any(names(dataset) == 'variable') == F){
+  if(any(names(dataset) == 'variable') == T){
   dataset <- dataset %>%
     mutate(
       variable = as.character(variable),
