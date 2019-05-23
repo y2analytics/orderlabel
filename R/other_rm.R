@@ -1,7 +1,7 @@
 #### other_rm Function ####
 #' Auto change those pesky "Other please specify"s into "Other"
 #'
-#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
+#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text after parantheses opening. Does this for both the 'label' and 'variable' vars.
 #' @param dataset The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs. You almost never need any arguments in this function.
 #' @keywords other none extra
 #' @export
