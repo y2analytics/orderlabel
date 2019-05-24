@@ -7,7 +7,7 @@
 order_same(dataset, orders = ordered_df)
 }
 \arguments{
-\item{dataset}{The name of the data frame that the mscharts pulls from, automatically included if function is piped in after running freqs. You almost never need any arguments in this function.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs.}
 
 \item{orders}{DEFAULT = ordered_df; First create an ordered dataframe called ordered_df using order_label. Your new dataframe crated by using order_same will have variables and groups in the same order as ordered_df}
 }

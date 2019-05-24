@@ -6,11 +6,11 @@
 \usage{
 order_label(dataset, label_var = label, inherent_order_label = F,
   group_var = F, inherent_order_group = F, label_specific = NA,
-  group_specific = NA, stacked = F, ms_stacked = F, horizontal = F,
-  rev_label = F, rev_group = F, none_other = T, top2box = F)
+  group_specific = NA, stacked = "NULL", horizontal = F,
+  rev_label = F, rev_group = F, none_other = T, topbox = NULL)
 }
 \arguments{
-\item{dataset}{The name of the data frame that the mscharts pulls from, usually piped in after running freqs.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs.}
 
 \item{label_var}{DEFAULT = label; name of variable to be ordered}
 
@@ -24,11 +24,9 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 
 \item{group_specific}{DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 
-\item{stacked}{DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)}
+\item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
 
-\item{ms_stacked}{DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T}
-
-\item{horizontal}{DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T}
+\item{horizontal}{DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = T}
 
 \item{rev_label}{DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T}
 
@@ -36,7 +34,7 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 
 \item{none_other}{DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
 
-\item{top2box}{DEFAULT = F; Can be set to T for stacked bars. If T, it will order the stacked bars by top2box instead of topbox}
+\item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 }
 \description{
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
@@ -49,7 +47,7 @@ inherent_order_label = T
 OR
 frequencies \%>\% order_label(
 group_var = brand,
-stacked = T,
+stacked = 'gg',
 group_specific = 'Y2 Analytics'
 )
 }

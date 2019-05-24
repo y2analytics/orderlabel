@@ -3,20 +3,19 @@
 #' Order your data and add percent labels
 #'
 #' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
-#' @param dataset The name of the data frame that the mscharts pulls from, usually piped in after running freqs.
+#' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs.
 #' @param label_var DEFAULT = label; name of variable to be ordered
 #' @param inherent_order_label DEFAULT = F; If F, puts labels in descending order. If T, puts labels in the inherent order from survey (Strongly agree to strongly disagree)
 #' @param group_var DEFAULT = F; Add the name of the grouping variable if your data is grouped
 #' @param inherent_order_group DEFAULT = F; If F, puts groups in descending order. If T, puts groups in the order they are factored (District 1, District 2...)
 #' @param label_specific DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels
 #' @param group_specific DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups
-#' @param stacked DEFAULT = F; For stacked barcharts, use stacked = T (use ms_stacked for stacked mscharts)
-#' @param ms_stacked DEFAULT = F; For stacked barcharts using mscharts, use ms_stacked = T. Specifying stacked = T automatically makes inherent_order_label = T
-#' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying ms_stacked = T automatically makes inherent_order_label = T
+#' @param stacked DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart
+#' @param horizontal DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = T
 #' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
 #' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
 #' @param none_other DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
-#' @param top2box DEFAULT = F; Can be set to T for stacked bars. If T, it will order the stacked bars by top2box instead of topbox
+#' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @keywords order label arrange
 #' @export
 #' @examples
@@ -27,7 +26,7 @@
 #' OR
 #' frequencies %>% order_label(
 #' group_var = brand,
-#' stacked = T,
+#' stacked = 'gg',
 #' group_specific = 'Y2 Analytics'
 #' )
 
@@ -40,13 +39,12 @@ order_label <- function(
   inherent_order_group = F,
   label_specific = NA,
   group_specific = NA,
-  stacked = F,
-  ms_stacked = F,
+  stacked = 'NULL',
   horizontal = F,
   rev_label = F,
   rev_group = F,
   none_other = T,
-  top2box = F
+  topbox = NULL
 ) {
   options(warn = -1)
 
@@ -56,7 +54,7 @@ order_label <- function(
   group_var_flag <- dplyr::enquo(group_var)
   #Stacked flags: bars always inherently ordered
   inherent_order_label = ifelse(
-    stacked == T | ms_stacked == T,
+    stacked != 'NULL',
     T,
     inherent_order_label
   )
@@ -103,15 +101,15 @@ order_label <- function(
     ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
     dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
   }
-  ### top2box
-  dataset <- top2box(dataset, top2box)
+  ### topbox
+  dataset <- topbox(dataset, topbox)
   ### Put "None" & "Other" at bottom
   dataset <- none_other(dataset, none_other, grouped)
   ### Horizontal
   dataset <- horizontal_chart(dataset, horizontal, grouped)
   ### Stacked
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
-  dataset <- stacked_chart_ms(dataset, ms_stacked, grouped, inherent_order_group, specifically_ordered_group)
+  dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
 }
 
 
@@ -147,15 +145,10 @@ add_label <- function(
 ){
   dataset <- blank_values(dataset)
   label_var_flag <- dplyr::enquo(label_var)
-  if(dataset$label == 'x'
-  ) {
     dataset <- dataset %>%
       dplyr::mutate(
         label = !!label_var_flag
-      ) } else{
-        dataset <- dataset
-      }
-  return(dataset)
+      )
 }
 
 #### Add group ####
@@ -358,7 +351,7 @@ ungrouped3 <- function(
   dataset,
   stacked
 ){
-  if(stacked == T){
+  if(stacked != 'NULL'){
     dataset <- dataset %>%
       dplyr::arrange(
         value, result
@@ -1349,21 +1342,23 @@ grouped_unordered4 <- function(
   }
 }
 
-#### top2box ####
-top2box <- function(
+#### topbox ####
+topbox <- function(
   dataset,
-  top2box
+  topbox = NULL
 ) {
-  if(top2box == T){
-    dataset <- spreading_top2(dataset)
+  if(is.null(topbox) == F){
+    top2box <- topbox + 1
+
+    dataset <- spreading_top2(dataset, top2box)
     dataset <- ordering_top2(dataset)
-  } else{ #top2box == F
+  } else{ #is.null(topbox)
     dataset <- dataset
   }
 }
 
 ### spreading_top2
-spreading_top2 <- function(dataset) {
+spreading_top2 <- function(dataset, top2box) {
   test1 <- dataset %>%
     dplyr::select(
       -result
@@ -1381,13 +1376,14 @@ spreading_top2 <- function(dataset) {
       value = result
     ) %>%
     dplyr::mutate(
-      top2box = `1` + `2`
-    ) %>%
+      topbox = dplyr::select(., 2:top2box) %>%
+        rowSums(na.rm = T)
+      ) %>%
     tidyr::gather(
       key = value,
       value = result,
       -group_var,
-      -top2box
+      -topbox
     ) %>%
     dplyr::mutate(
       value = as.numeric(value)
@@ -1403,7 +1399,7 @@ spreading_top2 <- function(dataset) {
 ordering_top2 <- function(dataset) {
   dataset <- dataset %>%
     dplyr::arrange(
-      top2box %>% desc
+      topbox %>% desc
     ) %>%
     dplyr::mutate(
       group_var = forcats::fct_inorder(group_var)
@@ -1454,13 +1450,13 @@ stacked_chart <- function(
   inherent_order_group,
   specifically_ordered
 ){
-  if(stacked == T &
+  if(stacked == 'gg' &
      grouped == F){
     dataset <- dataset  %>%
       dplyr::mutate(
         label = forcats::fct_rev(label)
       )
-  } else if(stacked == T &
+  } else if(stacked == 'gg' &
             grouped == T){
     dataset <- dataset %>%
       dplyr::mutate(
@@ -1477,12 +1473,12 @@ stacked_chart <- function(
 #### MS Stacked ####
 stacked_chart_ms <- function(
   dataset,
-  ms_stacked,
+  stacked,
   grouped,
   inherent_order_group,
   specifically_ordered_group
 ){
-  if(ms_stacked == T &
+  if(stacked == 'ms' &
      grouped == T){
     dataset <- dataset %>%
       dplyr::mutate(
@@ -1511,7 +1507,12 @@ none_other <- function(
         )
       ) %>%
       dplyr::mutate(
-        label = forcats::fct_inorder(label)
+        label = forcats::fct_inorder(label),
+        percent_label = ifelse(
+          label == label[1],
+          str_c(result * 100, '%'),
+          str_c(result * 100)
+          )
       )
   } else{
     dataset <- dataset
@@ -1519,7 +1520,14 @@ none_other <- function(
   #For grouped
   if(grouped == T & none_other == T){
     dataset <- dataset %>%
-      dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+      dplyr::mutate(
+        group_var = forcats::fct_inorder(group_var),
+        percent_label = ifelse(
+          label == label[1] & group_var == group_var[1],
+          str_c(result * 100, '%'),
+          str_c(result * 100)
+        )
+      )
   } else{
     dataset <- dataset
   }
