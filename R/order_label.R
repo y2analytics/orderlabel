@@ -46,7 +46,7 @@ order_label <- function(
   none_other = T,
   topbox = NULL
 ) {
-  options(warn = -1)
+  options(warn = -1) #check what these warning actually are...
 
   ###Flags
   #Enquo flags
@@ -1501,6 +1501,7 @@ none_other <- function(
       dplyr::arrange(
         label = forcats::fct_relevel(
           label,
+          "Prefer not to say",
           "Other",
           'None of the above',
           after = Inf
