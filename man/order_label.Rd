@@ -32,7 +32,7 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 
 \item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
 
-\item{none_other}{DEFAULT = T; Automatically puts "Other" and "None of the above" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
+\item{none_other}{DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
 
 \item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 }

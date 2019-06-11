@@ -10,7 +10,7 @@ other_rm(dataset)
 \item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.}
 }
 \description{
-Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text after parantheses opening. Does this for both the 'label' and 'variable' vars.
+Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parantheses opening. Does this for both the 'label' and 'variable' vars.
 }
 \examples{
 frequencies \%>\% other_rm()
