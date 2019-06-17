@@ -4,10 +4,10 @@
 \alias{taking_names}
 \title{Create a dataframe of varaible names and labels}
 \usage{
-taking_names(dataset)
+taking_names(dataset = responses)
 }
 \arguments{
-\item{dataset}{The name of the data frame for the function to use, typically responses}
+\item{dataset}{DEFAULT = responses; The name of the data frame for the function to use, typically responses}
 }
 \description{
 Takes a dataset (responses) and creates a new df with two columns: 1) the variable names of your original dataset, 2) the labels of those variables (question wording from a sav/rds file)
