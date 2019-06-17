@@ -14,30 +14,30 @@ other_rm <- function(
 ) {
   #Remove for 'label' var
   dataset <- dataset %>%
-    mutate(
+    dplyr::mutate(
       label = as.character(label),
       label = dplyr::case_when(
-        stringr::str_detect(label, regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
-        stringr::str_detect(label, regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(label, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+        stringr::str_detect(label, stringr::regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
+        stringr::str_detect(label, stringr::regex('please specify', ignore_case = T)) == T ~ 'Other',
+        stringr::str_detect(label, stringr::regex('none of the', ignore_case = T)) == T ~ 'None of the above',
         label == 'None' ~ 'None of the above',
         T ~ label
       ),
-      label = str_remove_all(label, ' \\(.*')
+      label = stringr::str_remove_all(label, ' \\(.*')
     )
   #Remove for 'variable' var
   if(any(names(dataset) == 'variable') == T){
   dataset <- dataset %>%
-    mutate(
+    dplyr::mutate(
       variable = as.character(variable),
       variable = dplyr::case_when(
-        stringr::str_detect(label, regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
-        stringr::str_detect(variable, regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(variable, regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+        stringr::str_detect(variable, stringr::regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
+        stringr::str_detect(variable, stringr::regex('please specify', ignore_case = T)) == T ~ 'Other',
+        stringr::str_detect(variable, stringr::regex('none of the', ignore_case = T)) == T ~ 'None of the above',
         variable == 'None' ~ 'None of the above',
         T ~ variable
       ),
-      variable = str_remove_all(variable, ' \\(.*')
+      variable = stringr::str_remove_all(variable, ' \\(.*')
     )
   } else{
     dataset <- dataset
