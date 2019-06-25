@@ -164,12 +164,13 @@ add_group <- function(
     dataset <- add_label(dataset, !!label_var_flag)
     group_var_flag <- dplyr::enquo(group_var)
     dataset <- dataset %>%
+      dplyr::ungroup() %>%
       dplyr::mutate(
         group_var = !!group_var_flag
       ) %>%
-      group_by(
+      dplyr::group_by(
         group_var
-      )
+        )
   } else{
     label_var_flag <- dplyr::enquo(label_var)
     dataset <- add_label(dataset, !!label_var_flag)
@@ -198,10 +199,9 @@ factors <- function(
     dataset <- dataset %>%
       dplyr::mutate(
         value = 1:max_lab
-      ) %>%
-      dplyr::ungroup()
+      )
   } else {
-    dataset <- dataset %>% dplyr::ungroup()
+    dataset <- dataset
   }
 
   #Now convert value to numeric for inherent_orders
@@ -228,7 +228,7 @@ reverse_label <- function(
     min_val <- min(dataset$value)
     dataset <- dataset %>%
       dplyr::mutate(
-        value = mapvalues(
+        value = plyr::mapvalues(
           value,
           from = c(min_val:max_val),
           to = c(max_val:min_val)
@@ -264,7 +264,7 @@ reverse_label_unordered <- function(
   }
 }
 
-#### ungrouped Section ####
+#### (1) Ungrouped Section ####
 section_ungrouped <- function(
   dataset,
   grouped,
@@ -285,7 +285,7 @@ section_ungrouped <- function(
   return(dataset)
 }
 
-#### (1) ungrouped 1 ####
+#### ungrouped 1 ####
 #Arranging with specific label first
 ungrouped1 <- function(
   dataset,
@@ -307,8 +307,8 @@ ungrouped1 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       )
   } else{
@@ -337,8 +337,8 @@ ungrouped2 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       )
   } else{
@@ -360,8 +360,8 @@ ungrouped3 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -390,8 +390,8 @@ ungrouped4 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       )
   } else{
@@ -416,8 +416,8 @@ ungrouped5 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       )
   } else{
@@ -435,6 +435,7 @@ reverse_group <- function(
 ){
   if(rev_group == T){
     dataset <- dataset %>%
+      dplyr::ungroup() %>%
       dplyr::arrange(
         group_var = forcats::fct_inorder(group_var)
       ) %>%
@@ -447,7 +448,8 @@ reverse_group <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(group_var),
         group_var = as.character.factor(group_var)
-      )
+      ) %>%
+      dplyr::group_by(group_var)
   } else {
     dataset <- dataset
   }
@@ -460,6 +462,7 @@ reverse_label_unordered2 <- function(
 ){
   if(rev_label == T){
     dataset <- dataset %>%
+      dplyr::ungroup() %>%
       dplyr::arrange(
         group_var = forcats::fct_inorder(group_var)
       ) %>%
@@ -472,7 +475,8 @@ reverse_label_unordered2 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(group_var),
         group_var = as.character.factor(group_var)
-      )
+      )  %>%
+      dplyr::group_by(group_var)
   } else {
     dataset <- dataset
   }
@@ -552,8 +556,8 @@ grouped_specific1 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           label == label_specific & group_var == group_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -608,8 +612,8 @@ grouped_specific2 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           group_var == group_specific & label == label_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -655,8 +659,8 @@ grouped_specific3 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label_specific & group_var == group_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -710,8 +714,8 @@ grouped_specific4 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           group_var == group_specific & label == label_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -793,8 +797,8 @@ grouped_specific5 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           label == label[1] & group_var == group_specific,
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -843,8 +847,8 @@ grouped_specific6 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           group_var == group_specific & label == label[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -885,8 +889,8 @@ grouped_specific7 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -924,8 +928,8 @@ grouped_specific8 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -995,8 +999,8 @@ grouped_ordered1 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1047,8 +1051,8 @@ grouped_ordered2 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label_specific & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1080,8 +1084,8 @@ grouped_ordered3 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1112,8 +1116,8 @@ grouped_ordered4 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1197,8 +1201,8 @@ grouped_unordered1 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           label == label_specific & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -1246,8 +1250,8 @@ grouped_unordered2 <- function(
       dplyr::mutate(
         percent_label = ifelse(
           label == label_specific & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         ),
         label = forcats::fct_inorder(label)
       ) %>%
@@ -1298,8 +1302,8 @@ grouped_unordered3 <- function(
         group_var = forcats::fct_inorder(group_var),
         percent_label = ifelse(
           label == group1 & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1330,8 +1334,8 @@ grouped_unordered4 <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       ) %>%
       dplyr::mutate(
@@ -1511,8 +1515,8 @@ none_other <- function(
         label = forcats::fct_inorder(label),
         percent_label = ifelse(
           label == label[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
           )
       )
   } else{
@@ -1525,8 +1529,8 @@ none_other <- function(
         group_var = forcats::fct_inorder(group_var),
         percent_label = ifelse(
           label == label[1] & group_var == group_var[1],
-          str_c(result * 100, '%'),
-          str_c(result * 100)
+          stringr::str_c(result * 100, '%'),
+          stringr::str_c(result * 100)
         )
       )
   } else{
