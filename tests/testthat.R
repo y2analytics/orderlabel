@@ -1,4 +1,4 @@
 library(testthat)
-library(y2clerk)
+library(orderlabel)
 
-test_check("y2clerk")
+test_check("orderlabel")
