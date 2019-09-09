@@ -47,6 +47,7 @@ other_rm <- function(
   #Remove for 'group_var'
   if(any(names(dataset) == 'group_var') == T){
     dataset <- dataset %>%
+      dplyr::ungroup() %>%
       dplyr::mutate(
         group_var = as.character(group_var),
         group_var = dplyr::case_when(
