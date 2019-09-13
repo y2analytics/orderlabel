@@ -2,18 +2,24 @@
 % Please edit documentation in R/read_excel_allsheets.R
 \name{read_excel_allsheets}
 \alias{read_excel_allsheets}
-\title{2+ excel sheets -> 1 data frame}
+\title{Read multiple excel sheets at once}
 \usage{
-read_excel_allsheets(filename, tibble = TRUE)
+read_excel_allsheets(filename, single_frame = TRUE)
 }
 \arguments{
-\item{filename}{The file path to the .xlsx you want to pull all sheets from}
+\item{filename}{The file path to the .xlsx from which you want to pull all sheets}
 
-\item{tibble}{DEFAULT = TRUE}
+\item{single_frame}{DEFAULT = TRUE; If T, will combine all sheets from an excel workbook into a single data frame with a variable called "sheet_name" having the values of the different sheet names. If F, will read in all sheets from an excel workbook but will create a separate data frame for each sheet (each data frame will be named after what the sheet was called)}
 }
 \description{
-Read in multiple excel sheets in a workbook & turn them into one tibble. Each excel sheet should have matching column names and orders to ensure correct row binding occurs
+Read in multiple excel sheets from a workbook & turn them into one tibble or a series of data frames each named after the sheet name. Each excel sheet should have matching column names to ensure correct row binding occurs.
 }
 \examples{
 responses <- read_excel_allsheets('~/filepath.xlsx')
+OR
+read_excel_allsheets('~/filepath.xlsx', F)
 }
+\keyword{excel}
+\keyword{sheet}
+\keyword{workbook}
+\keyword{xlsx}
