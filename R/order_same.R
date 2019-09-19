@@ -20,7 +20,6 @@ order_same <- function(
  if(any(names(orders) == 'group_var') == T |
     names(dataset)[1] != 'variable'
    ) {
-   dataset <- group_names(dataset)
    group_flag <- purrr::as_vector(orders$group_var) %>% levels()
    dataset <- grouped_vector(dataset, label_flag1 = label_flag, group_flag1 = group_flag)
  } else{ #NOT grouped
@@ -30,23 +29,11 @@ order_same <- function(
 
 
 #### ***** Hidden Functions ***** ####
-#### group_names ####
-group_names <- function(dataset){
-  grouping_vars <- names(dataset)[1]
-  grouping_vars_flag <- dplyr::enquo(grouping_vars)
-
-  dataset <- dataset %>%
-    dplyr::mutate(
-      group_var = !!grouping_vars_flag
-    )
-}
-
 #### Grouped ####
 grouped_vector <- function(
   dataset,
   label_flag1 = label_flag,
   group_flag1 = group_flag
-
 ){
   dataset %>%
     dplyr::ungroup() %>%
@@ -72,6 +59,7 @@ grouped_vector <- function(
       percent_label =  stringr::str_c(result * 100)
     )
 }
+
 
 #### ungrouped ####
 ungrouped_vector <- function(
