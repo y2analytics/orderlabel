@@ -2,8 +2,9 @@
 #' Auto change those pesky "Other please specify"s into "Other"
 #'
 #' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
-#' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs.
+#' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs
 #' @param orders DEFAULT = ordered_df; First create an ordered dataframe called ordered_df using order_label. Your new dataframe crated by using order_same will have variables and groups in the same order as ordered_df
+#' @param group_var DEFAULT = 'NULL'. Leave as default if there is no grouping variable or if the grouping variable is valled "group_var". Otherwise, specify the group_var here in quotes
 #' @keywords order label equal same
 #' @export
 #' @examples
@@ -12,14 +13,16 @@
 
 order_same <- function(
   dataset,
-  orders = ordered_df
+  orders = ordered_df,
+  group_var = 'NULL'
   ) {
   label_flag <- purrr::as_vector(orders$label) %>% levels()
 
   #run ordering functions
  if(any(names(orders) == 'group_var') == T |
-    names(dataset)[1] != 'variable'
+    group_var != 'NULL'
    ) {
+   dataset <- create_group_var(dataset, group_var)
    group_flag <- purrr::as_vector(orders$group_var) %>% levels()
    dataset <- grouped_vector(dataset, label_flag1 = label_flag, group_flag1 = group_flag)
  } else{ #NOT grouped
@@ -30,6 +33,20 @@ order_same <- function(
 
 
 #### ***** Hidden Functions ***** ####
+#### Create group_var ####
+create_group_var <- function(dataset, group_var){
+  if(group_var != 'NULL'){
+    group_var_old <- dplyr::enquo(group_var)
+
+  dataset <- dataset %>%
+    dplyr::rename(
+      group_var = !!group_var_old
+    )
+  }
+  dataset <- dataset
+}
+
+
 #### Grouped ####
 grouped_vector <- function(
   dataset,
