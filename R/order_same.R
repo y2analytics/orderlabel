@@ -25,6 +25,7 @@ order_same <- function(
  } else{ #NOT grouped
    dataset <- ungrouped_vector(dataset, label_flag1 = label_flag)
  }
+  return(dataset)
 }
 
 

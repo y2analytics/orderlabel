@@ -18,11 +18,13 @@ topline <- function(
   dataset,
   whole_numbers = 'place your variable names here with a | (OR sign) between them'
 ) {
-  dataset %>%
+  dataset <- dataset %>%
     var_sep() %>%
     add_percent() %>%
     add_lessthan() %>%
     whole_numbers(whole_numbers)
+
+  return(dataset)
 }
 
 

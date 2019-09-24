@@ -110,6 +110,7 @@ order_label <- function(
   ### Stacked
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
+  return(dataset)
 }
 
 
