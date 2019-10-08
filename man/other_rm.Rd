@@ -4,10 +4,12 @@
 \alias{other_rm}
 \title{Auto change those pesky "Other please specify"s into "Other"}
 \usage{
-other_rm(dataset)
+other_rm(dataset, remove = FALSE)
 }
 \arguments{
 \item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.}
+
+\item{remove}{DEFAULT = FALSE; If set to TRUE, will remove categories of "Other" and "None of the above" from the frequencies}
 }
 \description{
 Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parantheses opening. Does this for the 'label', 'variable', and 'group_var' vars.

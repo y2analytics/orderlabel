@@ -4,12 +4,14 @@
 \alias{order_same}
 \title{Auto change those pesky "Other please specify"s into "Other"}
 \usage{
-order_same(dataset, orders = ordered_df)
+order_same(dataset, orders = ordered_df, group_var = "NULL")
 }
 \arguments{
-\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs}
 
 \item{orders}{DEFAULT = ordered_df; First create an ordered dataframe called ordered_df using order_label. Your new dataframe crated by using order_same will have variables and groups in the same order as ordered_df}
+
+\item{group_var}{DEFAULT = 'NULL'. Leave as default if there is no grouping variable or if the grouping variable is valled "group_var". Otherwise, specify the group_var here in quotes}
 }
 \description{
 Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
