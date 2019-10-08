@@ -88,6 +88,9 @@ remove_function <- function(dataset, remove){
       ) %>%
       dplyr::filter_all(
         ~str_detect(., 'None of the above') == F
+      )  %>%
+      dplyr::filter_all(
+        ~str_detect(., 'Prefer not to ') == F
       )
   } else{
     dataset <- dataset
