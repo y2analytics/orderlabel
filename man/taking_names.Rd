@@ -13,7 +13,10 @@ taking_names(dataset = responses)
 Takes a dataset (responses) and creates a new df with two columns: 1) the variable names of your original dataset, 2) the labels of those variables (question wording from a sav/rds file)
 }
 \examples{
-taking_names(responses)
+names <- taking_names(mtcars)
+
+responses <- mtcars
+names <- taking_names()
 }
 \keyword{label}
 \keyword{name}

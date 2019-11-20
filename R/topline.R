@@ -7,11 +7,11 @@
 #' @keywords topline percent label
 #' @export
 #' @examples
-#' frequencies %>% topline()
-#' OR
-#' frequencies %>% topline(
-#' 'DOLLARS_GIVEN|DONATIONS_RECEIVED')
+#' frequencies <- mtcars %>% y2artisan::freqs(vs, am, gear, carb)
+#' topline(frequencies)
 #'
+#' frequencies <- mtcars %>% y2artisan::freqs(mpg, cyl, disp, stat = 'mean')
+#' topline(frequencies, 'mpg|cyl|disp')
 
 
 topline <- function(

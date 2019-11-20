@@ -6,7 +6,10 @@
 #' @keywords name label
 #' @export
 #' @examples
-#' taking_names(responses)
+#' names <- taking_names(mtcars)
+#'
+#' responses <- mtcars
+#' names <- taking_names()
 #
 
 taking_names <- function(dataset = responses) {

@@ -17,7 +17,22 @@ order_same(dataset, orders = ordered_df, group_var = "NULL")
 Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Converts all "None of the above" variations into "None of the above". Also removes all extra text in parantheses. Does this for both the 'label' and 'variable' vars.
 }
 \examples{
-frequencies \%>\% order_same()
+# The original frequencies, put in descending order of the result
+frequencies <- tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.25, .15, .20, .10, .30),
+  value = c(1, 2, 3, 4, 5),
+  group_var = rep('Group A', 5)
+) \%>\% order_label()
+ordered_df <- frequencies
+
+# The second frequencies that you want to be ordered the same as the original
+frequencies <- tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.30, .10, .15, .20, .25),
+  value = c(1, 2, 3, 4, 5),
+  group_var = rep('Group B', 5)
+) \%>\% order_same()
 }
 \keyword{equal}
 \keyword{label}

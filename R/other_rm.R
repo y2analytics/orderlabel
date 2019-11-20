@@ -7,8 +7,14 @@
 #' @keywords other none extra
 #' @export
 #' @examples
+#' frequencies <- tibble(
+#'   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Other (please specify)', 'None of the above brands...'),
+#'   result = c(.25, .15, .20, .10, .30)
+#' )
+#'
+#' frequencies
 #' frequencies %>% other_rm()
-#
+#' frequencies %>% other_rm(T)
 
 other_rm <- function(
   dataset,

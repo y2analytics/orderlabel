@@ -40,15 +40,33 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
 }
 \examples{
-frequencies \%>\% order_label(
-horizontal = T,
-inherent_order_label = T
+# Ungrouped, put in descending order of the result
+frequencies <- tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.25, .15, .20, .10, .30),
+  value = c(1, 2, 3, 4, 5)
+) \%>\% order_label()
+
+# Grouped, with an inherent order for the label, or the brand
+frequencies <- tibble(
+  label = rep(c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'), 2),
+  result = c(.20, .20, .30, .10, .20, .20, .30, .20, .20, .10),
+  value = rep(c(1, 2, 3, 4, 5), 2),
+  group_var = c(rep('Group A', 5), rep('Group B', 5))
+) \%>\% order_label(
+  group_var = group_var,
+  inherent_order_label = T
 )
-OR
-frequencies \%>\% order_label(
-group_var = brand,
-stacked = 'gg',
-group_specific = 'Y2 Analytics'
+
+# Stacked, will be using this frequencies in an mschart later on
+frequencies <- tibble(
+  label = rep(c('Promoter', 'Passive', 'Detractor'), 3),
+  result = c(.33, .33, .34, .20, .30, .50, .25, .50, .25),
+  value = rep(c(1, 2, 3), 3),
+  group_var = c(rep('Group A', 3), rep('Group B', 3), rep('Group C', 3))
+) \%>\% order_label(
+  group_var = group_var,
+  stacked = 'ms'
 )
 }
 \keyword{arrange}

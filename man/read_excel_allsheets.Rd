@@ -15,9 +15,11 @@ read_excel_allsheets(filename, single_frame = TRUE)
 Read in multiple excel sheets from a workbook & turn them into one tibble or a series of data frames each named after the sheet name. Each excel sheet should have matching column names to ensure correct row binding occurs.
 }
 \examples{
-responses <- read_excel_allsheets('~/filepath.xlsx')
-OR
-read_excel_allsheets('~/filepath.xlsx', F)
+# Create a single data frame with all sheets stacked
+responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx')
+
+# Create a list and multiple data frames, one for each sheet in the excel file
+responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx', F)
 }
 \keyword{excel}
 \keyword{sheet}

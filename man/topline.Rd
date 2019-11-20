@@ -16,11 +16,11 @@ topline(dataset,
 Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 }
 \examples{
-frequencies \%>\% topline()
-OR
-frequencies \%>\% topline(
-'DOLLARS_GIVEN|DONATIONS_RECEIVED')
+frequencies <- mtcars \%>\% y2artisan::freqs(vs, am, gear, carb)
+topline(frequencies)
 
+frequencies <- mtcars \%>\% y2artisan::freqs(mpg, cyl, disp, stat = 'mean')
+topline(frequencies, 'mpg|cyl|disp')
 }
 \keyword{label}
 \keyword{percent}

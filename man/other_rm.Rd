@@ -15,7 +15,14 @@ other_rm(dataset, remove = FALSE)
 Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parantheses opening. Does this for the 'label', 'variable', and 'group_var' vars.
 }
 \examples{
+frequencies <- tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Other (please specify)', 'None of the above brands...'),
+  result = c(.25, .15, .20, .10, .30)
+)
+
+frequencies
 frequencies \%>\% other_rm()
+frequencies \%>\% other_rm(T)
 }
 \keyword{extra}
 \keyword{none}
