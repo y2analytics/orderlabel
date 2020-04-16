@@ -4,8 +4,10 @@
 \alias{topline}
 \title{Add \%s to a topline report}
 \usage{
-topline(dataset,
-  whole_numbers = "place your variable names here with a | (OR sign) between them")
+topline(
+  dataset,
+  whole_numbers = "place your variable names here with a | (OR sign) between them"
+)
 }
 \arguments{
 \item{dataset}{The name of the data frame that the mscharts pulls from, usually piped in after running freqs. Please note that the variable column must be "variable" and the percentage column must be "result"}
