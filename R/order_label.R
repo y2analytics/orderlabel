@@ -15,6 +15,7 @@
 #' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
 #' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
 #' @param none_other DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
+#' @param stat DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
 #' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @keywords order label arrange
 #' @export
@@ -62,11 +63,16 @@ order_label <- function(
   rev_label = F,
   rev_group = F,
   none_other = T,
+  stat = c("percent", "general"),
   topbox = NULL
 ) {
-  options(warn = -1) #check what these warning actually are...
+  options(warn = -1) #check what these warnings actually are...
 
-  ###Flags
+### Test matching arguments
+  stat <- rlang::arg_match(stat)
+
+
+### Flags
   #Enquo flags
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
@@ -102,32 +108,42 @@ order_label <- function(
     F
   )
 
-  ### Prep work
+### Stop if group_var not specified but other grouping arguments are
+  if((inherent_order_group == T | !is.na(group_specific) | rev_group == T) & grouped == F){
+    stop("You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.")
+  }
+  if(stacked != 'NULL' & grouped == F){
+    warning('You used a "stacked" ordering system without specifying group_var. Is your data grouped?')
+  }
+
+### Prep work
   dataset <- reverse_label(dataset, grouped, !!group_var_flag, !!label_var_flag, rev_label)
 
-  ### (1) ungrouped Section
+### (1) ungrouped Section
   if(grouped == F){
     dataset <- section_ungrouped(dataset, grouped, specifically_ordered, inherent_order_label, stacked, label_specific)
-    ### Arranging WITH grouping variables
+### Arranging WITH grouping variables
   } else{
-    ### (2) Grouped Section: arranging for specific group and label to be first
+  # (2) Grouped Section: arranging for specific group and label to be first
     dataset <- section_grouped_specifics(dataset, specifically_ordered, label_specific,inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group)
-    ### (3) Grouped Section: arranging for specific group to be first
+  # (3) Grouped Section: arranging for specific group to be first
     dataset <- section_grouped_specifics_nolab(dataset, specifically_ordered, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
-    ### (4) Grouped Section: inherent order of grouping variables
+  # (4) Grouped Section: inherent order of grouping variables
     dataset <- section_grouped_ordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
-    ### (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
+  # (5) Grouped Section: arranging grouping variables if group NOT inherently ordered
     dataset <- section_grouped_unordered(dataset, specifically_ordered, label_specific, inherent_order_label, group_var, inherent_order_group, group_specific, specifically_ordered_group, rev_group, rev_label)
   }
-  ### topbox
+### topbox
   dataset <- topbox(dataset, topbox)
-  ### Put "None" & "Other" at bottom
+### Put "None" & "Other" at bottom
   dataset <- none_other(dataset, none_other, grouped)
-  ### Horizontal
+### Horizontal
   dataset <- horizontal_chart(dataset, horizontal, grouped)
-  ### Stacked
+### Stacked
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
+### Stat
+  dataset <- stat_orderlabel(dataset, stat)
   return(dataset)
 }
 
@@ -1558,3 +1574,16 @@ none_other <- function(
 }
 
 
+
+#### Stat ####
+stat_orderlabel <- function(
+  dataset,
+  stat
+){
+  if(stat == "percent"){
+    dataset <- dataset
+  } else{
+    dataset <- dataset %>%
+      dplyr::mutate(percent_label = as.character(result))
+  }
+}

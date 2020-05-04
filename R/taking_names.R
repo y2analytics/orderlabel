@@ -10,11 +10,13 @@
 #'
 #' responses <- mtcars
 #' names <- taking_names()
-#
+#'
+#' names <- taking_names(mtcars)
 
 taking_names <- function(dataset = responses) {
   labels <- sapply(dataset, function(x) attr(x, "label"))
-  tibble::tibble(name = names(labels),
-         label = labels)
+  tibble::tibble(
+    name = names(labels),
+    label = labels %>% as.character())
 }
 

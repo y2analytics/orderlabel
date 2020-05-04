@@ -8,8 +8,7 @@ test_that("unlabelled vars", {
     Q1 = c(1:5),
     Q2 = rep(.2, 5),
     QTRAILS = rep(100, 5)
-  ) %>% taking_names() %>%
-    dplyr::mutate_all(.funs = ~as.character(.))
+  ) %>% taking_names()
 
   test <- data.frame(
     name = c('Q1', 'Q2', 'QTRAILS'),
@@ -30,7 +29,7 @@ test_that("unlabelled vars", {
   labelled::var_label(df$Q2) <- 'And this is question 2?'
   labelled::var_label(df$QTRAILS) <- 'Are we done?'
   test <- taking_names(df)
-   test2 <- data.frame(
+  test2 <- data.frame(
     name = c('Q1', 'Q2', 'QTRAILS'),
     label = c('This is question 1?', 'And this is question 2?', 'Are we done?')
   ) %>% dplyr::mutate_all(.funs = ~as.character(.))

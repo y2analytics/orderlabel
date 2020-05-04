@@ -4,10 +4,22 @@
 \alias{order_label}
 \title{Order your data and add percent labels}
 \usage{
-order_label(dataset, label_var = label, inherent_order_label = F,
-  group_var = F, inherent_order_group = F, label_specific = NA,
-  group_specific = NA, stacked = "NULL", horizontal = F,
-  rev_label = F, rev_group = F, none_other = T, topbox = NULL)
+order_label(
+  dataset,
+  label_var = label,
+  inherent_order_label = F,
+  group_var = F,
+  inherent_order_group = F,
+  label_specific = NA,
+  group_specific = NA,
+  stacked = "NULL",
+  horizontal = F,
+  rev_label = F,
+  rev_group = F,
+  none_other = T,
+  stat = c("percent", "general"),
+  topbox = NULL
+)
 }
 \arguments{
 \item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs.}
@@ -33,6 +45,8 @@ order_label(dataset, label_var = label, inherent_order_label = F,
 \item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
 
 \item{none_other}{DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
+
+\item{stat}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
 
 \item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 }

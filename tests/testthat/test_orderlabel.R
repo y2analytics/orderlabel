@@ -305,4 +305,37 @@ test_that("reverse_group", {
 
 ### reverse_label_unordered2
 
-#### Other special functions ####
+#### Stat ####
+test_that("Stat - percents", {
+  df_stat <- tibble::tibble(
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  ) %>% order_label()
+
+  expect_equal(
+    df_stat$percent_label,
+    c('50%', '40', '30', '20', '10'))
+})
+
+test_that("Stat - general", {
+  df_stat <- tibble::tibble(
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(1, 2, 3, 4, 5),
+    n = rep(100, 5)
+  ) %>% order_label(stat = "general")
+
+  expect_equal(
+    df_stat$percent_label,
+    c('5', '4', '3', '2', '1'))
+})
+
+test_that("Stat - errors", {
+  df_stat <- tibble::tibble(
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(1, 2, 3, 4, 5),
+    n = rep(100, 5)
+  )
+
+  expect_error(df_stat %>% order_label(stat = "gnral"))
+})
