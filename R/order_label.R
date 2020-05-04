@@ -15,7 +15,7 @@
 #' @param rev_label DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T
 #' @param rev_group DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T
 #' @param none_other DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart
-#' @param stat DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
+#' @param num_fmt DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
 #' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @keywords order label arrange
 #' @export
@@ -63,13 +63,13 @@ order_label <- function(
   rev_label = F,
   rev_group = F,
   none_other = T,
-  stat = c("percent", "general"),
+  num_fmt = c("percent", "general"),
   topbox = NULL
 ) {
   options(warn = -1) #check what these warnings actually are...
 
 ### Test matching arguments
-  stat <- rlang::arg_match(stat)
+  num_fmt <- rlang::arg_match(num_fmt)
 
 
 ### Flags
@@ -142,8 +142,8 @@ order_label <- function(
 ### Stacked
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
-### Stat
-  dataset <- stat_orderlabel(dataset, stat)
+### num_fmt
+  dataset <- num_fmt_orderlabel(dataset, num_fmt)
   return(dataset)
 }
 
@@ -1575,12 +1575,12 @@ none_other <- function(
 
 
 
-#### Stat ####
-stat_orderlabel <- function(
+#### num_fmt ####
+num_fmt_orderlabel <- function(
   dataset,
-  stat
+  num_fmt
 ){
-  if(stat == "percent"){
+  if(num_fmt == "percent"){
     dataset <- dataset
   } else{
     dataset <- dataset %>%

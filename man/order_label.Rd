@@ -17,7 +17,7 @@ order_label(
   rev_label = F,
   rev_group = F,
   none_other = T,
-  stat = c("percent", "general"),
+  num_fmt = c("percent", "general"),
   topbox = NULL
 )
 }
@@ -46,7 +46,7 @@ order_label(
 
 \item{none_other}{DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
 
-\item{stat}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
+\item{num_fmt}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
 
 \item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 }
