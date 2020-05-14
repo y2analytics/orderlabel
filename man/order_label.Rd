@@ -12,10 +12,10 @@ order_label(
   inherent_order_group = F,
   label_specific = NA,
   group_specific = NA,
-  stacked = "NULL",
-  horizontal = F,
   rev_label = F,
   rev_group = F,
+  stacked = c("NULL", "ms", "gg"),
+  horizontal = F,
   none_other = T,
   num_fmt = c("percent", "general"),
   topbox = NULL
@@ -36,13 +36,13 @@ order_label(
 
 \item{group_specific}{DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 
-\item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
-
-\item{horizontal}{DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = T}
-
 \item{rev_label}{DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T}
 
 \item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
+
+\item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
+
+\item{horizontal}{DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = T}
 
 \item{none_other}{DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
 

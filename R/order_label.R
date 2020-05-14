@@ -58,10 +58,10 @@ order_label <- function(
   inherent_order_group = F,
   label_specific = NA,
   group_specific = NA,
-  stacked = 'NULL',
-  horizontal = F,
   rev_label = F,
   rev_group = F,
+  stacked = c('NULL', 'ms', 'gg'),
+  horizontal = F,
   none_other = T,
   num_fmt = c("percent", "general"),
   topbox = NULL
@@ -70,6 +70,7 @@ order_label <- function(
 
 ### Test matching arguments
   num_fmt <- rlang::arg_match(num_fmt)
+  stacked <- rlang::arg_match(stacked)
 
 
 ### Flags
