@@ -1,17 +1,25 @@
+Type: Package
 Package: orderlabel
 Title: Order Your Tables and Add Percent Labels
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: person("Nick", "Moffitt", email = "nicksmoffitt@gmail.com", role = c("aut", "cre"))
-Description: Order Your Tables and Add Percent Labels
-Depends: R (>= 3.5.2)
-License: What license is it under?
+Description: Order your frequency tables and add percent labels for charting. 
+License: GPL-3
+URL: https://github.com/nick-moffitt/orderlabel
+BugReports: https://github.com/nick-moffitt/orderlabel/issues
+Imports:
+  dplyr,
+  forcats,
+  labelled,
+  plyr,
+  purrr,
+  readxl,
+  rlang,
+  stringr,
+  testthat,
+  tibble,
+  tidyr,
+  y2clerk
 Encoding: UTF-8
 LazyData: true
-Imports:
-	dplyr,
-	forcats,
-	tidyr,
-	readxl,
-	stringr,
-        purrr
 RoxygenNote: 7.1.0
