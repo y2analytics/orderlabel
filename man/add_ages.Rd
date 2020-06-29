@@ -7,14 +7,14 @@
 add_ages(dataset, year_born_var, age_var)
 }
 \arguments{
-\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped into your main data frame.}
 
-\item{year_born_var}{DFAULT = NULL; You may either provide a year_born_var or an age_var, not both}
+\item{year_born_var}{NO DFAULT; You may either provide a year_born_var or an age_var, not both}
 
-\item{age_var}{DFAULT = NULL}
+\item{age_var}{NO DFAULT}
 }
 \description{
-Takes a dataframe with a year born variable or age variable and creates three new variables:
+Takes a data frame with a year born variable or age variable and creates three new variables:
 1. year_born_numeric
 2. age_numeric
 3. census_age_groups
