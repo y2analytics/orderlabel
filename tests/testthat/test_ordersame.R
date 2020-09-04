@@ -1,63 +1,10 @@
 #### order_same ####
 context("order_same")
+library(testthat)
+library(dplyr)
+library(orderlabel)
 
-
-### Ungrouped
-test_that("Ungrouped", {
-  df <- data.frame(
-    label = c(
-      'Brand 2',
-      'Brand 1',
-      'Brand 3',
-      'Brand 4',
-      'Brand 6',
-      'Brand 5'
-    ),
-    result = c(1:6)
-  ) %>%
-    dplyr::mutate(
-      label = forcats::fct_inorder(label)
-    )
-  ordered_df <- df
-  ordered_levels <- levels(df$label)
-
-  df_unordered <- data.frame(
-    label = c(
-      'Brand 1',
-      'Brand 2',
-      'Brand 3',
-      'Brand 4',
-      'Brand 5',
-      'Brand 6'
-    ),
-    result = c(1:6)
-  ) %>% order_same(orders = ordered_df)
-  unordered_levels <- levels(df_unordered$label)
-
-  expect_equal(ordered_levels, unordered_levels)
-})
-
-### Create group var
-test_that("Create group var", {
-  df <- data.frame(
-    test = c(
-      rep('One', 4),
-      rep('Two', 4),
-      rep('Three', 4)
-    ),
-    label = c(
-      'Brand 1',
-      'Brand 2',
-      'Brand 3',
-      'Brand 4'
-    ),
-    result = rep(c(1:4),3)
-  ) %>%
-    create_group_var(group_var = 'test')
-
-  expect_equal(names(df)[1], 'group_var')
-})
-
+#### Private functions ####
 ### grouped_vector
 test_that("grouped_vector", {
   df <- data.frame(
@@ -111,7 +58,66 @@ test_that("grouped_vector", {
   expect_equal(group_lev1, group_lev2)
 })
 
-### Grouped - full function
+### Create group var
+test_that("Create group var", {
+  df <- data.frame(
+    test = c(
+      rep('One', 4),
+      rep('Two', 4),
+      rep('Three', 4)
+    ),
+    label = c(
+      'Brand 1',
+      'Brand 2',
+      'Brand 3',
+      'Brand 4'
+    ),
+    result = rep(c(1:4),3)
+  ) %>%
+    create_group_var(group_var = 'test')
+
+  expect_equal(names(df)[1], 'group_var')
+})
+
+
+#### Ungrouped ####
+test_that("Ungrouped", {
+  df <- data.frame(
+    label = c(
+      'Brand 2',
+      'Brand 1',
+      'Brand 3',
+      'Brand 4',
+      'Brand 6',
+      'Brand 5'
+    ),
+    result = c(1:6)
+  ) %>%
+    dplyr::mutate(
+      label = forcats::fct_inorder(label)
+    )
+  ordered_df <- df
+  ordered_levels <- levels(df$label)
+
+  df_unordered <- data.frame(
+    label = c(
+      'Brand 1',
+      'Brand 2',
+      'Brand 3',
+      'Brand 4',
+      'Brand 5',
+      'Brand 6'
+    ),
+    result = c(1:6)
+  ) %>% order_same(orders = ordered_df)
+  unordered_levels <- levels(df_unordered$label)
+
+  expect_equal(ordered_levels, unordered_levels)
+})
+
+
+
+#### Grouped - full function ####
 test_that("Grouped", {
   df <- data.frame(
     group_var = c(

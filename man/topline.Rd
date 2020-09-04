@@ -18,10 +18,10 @@ topline(
 Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 }
 \examples{
-frequencies <- mtcars \%>\% y2artisan::freqs(vs, am, gear, carb)
+frequencies <- y2clerk::freqs(mtcars, vs, am, gear, carb)
 topline(frequencies)
 
-frequencies <- mtcars \%>\% y2artisan::freqs(mpg, cyl, disp, stat = 'mean')
+frequencies <- y2clerk::freqs(mtcars, mpg, cyl, disp, stat = 'mean')
 topline(frequencies, 'mpg|cyl|disp')
 }
 \keyword{label}

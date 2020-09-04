@@ -16,10 +16,14 @@ Read in multiple excel sheets from a workbook & turn them into one tibble or a s
 }
 \examples{
 # Create a single data frame with all sheets stacked
-responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx')
+\dontrun{
+responses <- read_excel_allsheets(
+~/Desktop/Example Excel File.xlsx')
 
 # Create a list and multiple data frames, one for each sheet in the excel file
-responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx', F)
+responses <- read_excel_allsheets(
+~/Desktop/Example Excel File.xlsx', FALSE)
+}
 }
 \keyword{excel}
 \keyword{sheet}

@@ -1,7 +1,12 @@
-#### order_label ####
+# prep work ------------------------------------------------------
+library(testthat)
+library(orderlabel)
+library(dplyr)
+
+# taking_names tests ------------------------------------------------------
+
+
 context("taking_names")
-
-
 ### unlabelled vars
 test_that("unlabelled vars", {
   df <- data.frame(
@@ -10,7 +15,7 @@ test_that("unlabelled vars", {
     QTRAILS = rep(100, 5)
   ) %>% taking_names()
 
-  test <- data.frame(
+  test <- tibble::tibble(
     name = c('Q1', 'Q2', 'QTRAILS'),
     label = c('NULL', 'NULL', 'NULL')
   ) %>% dplyr::mutate_all(.funs = ~as.character(.))
@@ -29,7 +34,7 @@ test_that("unlabelled vars", {
   labelled::var_label(df$Q2) <- 'And this is question 2?'
   labelled::var_label(df$QTRAILS) <- 'Are we done?'
   test <- taking_names(df)
-  test2 <- data.frame(
+  test2 <- tibble::tibble(
     name = c('Q1', 'Q2', 'QTRAILS'),
     label = c('This is question 1?', 'And this is question 2?', 'Are we done?')
   ) %>% dplyr::mutate_all(.funs = ~as.character(.))

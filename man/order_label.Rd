@@ -7,18 +7,18 @@
 order_label(
   dataset,
   label_var = label,
-  inherent_order_label = F,
-  group_var = F,
-  inherent_order_group = F,
+  group_var = FALSE,
+  inherent_order_label = FALSE,
+  inherent_order_group = FALSE,
   label_specific = NA,
   group_specific = NA,
-  rev_label = F,
-  rev_group = F,
+  rev_label = FALSE,
+  rev_group = FALSE,
+  horizontal = FALSE,
   stacked = c("NULL", "ms", "gg"),
-  horizontal = F,
-  none_other = T,
-  num_fmt = c("percent", "general"),
-  topbox = NULL
+  topbox = NULL,
+  none_other = TRUE,
+  num_fmt = c("percent", "general")
 )
 }
 \arguments{
@@ -26,54 +26,55 @@ order_label(
 
 \item{label_var}{DEFAULT = label; name of variable to be ordered}
 
-\item{inherent_order_label}{DEFAULT = F; If F, puts labels in descending order. If T, puts labels in the inherent order from survey (Strongly agree to strongly disagree)}
+\item{group_var}{DEFAULT = FALSE; Add the name of the grouping variable if your data is grouped}
 
-\item{group_var}{DEFAULT = F; Add the name of the grouping variable if your data is grouped}
+\item{inherent_order_label}{DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE, puts labels in the inherent order from survey (Strongly agree to strongly disagree)}
 
-\item{inherent_order_group}{DEFAULT = F; If F, puts groups in descending order. If T, puts groups in the order they are factored (District 1, District 2...)}
+\item{inherent_order_group}{DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (District 1, District 2...)}
 
-\item{label_specific}{DEFAULT = NA; If T, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
+\item{label_specific}{DEFAULT = NA; If TRUE, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
 
-\item{group_specific}{DEFAULT = NA; If T, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
+\item{group_specific}{DEFAULT = NA; If TRUE, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 
-\item{rev_label}{DEFAULT = F; To reverse the order of labels in a chart, use rev_label = T}
+\item{rev_label}{DEFAULT = FALSE; To reverse the order of labels in a chart, use rev_label = TRUE}
 
-\item{rev_group}{DEFAULT = F; To reverse the order of groups in a chart, use rev_group = T}
+\item{rev_group}{DEFAULT = FALSE; To reverse the order of groups in a chart, use rev_group = TRUE}
+
+\item{horizontal}{DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = TRUE}
 
 \item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
 
-\item{horizontal}{DEFAULT = F; For horizontal charts (grouped or ungrouped), use horizontal = T. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = T}
+\item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 
-\item{none_other}{DEFAULT = T; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to F to let them stay ordered elsewhere in the chart}
+\item{none_other}{DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart}
 
 \item{num_fmt}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
-
-\item{topbox}{DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox}
 }
 \description{
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
 }
 \examples{
+\dontrun{
 # Ungrouped, put in descending order of the result
-frequencies <- tibble(
+frequencies <- tibble::tibble(
   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
   result = c(.25, .15, .20, .10, .30),
   value = c(1, 2, 3, 4, 5)
 ) \%>\% order_label()
 
 # Grouped, with an inherent order for the label, or the brand
-frequencies <- tibble(
+frequencies <- tibble::tibble(
   label = rep(c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'), 2),
   result = c(.20, .20, .30, .10, .20, .20, .30, .20, .20, .10),
   value = rep(c(1, 2, 3, 4, 5), 2),
   group_var = c(rep('Group A', 5), rep('Group B', 5))
 ) \%>\% order_label(
   group_var = group_var,
-  inherent_order_label = T
+  inherent_order_label = TRUE
 )
 
 # Stacked, will be using this frequencies in an mschart later on
-frequencies <- tibble(
+frequencies <- tibble::tibble(
   label = rep(c('Promoter', 'Passive', 'Detractor'), 3),
   result = c(.33, .33, .34, .20, .30, .50, .25, .50, .25),
   value = rep(c(1, 2, 3), 3),
@@ -82,6 +83,7 @@ frequencies <- tibble(
   group_var = group_var,
   stacked = 'ms'
 )
+}
 }
 \keyword{arrange}
 \keyword{label}

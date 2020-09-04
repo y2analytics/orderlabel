@@ -7,10 +7,10 @@
 #' @keywords topline percent label
 #' @export
 #' @examples
-#' frequencies <- mtcars %>% y2artisan::freqs(vs, am, gear, carb)
+#' frequencies <- y2clerk::freqs(mtcars, vs, am, gear, carb)
 #' topline(frequencies)
 #'
-#' frequencies <- mtcars %>% y2artisan::freqs(mpg, cyl, disp, stat = 'mean')
+#' frequencies <- y2clerk::freqs(mtcars, mpg, cyl, disp, stat = 'mean')
 #' topline(frequencies, 'mpg|cyl|disp')
 
 
@@ -34,11 +34,11 @@ topline <- function(
 var_sep <- function(dataset) {
   dataset %>%
     dplyr::mutate(
-      var = variable
+      var = .data$variable
     ) %>%
     tidyr::separate(
-      var,
-      into = str_c('variable', 1:4),
+      .data$var,
+      into = stringr::str_c('variable', 1:4),
       sep = "_"
     ) %>%
     dplyr::mutate(
@@ -62,11 +62,11 @@ var_sep <- function(dataset) {
 #### add_percent ####
 add_percent <- function(dataset) {
   dataset %>%
-    dplyr::group_by(sort_var) %>%
+    dplyr::group_by(.data$sort_var) %>%
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        label == label[1] & variable == variable[1] ~ stringr::str_c(result * 100, '%'),
-        T ~ stringr::str_c(result * 100)
+        label == label[1] & variable == variable[1] ~ stringr::str_c(.data$result * 100, '%'),
+        T ~ stringr::str_c(.data$result * 100)
       )
     )
 }
@@ -76,18 +76,18 @@ add_lessthan <- function(dataset) {
   dataset %>%
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        percent_label =='0%' & n >= 1 ~ '<1%',
-        percent_label == '0' & n >= 1 ~ '<1',
-        T ~ percent_label
+        .data$percent_label =='0%' & .data$n >= 1 ~ '<1%',
+        .data$percent_label == '0' & .data$n >= 1 ~ '<1',
+        T ~ .data$percent_label
       )
     ) %>%
     dplyr::ungroup() %>%
     dplyr::select(
-      -variable1,
-      -variable2,
-      -variable3,
-      -variable4,
-      -sort_var
+      -.data$variable1,
+      -.data$variable2,
+      -.data$variable3,
+      -.data$variable4,
+      -.data$sort_var
     )
 }
 
@@ -99,7 +99,7 @@ whole_numbers <- function(
   dataset %>%
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        str_detect(variable, whole_numbers) ~ as.character(result),
+        stringr::str_detect(variable, whole_numbers) ~ as.character(result),
         T ~ percent_label
       )
     )

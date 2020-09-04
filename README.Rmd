@@ -1,0 +1,87 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# y2clerk
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+
+## Overview
+`orderlabel` is the second package in the Y2 Analytics series. Many of its functions rely heavily on the frequencies data frame created by the `freqs()` function from the `y2clerk` package. The premier function in this package is `order_label()`, but we will quickly go over a few of the other major functions as well.
+
+* `order_label()` - takes a frequency table created by `freqs()` and orders it for charting. There are several key arguments within the function that allow to user to easily specify how they envision the ordering or what type of chart the table will be used in. For example, some key ordering arguments are "inherent_order_label", "label_specific", "group_var", "horizontal", and "stacked", among others.
+* `order_same()` - similar to order_label, only this time you give the function another data frame to reference, and your new data frame will be ordered in the same way.
+* `taking_names()` - a short function that should be run at the beginning of every project. It takes one argument, a data frame, and it will create a new data frame of variable names and labels for quick reference and using ctrl + F to search for variables.
+* `other_rm()` - after running freqs, add on `other_rm` to remove all parenthetical additions to a variable label as well as "please specify" parts of "Other, please specify" type answers. Trims down your labels quickly. 
+* `preamble_rm()` - works similar to other_rm. This time it removes question preambles to variable labels such as "What is your favorite color? - Blue", when all you want is "Blue".
+* There are other functions too, so be sure to check those out on your own!
+
+
+## Installation
+You can install the released version of orderlabel from [CRAN](https://CRAN.R-project.org) with:
+
+``` r
+install.packages("orderlabel")
+```
+
+And the development version from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("nick-moffitt/orderlabel")
+```
+
+
+## Examples
+Below you will find a few basic examples which show you how to quickly order your frequencies table with `order_label()`:
+
+```{r example}
+library(orderlabel)
+library(dplyr)
+# Ungrouped, put in descending order of the result
+frequencies <- tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.25, .15, .20, .10, .30),
+  value = c(1, 2, 3, 4, 5)
+) %>% order_label()
+
+# # Grouped, with an inherent order for the label, or the brand
+# frequencies <- tibble(
+#   label = rep(c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'), 2),
+#   result = c(.20, .20, .30, .10, .20, .20, .30, .20, .20, .10),
+#   value = rep(c(1, 2, 3, 4, 5), 2),
+#   group_var = c(rep('Group A', 5), rep('Group B', 5))
+# ) %>% order_label(
+#   group_var = group_var,
+#   inherent_order_label = T
+# )
+# 
+# # Stacked, will be using this frequencies in an mschart later on
+# frequencies <- tibble(
+#   label = rep(c('Promoter', 'Passive', 'Detractor'), 3),
+#   result = c(.33, .33, .34, .20, .30, .50, .25, .50, .25),
+#   value = rep(c(1, 2, 3), 3),
+#   group_var = c(rep('Group A', 3), rep('Group B', 3), rep('Group C', 3))
+# ) %>% order_label(
+#   group_var = group_var,
+#   stacked = 'ms'
+# )
+```
+
+
+## Help
+If you have issues using orderlabel, please post your issue on [GitHub](https://github.com/nick-moffitt/orderlabel/issues) along with a minimal reproducible example. We will do our best to address your issues and get them fixed for the next version of orderlabel.
+

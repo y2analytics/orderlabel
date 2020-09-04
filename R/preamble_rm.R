@@ -6,6 +6,7 @@
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.
 #' @param var DEFAULT = prompt; If you use the prompt = T argument in freqs(), this default should be perfect for you.
 #' @param before_symbol DEFAULT = "- "; preamble_rm will remove everything before this symbol or string of symbols
+#' @importFrom rlang ":="
 #' @export
 #' @examples
 #' frequencies <- tibble::tibble(
@@ -29,6 +30,9 @@
 #'
 #' preamble_rm(frequencies)
 #' preamble_rm(frequencies, var = prompt2, before_symbol = '\n')
+#' \dontrun{
+#' frequencies %>% preamble_rm()
+#' }
 
 preamble_rm <- function(
   dataset,

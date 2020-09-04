@@ -9,7 +9,8 @@
 #' @export
 #' @examples
 #' # The original frequencies, put in descending order of the result
-#' frequencies <- tibble(
+#' \dontrun{
+#' frequencies <- tibble::tibble(
 #'   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
 #'   result = c(.25, .15, .20, .10, .30),
 #'   value = c(1, 2, 3, 4, 5),
@@ -18,12 +19,13 @@
 #' ordered_df <- frequencies
 #'
 #' # The second frequencies that you want to be ordered the same as the original
-#' frequencies <- tibble(
+#' frequencies <- tibble::tibble(
 #'   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
 #'   result = c(.30, .10, .15, .20, .25),
 #'   value = c(1, 2, 3, 4, 5),
 #'   group_var = rep('Group B', 5)
 #' ) %>% order_same()
+#' }
 
 order_same <- function(
   dataset,
@@ -64,31 +66,31 @@ create_group_var <- function(dataset, group_var){
 #### Grouped ####
 grouped_vector <- function(
   dataset,
-  label_flag1 = label_flag,
-  group_flag1 = group_flag
+  label_flag1,
+  group_flag1
 ){
   dataset %>%
     dplyr::ungroup() %>%
     dplyr::arrange(
       #first arrange by groups
       group_var = forcats::fct_relevel(
-        group_var,
+        .data$group_var,
         group_flag1
       ),
       #then arrange by labels, now in order of both
       label = forcats::fct_relevel(
-        label,
+        .data$label,
         label_flag1
       )
     ) %>%
     dplyr::mutate(
-      label = forcats::fct_inorder(label)
+      label = forcats::fct_inorder(.data$label)
     ) %>%
     dplyr::mutate(
-      group_var = forcats::fct_inorder(group_var)
+      group_var = forcats::fct_inorder(.data$group_var)
     ) %>%
     dplyr::mutate(
-      percent_label =  stringr::str_c(result * 100)
+      percent_label =  stringr::str_c(.data$result * 100)
     )
 }
 
@@ -96,20 +98,20 @@ grouped_vector <- function(
 #### ungrouped ####
 ungrouped_vector <- function(
   dataset,
-  label_flag1 = label_flag
+  label_flag1
 ) {
   dataset %>%
     dplyr::arrange(
       label = forcats::fct_relevel(
-        label,
+        .data$label,
         label_flag1
       )
     ) %>%
     dplyr::mutate(
-      label = forcats::fct_inorder(label)
+      label = forcats::fct_inorder(.data$label)
     ) %>%
     dplyr::mutate(
-      percent_label = stringr::str_c(result * 100)
+      percent_label = stringr::str_c(.data$result * 100)
     )
 }
 

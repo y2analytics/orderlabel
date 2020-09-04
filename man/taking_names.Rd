@@ -17,8 +17,6 @@ names <- taking_names(mtcars)
 
 responses <- mtcars
 names <- taking_names()
-
-names <- taking_names(mtcars)
 }
 \keyword{label}
 \keyword{name}

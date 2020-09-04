@@ -18,7 +18,8 @@ Takes a dataframe (frequencies) and orders it in the same order as another frequ
 }
 \examples{
 # The original frequencies, put in descending order of the result
-frequencies <- tibble(
+\dontrun{
+frequencies <- tibble::tibble(
   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
   result = c(.25, .15, .20, .10, .30),
   value = c(1, 2, 3, 4, 5),
@@ -27,12 +28,13 @@ frequencies <- tibble(
 ordered_df <- frequencies
 
 # The second frequencies that you want to be ordered the same as the original
-frequencies <- tibble(
+frequencies <- tibble::tibble(
   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
   result = c(.30, .10, .15, .20, .25),
   value = c(1, 2, 3, 4, 5),
   group_var = rep('Group B', 5)
 ) \%>\% order_same()
+}
 }
 \keyword{equal}
 \keyword{label}

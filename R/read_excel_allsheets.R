@@ -8,18 +8,21 @@
 #' @export
 #' @examples
 #' # Create a single data frame with all sheets stacked
-#' responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx')
+#' \dontrun{
+#' responses <- read_excel_allsheets(
+#' ~/Desktop/Example Excel File.xlsx')
 #'
 #' # Create a list and multiple data frames, one for each sheet in the excel file
-#' responses <- read_excel_allsheets('~/Dropbox (Y2 Analytics)/Y2 Analytics Team Folder/Resources/Example Excel File.xlsx', F)
-
+#' responses <- read_excel_allsheets(
+#' ~/Desktop/Example Excel File.xlsx', FALSE)
+#'}
 
 read_excel_allsheets <- function(filename, single_frame = TRUE) {
   sheets <- readxl::excel_sheets(filename)
   ldf <- lapply(sheets, function(X) readxl::read_excel(filename, sheet = X))
   names(ldf) <- sheets
-  if(single_frame == T){ # Creates a single data frame with all sheets combined together
-    ldf <- ldf %>% dplyr::bind_rows(.id = 'sheet_name') %>% as_tibble()
+  if(single_frame == TRUE){ # Creates a single data frame with all sheets combined together
+    ldf <- ldf %>% dplyr::bind_rows(.id = 'sheet_name') %>% tibble::as_tibble()
   } else{ # Creates a separate data frame for each sheet, with each data frame being called the name of that sheet
     list2env(ldf, envir = .GlobalEnv)
   }
