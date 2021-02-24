@@ -10,8 +10,8 @@ order_label(
   group_var = FALSE,
   inherent_order_label = FALSE,
   inherent_order_group = FALSE,
-  label_specific = NA,
-  group_specific = NA,
+  label_first = NA,
+  group_first = NA,
   rev_label = FALSE,
   rev_group = FALSE,
   label_last = NA,
@@ -34,9 +34,9 @@ order_label(
 
 \item{inherent_order_group}{DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (District 1, District 2...)}
 
-\item{label_specific}{DEFAULT = NA; If specified, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
+\item{label_first}{DEFAULT = NA; If specified, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
 
-\item{group_specific}{DEFAULT = NA; If specified, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
+\item{group_first}{DEFAULT = NA; If specified, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 
 \item{rev_label}{DEFAULT = FALSE; To reverse the order of labels in a chart, use rev_label = TRUE}
 
