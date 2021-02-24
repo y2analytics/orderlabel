@@ -1,4 +1,4 @@
-# orderlabel 0.2.0
+# orderlabel 0.2.1
 ## Breaking changes
 * `order_label`
 1. `label_secific` and `group_specific` are replaced with `label_first` and `group_first`. Naming conventions changed due to the additions of `label_last` and `group_last`.
