@@ -1,5 +1,5 @@
 #### Executive Function ####
-#' Auto order a freqs table to match another freqs
+#' Auto order a freqs table to match another freqs table
 #'
 #' Takes a dataframe (frequencies) and orders it in the same order as another frequencies table in your R environment called "ordered_df".
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs
@@ -34,14 +34,14 @@ order_same <- function(
   ) {
   label_flag <- purrr::as_vector(orders$label) %>% levels()
 
-  #run ordering functions
- if(any(names(orders) == 'group_var') == T |
+  # run ordering functions
+ if(any(names(orders) == 'group_var') == TRUE |
     group_var != 'NULL'
    ) {
    dataset <- create_group_var(dataset, group_var)
    group_flag <- purrr::as_vector(orders$group_var) %>% levels()
    dataset <- grouped_vector(dataset, label_flag1 = label_flag, group_flag1 = group_flag)
- } else{ #NOT grouped
+ } else{ # NOT grouped
    dataset <- ungrouped_vector(dataset, label_flag1 = label_flag)
  }
   return(dataset)
@@ -72,12 +72,12 @@ grouped_vector <- function(
   dataset %>%
     dplyr::ungroup() %>%
     dplyr::arrange(
-      #first arrange by groups
+      # first arrange by groups
       group_var = forcats::fct_relevel(
         .data$group_var,
         group_flag1
       ),
-      #then arrange by labels, now in order of both
+      # then arrange by labels, now in order of both
       label = forcats::fct_relevel(
         .data$label,
         label_flag1

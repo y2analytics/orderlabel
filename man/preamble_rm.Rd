@@ -9,7 +9,7 @@ preamble_rm(dataset, var = prompt, before_symbol = "- ")
 \arguments{
 \item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.}
 
-\item{var}{DEFAULT = prompt; If you use the prompt = T argument in freqs(), this default should be perfect for you.}
+\item{var}{DEFAULT = prompt; If you use the prompt = TRUE argument in freqs(), this default should be perfect for you.}
 
 \item{before_symbol}{DEFAULT = "- "; preamble_rm will remove everything before this symbol or string of symbols}
 }

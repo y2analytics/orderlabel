@@ -4,7 +4,7 @@
 #' Takes a dataframe (frequencies) and removes the usual question preambles so that you are left with only the labels you care about.
 #' For example, "What is your favorite color? - Blue" becomes "Blue"
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.
-#' @param var DEFAULT = prompt; If you use the prompt = T argument in freqs(), this default should be perfect for you.
+#' @param var DEFAULT = prompt; If you use the prompt = TRUE argument in freqs(), this default should be perfect for you.
 #' @param before_symbol DEFAULT = "- "; preamble_rm will remove everything before this symbol or string of symbols
 #' @importFrom rlang ":="
 #' @export
@@ -43,8 +43,8 @@ preamble_rm <- function(
 
   dataset <- dataset %>%
     dplyr::mutate(
-      '{{var}}' := as.character({{var}}),
-      '{{var}}' := stringr::str_remove({{var}}, combined_remove_symbol)
+      '{{var}}' := as.character({{ var }}),
+      '{{var}}' := stringr::str_remove({{ var }}, combined_remove_symbol)
     )
   return(dataset)
 }

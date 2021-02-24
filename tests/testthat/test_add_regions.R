@@ -1,6 +1,4 @@
 # add_regions set up ---------------------------------------------------------
-
-context("add_regions")
 library(testthat)
 library(dplyr)
 library(orderlabel)
@@ -26,6 +24,7 @@ responses <- tibble::tibble(
 
 
 # tests -------------------------------------------------------------------
+context("add_regions")
 
 
 test_that("add_regions - upper/lower case", {

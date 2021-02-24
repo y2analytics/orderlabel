@@ -26,7 +26,7 @@ add_regions <- function(
 ) {
   dataset <- dataset %>%
     dplyr::mutate(
-      state_new_var = {{state_var}},
+      state_new_var = {{ state_var }},
       state_new_var = forcats::as_factor(.data$state_new_var) %>%
         as.character() %>%
         stringr::str_to_title(),

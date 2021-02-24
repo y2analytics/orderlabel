@@ -1,10 +1,11 @@
 #### order_same ####
-context("order_same")
 library(testthat)
 library(dplyr)
 library(orderlabel)
 
 #### Private functions ####
+context("order_same")
+
 ### grouped_vector
 test_that("grouped_vector", {
   df <- data.frame(

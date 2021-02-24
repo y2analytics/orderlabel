@@ -1,7 +1,4 @@
-
 # preamble_rm set up ---------------------------------------------------------
-
-context("preamble_rm")
 library(testthat)
 library(dplyr)
 library(orderlabel)
@@ -29,6 +26,7 @@ frequencies <- tibble::tibble(
 
 
 # tests -------------------------------------------------------------------
+context("preamble_rm")
 
 
 test_that("preamble_rm - all defaults", {

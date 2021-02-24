@@ -1,5 +1,4 @@
 #### order_label setup ####
-context("order_label")
 library(testthat)
 library(tibble)
 library(dplyr)
@@ -37,7 +36,16 @@ grouped_df <- bind_rows(ungrouped_df, ungrouped_df) %>%
 noneother_df <- tibble(
   variable = rep('X', 8),
   value = c('1', '2', '3', '4', '5', '6', '7', '8'),
-  label = c('One', 'Two', 'Other', 'None of the above', 'Prefer not to say', 'Three', 'Four', 'Five'),
+  label = c(
+    'One',
+    'Two',
+    'Other',
+    'None of the above',
+    'Prefer not to say',
+    'Three',
+    'Four',
+    'Five'
+    ),
   result = c(.1, .2, .3, .4, .5, .6, .7, .8),
   n = rep(100, 8)
 )
@@ -63,6 +71,9 @@ noneother_grouped2 <- tibble(
 )
 
 #### Private Functions *************************************** ####
+context("order_label")
+
+
 #### PRE- grouped internal functions ####
 ### blank_values
 test_that("blank_values - creates value var", {
@@ -116,14 +127,14 @@ test_that("add_group", {
     result = rep(.2, 5),
     n = rep(100, 5),
     change = c(1, 1, 1, 2, 2)
-  ) %>% add_group(grouped = F, group_var = change, label_var = label)
+  ) %>% add_group(grouped = FALSE, group_var = change, label_var = label)
   df_grouped <- data.frame(
     value = c(1:5),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5),
     change = c(1, 1, 1, 2, 2)
-  ) %>% add_group(grouped = T, group_var = change, label_var = label)
+  ) %>% add_group(grouped = TRUE, group_var = change, label_var = label)
 
   test_ungrouped <- df_ungrouped %>% names()
   test_grouped <- df_grouped %>% names()
@@ -140,7 +151,7 @@ test_that("factors: value = label", {
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% factors(grouped = F, group_var = NULL, label_var = label)
+  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
   value_values <- unique(df$value)
 
   expect_equal(value_values, c(1:5))
@@ -151,7 +162,7 @@ test_that("factors: value was non existant", {
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% factors(grouped = F, group_var = NULL, label_var = label)
+  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
   value_values <- unique(df$value)
 
   expect_equal(value_values, c(1:5))
@@ -163,7 +174,7 @@ test_that("factors: value = x", {
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% factors(grouped = F, group_var = NULL, label_var = label)
+  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
   value_values <- unique(df$value)
 
   expect_equal(value_values, c(1:5))
@@ -175,7 +186,7 @@ test_that("factors: value out of order", {
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% factors(grouped = F, group_var = NULL, label_var = label)
+  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
   value_values <- unique(df$value)
 
   expect_equal(value_values, c(1:5))
@@ -188,13 +199,23 @@ test_that("reverse_label: inherent order", {
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% reverse_label(grouped = F, group_var = NULL, label_var = label, rev_label = F)
+  ) %>% reverse_label(
+    grouped = FALSE,
+    group_var = NULL,
+    label_var = label,
+    rev_label = FALSE
+    )
   values <- purrr::as_vector(df$value)
   df_rev <- data.frame(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% reverse_label(grouped = F, group_var = NULL, label_var = label, rev_label = T)
+  ) %>% reverse_label(
+    grouped = FALSE,
+    group_var = NULL,
+    label_var = label,
+    rev_label = TRUE
+    )
   values_rev <- purrr::as_vector(df_rev$value)
 
   expect_equal(values, c(1:5))
@@ -209,13 +230,13 @@ test_that("reverse_label_unordered", {
     result = rep(.2, 5),
     n = rep(100, 5)
   ) %>%
-    reverse_label_unordered(rev_label = F)
+    reverse_label_unordered(rev_label = FALSE)
   values <- purrr::as_vector(df$label)
   df_rev <- tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
-  ) %>% reverse_label_unordered(rev_label = T)
+  ) %>% reverse_label_unordered(rev_label = TRUE)
   values_rev <- purrr::as_vector(df_rev$label)
 
   expect_equal(values, as.vector(c('One', 'Two', 'Three', 'Four', 'Five')))
@@ -224,18 +245,23 @@ test_that("reverse_label_unordered", {
 
 
 #### (1) Ungrouped Section ####
-### Ungrouped1: label_specific
-test_that("Ungrouped1: label_specific", {
+### Ungrouped1: label_first
+test_that("Ungrouped1: label_first", {
   df <- tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
   ) %>%
-    reverse_label( grouped = F, group_var = F, label_var = label, rev_label = F) %>%
+    reverse_label(
+      grouped = FALSE,
+      group_var = FALSE,
+      label_var = label,
+      rev_label = FALSE
+      ) %>%
     ungrouped1(
-      specifically_ordered = T,
-      inherent_order_label = F,
-      label_specific = 'Three'
+      specifically_ordered = TRUE,
+      inherent_order_label = FALSE,
+      label_first = 'Three'
     )
   values <- purrr::as_vector(df$label) %>% levels()
 
@@ -243,18 +269,23 @@ test_that("Ungrouped1: label_specific", {
 })
 
 
-### Ungrouped2: label_specific, inherent_order
-test_that("Ungrouped2: label_specific, inherent_order", {
+### Ungrouped2: label_first, inherent_order
+test_that("Ungrouped2: label_first, inherent_order", {
   df <- tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
   ) %>%
-    reverse_label( grouped = F, group_var = F, label_var = label, rev_label = F) %>%
+    reverse_label(
+      grouped = FALSE,
+      group_var = FALSE,
+      label_var = label,
+      rev_label = FALSE
+      ) %>%
     ungrouped2(
-      specifically_ordered = T,
-      inherent_order_label = T,
-      label_specific = 'Three'
+      specifically_ordered = TRUE,
+      inherent_order_label = TRUE,
+      label_first = 'Three'
     )
   values <- purrr::as_vector(df$label) %>% levels()
 
@@ -269,7 +300,12 @@ test_that("Ungrouped3: stacked", {
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
   ) %>%
-    reverse_label( grouped = F, group_var = F, label_var = label, rev_label = F) %>%
+    reverse_label(
+      grouped = FALSE,
+      group_var = FALSE,
+      label_var = label,
+      rev_label = FALSE
+      ) %>%
     ungrouped3(
       stacked = 'gg'
     )
@@ -286,10 +322,15 @@ test_that("Ungrouped4: unordered", {
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
   ) %>%
-    reverse_label( grouped = F, group_var = F, label_var = label, rev_label = F) %>%
+    reverse_label(
+      grouped = FALSE,
+      group_var = FALSE,
+      label_var = label,
+      rev_label = FALSE
+      ) %>%
     ungrouped4(
-      specifically_ordered = F,
-      inherent_order_label = F
+      specifically_ordered = FALSE,
+      inherent_order_label = FALSE
     )
   values <- purrr::as_vector(df$label) %>% levels()
 
@@ -304,10 +345,15 @@ test_that("Ungrouped5: unordered", {
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
   ) %>%
-    reverse_label( grouped = F, group_var = F, label_var = label, rev_label = F) %>%
+    reverse_label(
+      grouped = FALSE,
+      group_var = FALSE,
+      label_var = label,
+      rev_label = FALSE
+      ) %>%
     ungrouped5(
-      specifically_ordered = F,
-      inherent_order_label = T
+      specifically_ordered = FALSE,
+      inherent_order_label = TRUE
     )
   values <- purrr::as_vector(df$label) %>% levels()
 
@@ -324,7 +370,7 @@ test_that("add_group", {
     group_var = c(1, 1, 2, 2)
   ) %>%
     add_group(
-      grouped = T,
+      grouped = TRUE,
       group_var = group_var,
       label_var = label
     )
@@ -336,7 +382,7 @@ test_that("add_group", {
   ) %>%
     dplyr::group_by(group_var) %>%
     add_group(
-      grouped = T,
+      grouped = TRUE,
       group_var = group_var,
       label_var = label
   )
@@ -349,7 +395,7 @@ test_that("factors: is grouped", {
     result = rep(.2, 4),
     n = rep(100, 4),
     group_var = c(1, 1, 2, 2)
-  ) %>% factors(grouped = T, group_var = group_var, label_var = label)
+  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
 
   df_grouped <- tibble(
     label = rep(c('One', 'Two'), 2),
@@ -358,7 +404,7 @@ test_that("factors: is grouped", {
     group_var = c(1, 1, 2, 2)
   ) %>%
     dplyr::group_by(group_var) %>%
-    factors(grouped = T, group_var = group_var, label_var = label)
+    factors(grouped = TRUE, group_var = group_var, label_var = label)
   expect_equal(df_ungrouped, df_grouped)
 })
 ### reverse_group
@@ -368,7 +414,7 @@ test_that("reverse_group", {
     result = rep(.2, 8),
     n = rep(100, 8),
     group_var = rep(c('One', 'Two', 'Three', 'Four'), 2)
-  ) %>% factors(grouped = T, group_var = group_var, label_var = label)
+  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
   purrr::as_vector(group_forward$group_var)
 
   group_backward <- tibble(
@@ -376,11 +422,14 @@ test_that("reverse_group", {
     result = rep(.2, 8),
     n = rep(100, 8),
     group_var = rep(c('One', 'Two', 'Three', 'Four'), 2)
-  ) %>% factors(grouped = T, group_var = group_var, label_var = label) %>%
-    reverse_group(rev_group = T)
+  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label) %>%
+    reverse_group(rev_group = TRUE)
   group_levels <- purrr::as_vector(group_backward$group_var)
 
-  expect_equal(group_levels, c('Four', 'Four', 'Three', 'Three', 'Two', 'Two', 'One', 'One'))
+  expect_equal(
+    group_levels,
+    c('Four', 'Four', 'Three', 'Three', 'Two', 'Two', 'One', 'One')
+    )
 })
 
 ### reverse_label_unordered2
@@ -441,19 +490,28 @@ test_that("topbox - top2box", {
 # label_last_fun
 test_that("label_last_fun", {
   factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
-  test <- factored_df %>% label_last_fun(label_last = 'Three')
+  test <- factored_df %>% label_last_fun(label_last = 'Three', FALSE, 'NULL')
   last_levels <- levels(test$label)
+  test <- factored_df %>% label_last_fun(label_last = 'Three', TRUE, 'NULL')
+  last_levels_hor <- levels(test$label)
 
   expect_equal(last_levels[5], 'Three')
+  expect_equal(last_levels[4], 'Five')
+  expect_equal(last_levels_hor[5], 'Three')
+  expect_equal(last_levels_hor[4], 'Five')
 })
+
 # group_last_fun
 test_that("group_last_fun", {
   factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
-  test <- factored_df %>% group_last_fun(group_last = 'Brand 1')
+  test <- factored_df %>% group_last_fun(group_last = 'Brand 1', FALSE, 'NULL')
   last_levels <- levels(test$group_var)
+  test <- factored_df %>% group_last_fun(group_last = 'Brand 1', TRUE, 'NULL')
+  last_levels_hor <- levels(test$group_var)
 
   expect_equal(last_levels[2], 'Brand 1')
+  expect_equal(last_levels_hor[2], 'Brand 1')
 })
 
 # label_last/group_last in order_label
@@ -473,7 +531,11 @@ test_that("label_last & group_last", {
 test_that("label_last & group_last", {
   test <- grouped_df %>% order_label( #these guys are backwards
     group_var = group_var,
-    horizontal = T,
+    label_last = 'Three')
+  last_original <- levels(test$label)
+  test <- grouped_df %>% order_label( #these guys are backwards
+    group_var = group_var,
+    horizontal = TRUE,
     label_last = 'Three')
   last_horizontal <- levels(test$label)
 
@@ -489,21 +551,23 @@ test_that("label_last & group_last", {
     label_last = 'Three')
   last_stacked_ms <- levels(test$label)
 
-  expect_equal(last_horizontal[5], 'Three')
-  expect_equal(last_stacked[5], 'Three')
+  expect_equal(last_original[5], 'Three')
+  expect_equal(last_horizontal[1], 'Three') # Will be reversed with horizontal
+  expect_equal(last_stacked_gg[1], 'Three') # Will be reversed with horizontal
+  expect_equal(last_stacked_ms[5], 'Three')
 })
 
 
 #### horizontal_chart ####
 # Not horizontal
 test_that("horizontal_chart - not horizontal", {
-  test <- horizontal_chart(ungrouped_df, horizontal = F)
+  test <- horizontal_chart(ungrouped_df, horizontal = FALSE)
   expect_equal(test, ungrouped_df)
 })
 # Ungrouped
 test_that("horizontal_chart - ungrouped", {
   factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
-  test <- horizontal_chart(factored_df, horizontal = T, grouped = F)
+  test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = FALSE)
   hor_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
 
@@ -515,7 +579,7 @@ test_that("horizontal_chart - grouped", {
     mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
 
-  test <- horizontal_chart(factored_df, horizontal = T, grouped = T)
+  test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = TRUE)
   hor_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
   hor_groups <- levels(test$group_var)
@@ -529,7 +593,7 @@ test_that("horizontal_chart - grouped", {
 # stacked_chart
 test_that("stacked_chart  - ungrouped", {
   factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
-  test <- stacked_chart(factored_df, stacked = 'gg', grouped = F)
+  test <- stacked_chart(factored_df, stacked = 'gg', grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
 
@@ -538,7 +602,7 @@ test_that("stacked_chart  - ungrouped", {
 test_that("stacked_chart  - grouped", {
   factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
-  test <- stacked_chart(factored_df, stacked = 'gg', grouped = T)
+  test <- stacked_chart(factored_df, stacked = 'gg', grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
   created_group <- levels(test$group_var)
@@ -551,7 +615,7 @@ test_that("stacked_chart  - grouped", {
 # stacked_chart
 test_that("stacked_chart_ms  - ungrouped", {
   factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
-  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = F)
+  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
 
@@ -560,7 +624,7 @@ test_that("stacked_chart_ms  - ungrouped", {
 test_that("stacked_chart_ms  - grouped", {
   factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
-  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = T)
+  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
   created_group <- levels(test$group_var)
@@ -574,13 +638,13 @@ test_that("stacked_chart_ms  - grouped", {
 #### none_other ####
 # Not horizontal
 test_that("none_other - none_other = FALSE", {
-  test <- none_other(noneother_df, none_other = F, grouped = F)
+  test <- none_other(noneother_df, none_other = FALSE, grouped = FALSE)
   expect_equal(test, noneother_df)
 })
 # Ungrouped
 test_that("none_other - ungrouped", {
   factored_df <- noneother_df %>% mutate(label = fct_inorder(label))
-  test <- none_other(factored_df, none_other = T, grouped = F)
+  test <- none_other(factored_df, none_other = TRUE, grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
                        'Other', 'None of the above', 'Prefer not to say')
@@ -591,7 +655,7 @@ test_that("none_other - ungrouped", {
 test_that("none_other - grouped (labels)", {
   factored_df <- other_grouped_df %>% mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
-  test <- none_other(factored_df, none_other = T, grouped = T)
+  test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
                        'Other', 'None of the above', 'Prefer not to say')
@@ -601,7 +665,7 @@ test_that("none_other - grouped (labels)", {
 test_that("none_other - grouped (group_var)", {
   factored_df <- noneother_grouped2 %>% mutate(label = fct_inorder(label)) %>%
     mutate(group_var = fct_inorder(group_var))
-  test <- none_other(factored_df, none_other = T, grouped = T)
+  test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$group_var)
   expected_levels <- c('Brand 1', 'Brand 2', 'Brand 3',
                        'Other', 'None of the above', 'Prefer not to say')

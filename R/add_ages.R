@@ -29,17 +29,18 @@ add_ages <- function(
   year_born_var,
   age_var
 ) {
-  if(!missing(year_born_var) & !missing(age_var)) stop("You specified both year_born_var and age_var, please specify only one")
+  if(!missing(year_born_var) & !missing(age_var))
+    stop("You specified both year_born_var and age_var, please specify only one")
   current_year <- get_current_year()
 
   # User specified year_born_var
   if(!missing(year_born_var)){
-    dataset <- year_born_var_specified(dataset, {{year_born_var}}, current_year)
+    dataset <- year_born_var_specified(dataset, {{ year_born_var }}, current_year)
     }
 
   # User specified age_var
   if(!missing(age_var)){
-    dataset <- age_var_specified(dataset, {{age_var}}, current_year)
+    dataset <- age_var_specified(dataset, {{ age_var }}, current_year)
     }
 
   dataset <- create_age_groups(dataset)
@@ -52,7 +53,7 @@ add_ages <- function(
 ### Step 1 - get current date
 get_current_year <- function(){
   date <- Sys.Date()
-  current_year <- stringr::str_remove_all(date,'-.*') %>% as.numeric()
+  current_year <- stringr::str_remove_all(date, '-.*') %>% as.numeric()
 }
 
 
@@ -64,7 +65,7 @@ year_born_var_specified <- function(
 ){
   dataset <- dataset %>%
     dplyr::mutate(
-      year_born_numeric = forcats::as_factor({{year_born_var}}) %>%
+      year_born_numeric = forcats::as_factor({{ year_born_var }}) %>%
         as.character() %>%
         as.numeric(),
       age_numeric = current_year - .data$year_born_numeric
@@ -78,7 +79,7 @@ age_var_specified <- function(
 ){
   dataset <- dataset %>%
     dplyr::mutate(
-      age_numeric = forcats::as_factor({{age_var}}) %>%
+      age_numeric = forcats::as_factor({{ age_var }}) %>%
         as.character() %>%
         as.numeric(),
       year_born_numeric = current_year - .data$age_numeric

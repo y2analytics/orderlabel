@@ -1,5 +1,4 @@
 #### other_rm set up####
-context("other_rm")
 library(testthat)
 library(dplyr)
 library(orderlabel)
@@ -30,6 +29,7 @@ filtered_df <- df %>%
   mutate_all(~ifelse(str_detect(., '7'), 'Brand 7', .))
 
 #### tests ####
+context("other_rm")
 
 test_that("other_rm - label", {
   test <- other_rm(df)

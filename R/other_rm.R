@@ -1,7 +1,7 @@
 #### other_rm Function ####
-#' Auto change those pesky "Other please specify"s into "Other"
+#' Auto change "Other please specify"s into "Other"
 #'
-#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parantheses opening. Does this for the 'label', 'variable', and 'group_var' vars.
+#' Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parentheses opening. Does this for the 'label', 'variable', and 'group_var' vars.
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs. You almost never need any arguments in this function.
 #' @param remove DEFAULT = FALSE; If set to TRUE, will remove categories of "Other" and "None of the above" from the frequencies
 #' @keywords other none extra
@@ -43,11 +43,11 @@ other_rm_label <- function(dataset){
     dplyr::mutate(
       label = as.character(.data$label),
       label = dplyr::case_when(
-        stringr::str_detect(.data$label, stringr::regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
-        stringr::str_detect(.data$label, stringr::regex('please specify', ignore_case = T)) == T ~ 'Other',
-        stringr::str_detect(.data$label, stringr::regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+        stringr::str_detect(.data$label, stringr::regex('prefer not to', ignore_case = TRUE)) == TRUE ~ 'Prefer not to say',
+        stringr::str_detect(.data$label, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
+        stringr::str_detect(.data$label, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
         label == 'None' ~ 'None of the above',
-        T ~ .data$label
+        TRUE ~ .data$label
       ),
       label = stringr::str_remove_all(.data$label, ' \\(.*')
     )
@@ -55,16 +55,16 @@ other_rm_label <- function(dataset){
 
 # variable
 other_rm_variable <- function(dataset){
-  if(any(names(dataset) == 'variable') == T){
+  if(any(names(dataset) == 'variable') == TRUE){
     dataset <- dataset %>%
       dplyr::mutate(
         variable = as.character(.data$variable),
         variable = dplyr::case_when(
-          stringr::str_detect(.data$variable, stringr::regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
-          stringr::str_detect(.data$variable, stringr::regex('please specify', ignore_case = T)) == T ~ 'Other',
-          stringr::str_detect(.data$variable, stringr::regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+          stringr::str_detect(.data$variable, stringr::regex('prefer not to', ignore_case = TRUE)) == TRUE ~ 'Prefer not to say',
+          stringr::str_detect(.data$variable, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
+          stringr::str_detect(.data$variable, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
           variable == 'None' ~ 'None of the above',
-          T ~ .data$variable
+          TRUE ~ .data$variable
         ),
         variable = stringr::str_remove_all(.data$variable, ' \\(.*')
       )
@@ -75,17 +75,17 @@ other_rm_variable <- function(dataset){
 
 # group_var
 other_rm_group <- function(dataset){
-  if(any(names(dataset) == 'group_var') == T){
+  if(any(names(dataset) == 'group_var') == TRUE){
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::mutate(
         group_var = as.character(.data$group_var),
         group_var = dplyr::case_when(
-          stringr::str_detect(.data$group_var, stringr::regex('prefer not to', ignore_case = T)) == T ~ 'Prefer not to say',
-          stringr::str_detect(.data$group_var, stringr::regex('please specify', ignore_case = T)) == T ~ 'Other',
-          stringr::str_detect(.data$group_var, stringr::regex('none of the', ignore_case = T)) == T ~ 'None of the above',
+          stringr::str_detect(.data$group_var, stringr::regex('prefer not to', ignore_case = TRUE)) == TRUE ~ 'Prefer not to say',
+          stringr::str_detect(.data$group_var, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
+          stringr::str_detect(.data$group_var, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
           group_var == 'None' ~ 'None of the above',
-          T ~ .data$group_var
+          TRUE ~ .data$group_var
         ),
         group_var = stringr::str_remove_all(.data$group_var, ' \\(.*')
       )
@@ -96,16 +96,16 @@ other_rm_group <- function(dataset){
 
 # remove_function
 remove_function <- function(dataset, remove){
-  if(remove == T){
+  if(remove == TRUE){
     dataset <- dataset %>%
       dplyr::filter_all(
-        ~stringr::str_detect(., 'Other') == F
+        ~stringr::str_detect(., 'Other') == FALSE
       ) %>%
       dplyr::filter_all(
-        ~stringr::str_detect(., 'None of the above') == F
+        ~stringr::str_detect(., 'None of the above') == FALSE
       )  %>%
       dplyr::filter_all(
-        ~stringr::str_detect(., 'Prefer not to ') == F
+        ~stringr::str_detect(., 'Prefer not to ') == FALSE
       )
   } else{
     dataset <- dataset

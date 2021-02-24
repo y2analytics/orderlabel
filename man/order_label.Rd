@@ -14,6 +14,8 @@ order_label(
   group_specific = NA,
   rev_label = FALSE,
   rev_group = FALSE,
+  label_last = NA,
+  group_last = NA,
   horizontal = FALSE,
   stacked = c("NULL", "ms", "gg"),
   topbox = NULL,
@@ -32,13 +34,17 @@ order_label(
 
 \item{inherent_order_group}{DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (District 1, District 2...)}
 
-\item{label_specific}{DEFAULT = NA; If TRUE, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
+\item{label_specific}{DEFAULT = NA; If specified, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
 
-\item{group_specific}{DEFAULT = NA; If TRUE, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
+\item{group_specific}{DEFAULT = NA; If specified, puts the specified group first. ex: 'brand1' would put group called brand1 before all other groups}
 
 \item{rev_label}{DEFAULT = FALSE; To reverse the order of labels in a chart, use rev_label = TRUE}
 
 \item{rev_group}{DEFAULT = FALSE; To reverse the order of groups in a chart, use rev_group = TRUE}
+
+\item{label_last}{DEFAULT = NA; If specified, puts the specified label last ex: 'brand1' would put label called brand1 after all other labels}
+
+\item{group_last}{DEFAULT = NA; If specified, puts the specified group last ex: 'brand1' would put group called brand1 after all other groups}
 
 \item{horizontal}{DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = TRUE}
 

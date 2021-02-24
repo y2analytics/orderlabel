@@ -43,18 +43,18 @@ var_sep <- function(dataset) {
     ) %>%
     dplyr::mutate(
       variable3 = dplyr::case_when(
-        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == F ~ NA_character_,
-        T ~ variable3
+        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == FALSE ~ NA_character_,
+        TRUE ~ variable3
       ),
       variable2 = dplyr::case_when(
-        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == F ~ NA_character_,
-        T ~ variable2
+        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == FALSE ~ NA_character_,
+        TRUE ~ variable2
       ),
       sort_var = dplyr::case_when(
         is.na(variable2) ~ variable1,
         is.na(variable3) ~ stringr::str_c(variable1, "_", variable2),
         is.na(variable4) ~ stringr::str_c(variable1, "_", variable2, '_', variable3),
-        T ~ stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
+        TRUE ~ stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
       )
     )
 }
@@ -66,7 +66,7 @@ add_percent <- function(dataset) {
     dplyr::mutate(
       percent_label = dplyr::case_when(
         label == label[1] & variable == variable[1] ~ stringr::str_c(.data$result * 100, '%'),
-        T ~ stringr::str_c(.data$result * 100)
+        TRUE ~ stringr::str_c(.data$result * 100)
       )
     )
 }
@@ -78,7 +78,7 @@ add_lessthan <- function(dataset) {
       percent_label = dplyr::case_when(
         .data$percent_label =='0%' & .data$n >= 1 ~ '<1%',
         .data$percent_label == '0' & .data$n >= 1 ~ '<1',
-        T ~ .data$percent_label
+        TRUE ~ .data$percent_label
       )
     ) %>%
     dplyr::ungroup() %>%
@@ -100,7 +100,7 @@ whole_numbers <- function(
     dplyr::mutate(
       percent_label = dplyr::case_when(
         stringr::str_detect(variable, whole_numbers) ~ as.character(result),
-        T ~ percent_label
+        TRUE ~ percent_label
       )
     )
 }

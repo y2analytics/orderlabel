@@ -2,7 +2,7 @@
 % Please edit documentation in R/other_rm.R
 \name{other_rm}
 \alias{other_rm}
-\title{Auto change those pesky "Other please specify"s into "Other"}
+\title{Auto change "Other please specify"s into "Other"}
 \usage{
 other_rm(dataset, remove = FALSE)
 }
@@ -12,7 +12,7 @@ other_rm(dataset, remove = FALSE)
 \item{remove}{DEFAULT = FALSE; If set to TRUE, will remove categories of "Other" and "None of the above" from the frequencies}
 }
 \description{
-Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parantheses opening. Does this for the 'label', 'variable', and 'group_var' vars.
+Takes a dataframe (frequencies) and replaces the usual variations of "Other please specify" into Other. Also standardizes "None of the above" and "Prefer not to say" options. Additionally, removes all extra text after parentheses opening. Does this for the 'label', 'variable', and 'group_var' vars.
 }
 \examples{
 frequencies <- tibble::tibble(

@@ -2,7 +2,7 @@
 % Please edit documentation in R/order_same.R
 \name{order_same}
 \alias{order_same}
-\title{Auto order a freqs table to match another freqs}
+\title{Auto order a freqs table to match another freqs table}
 \usage{
 order_same(dataset, orders = ordered_df, group_var = "NULL")
 }

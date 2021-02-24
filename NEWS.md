@@ -1,3 +1,14 @@
+# orderlabel 0.2.0
+## Breaking changes
+* `order_label`
+1. `label_secific` and `group_specific` are replaced with `label_first` and `group_first`. Naming conventions changed due to the additions of `label_last` and `group_last`.
+
+## New arguments
+* `order_label`
+1. New arguments: `label_last` and `group_last`. You can use these arguments to choose a specific label or group level you want to show up last on the chart
+
+
+
 # orderlabel 0.1.6
 
 ## New files

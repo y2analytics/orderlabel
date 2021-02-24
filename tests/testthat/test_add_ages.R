@@ -1,6 +1,4 @@
 # add_ages set up ---------------------------------------------------------
-
-context("add_ages")
 library(testthat)
 library(dplyr)
 library(orderlabel)
@@ -22,6 +20,7 @@ responses <- tibble::tibble(
 
 
 # tests -------------------------------------------------------------------
+context("add_ages")
 
 
 test_that("add_ages - gets current year", {
