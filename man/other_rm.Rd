@@ -29,9 +29,7 @@ frequencies <- tibble::tibble(
 frequencies
 other_rm(frequencies)
 other_rm(frequencies, TRUE)
-\dontrun{
 frequencies \%>\% other_rm()
-}
 }
 \keyword{extra}
 \keyword{none}

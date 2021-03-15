@@ -24,6 +24,7 @@ add_regions <- function(
   state_var,
   new_name = census_region
 ) {
+  census_region <- NULL
   dataset <- dataset %>%
     dplyr::mutate(
       state_new_var = {{ state_var }},

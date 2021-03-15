@@ -39,7 +39,5 @@ frequencies <- tibble::tibble(
 
 preamble_rm(frequencies)
 preamble_rm(frequencies, var = prompt2, before_symbol = '\n')
-\dontrun{
 frequencies \%>\% preamble_rm()
-}
 }

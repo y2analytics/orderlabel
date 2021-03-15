@@ -21,9 +21,7 @@
 #' frequencies
 #' other_rm(frequencies)
 #' other_rm(frequencies, TRUE)
-#' \dontrun{
 #' frequencies %>% other_rm()
-#' }
 
 other_rm <- function(
   dataset,

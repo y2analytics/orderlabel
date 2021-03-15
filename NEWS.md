@@ -1,3 +1,10 @@
+# orderlabel 0.2.2
+## Bugs
+* All examples now working
+* Fixed strange error showing up in some cases: "length of condition > 1"
+* Eliminated notes about missing global variables
+
+
 # orderlabel 0.2.1
 ## Breaking changes
 * `order_label`

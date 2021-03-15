@@ -528,7 +528,7 @@ test_that("label_last & group_last", {
 })
 
 # mixing label_last with other arguments
-test_that("label_last & group_last", {
+test_that("label_last & group_last, pt2", {
   test <- grouped_df %>% order_label( #these guys are backwards
     group_var = group_var,
     label_last = 'Three')
@@ -707,6 +707,5 @@ vectors <- c('1', '2', '3', '4', '5')
 
   expect_equal(df_stat$percent_label,vectors)
 })
-
 
 

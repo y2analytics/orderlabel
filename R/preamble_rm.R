@@ -30,15 +30,14 @@
 #'
 #' preamble_rm(frequencies)
 #' preamble_rm(frequencies, var = prompt2, before_symbol = '\n')
-#' \dontrun{
 #' frequencies %>% preamble_rm()
-#' }
 
 preamble_rm <- function(
   dataset,
   var = prompt,
   before_symbol = '- '
 ) {
+  prompt <- NULL
   combined_remove_symbol <- stringr::str_c('.*', before_symbol)
 
   dataset <- dataset %>%

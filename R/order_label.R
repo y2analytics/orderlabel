@@ -20,10 +20,8 @@
 #' @param none_other DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart
 #' @param num_fmt DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
 #' @keywords order label arrange
-#' @importFrom dplyr "%>%"
 #' @importFrom rlang .data
 #' @examples
-#' \dontrun{
 #' # Ungrouped, put in descending order of the result
 #' frequencies <- tibble::tibble(
 #'   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
@@ -52,7 +50,6 @@
 #'   group_var = group_var,
 #'   stacked = 'ms'
 #' )
-#' }
 #' @export
 
 ### Final Function
@@ -74,7 +71,6 @@ order_label <- function(
   none_other = TRUE,
   num_fmt = c("percent", "general")
 ) {
-  options(warn = -1) #check what these warnings actually are...
 
 ### Test matching arguments
   num_fmt <- rlang::arg_match(num_fmt)
@@ -83,10 +79,11 @@ order_label <- function(
 
 ### Flags
   #Enquo flags
+  label <- NULL
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
   #Stacked flags: bars always inherently ordered
-  inherent_order_label = ifelse(
+  inherent_order_label <- ifelse(
     stacked != 'NULL',
     TRUE,
     inherent_order_label
@@ -100,28 +97,33 @@ order_label <- function(
         TRUE
       )
     )
-  grouped = ifelse(
+  grouped <- ifelse(
     group_test$test == TRUE,
     TRUE,
     FALSE
-  )
+  )[1]
   #Flags for putting a specific label/group first
-  specifically_ordered = ifelse(
+  specifically_ordered <- ifelse(
     is.character(label_first) == TRUE,
     TRUE,
     FALSE
   )
-  specifically_ordered_group = ifelse(
+  specifically_ordered_group <- ifelse(
     is.character(group_first) == TRUE,
     TRUE,
     FALSE
   )
 
 ### Stop if group_var not specified but other grouping arguments are
-  if((inherent_order_group == TRUE | !is.na(group_first) | rev_group == TRUE) & grouped == FALSE) {
+  if ((
+    inherent_order_group == TRUE |
+      rev_group == TRUE |
+      !is.na(group_first) |
+      !is.na(group_last)
+    ) & grouped == FALSE) {
     stop("You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.")
   }
-  if(stacked != 'NULL' & grouped == FALSE) {
+  if (stacked != 'NULL' & grouped == FALSE) {
     warning('You used a "stacked" ordering system without specifying group_var. Is your data grouped?')
   }
 
@@ -129,10 +131,10 @@ order_label <- function(
   dataset <- reverse_label(dataset, grouped, !!group_var_flag, !!label_var_flag, rev_label)
 
 ### (1) ungrouped Section
-  if(grouped == FALSE) {
+  if (grouped == FALSE) {
     dataset <- section_ungrouped(dataset, grouped, specifically_ordered, inherent_order_label, stacked, label_first)
 ### Arranging WITH grouping variables
-  } else{
+  } else {
   # (2) Grouped Section: arranging for specific group and label to be first
     dataset <- section_grouped_specifics(
       dataset,
@@ -208,20 +210,20 @@ blank_values <- function(
   dataset
 ) {
   #If no value, add in place filler
-  if(
+  if (
     any(names(dataset) == 'value') == FALSE
   ) {
     dataset$value <- 'x'
-  } else{
+  } else {
     dataset <- dataset
   }
 
   #If no label, add in place filler
-  if(
+  if (
     any(names(dataset) == 'label') == FALSE
   ) {
     dataset$label <- 'x'
-  } else{
+  } else {
     dataset <- dataset
   }
   return(dataset)
@@ -246,9 +248,9 @@ add_group <- function(
   grouped,
   group_var,
   label_var
-){
+) {
   #Frequencies with a grouping variable must be grouped for following section
-  if(grouped == TRUE) {
+  if (grouped == TRUE) {
     label_var_flag <- dplyr::enquo(label_var)
     dataset <- add_label(dataset, !!label_var_flag)
     group_var_flag <- dplyr::enquo(group_var)
@@ -260,7 +262,7 @@ add_group <- function(
       dplyr::group_by(
         group_var
         )
-  } else{
+  } else {
     label_var_flag <- dplyr::enquo(label_var)
     dataset <- add_label(dataset, !!label_var_flag)
   }
@@ -280,7 +282,7 @@ factors <- function(
   dataset <- add_group(dataset, grouped, !!group_var_flag, !!label_var_flag)
   # When "value" is factored, value needs to be changed to .number
   # When "value" was completely missing or all the same, values needs to be changed to distinct .number
-  if(dataset$value[1] == dataset$label[1] |
+  if (dataset$value[1] == dataset$label[1] |
      length(unique(dataset$value)) == 1 |
      dataset$value[1] != '1'
   ) {
@@ -314,7 +316,7 @@ reverse_label <- function(
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
   dataset <- factors(dataset, grouped, !!group_var_flag, !!label_var_flag)
-  if(rev_label == TRUE){
+  if (rev_label == TRUE){
     max_val <- max(dataset$value)
     min_val <- min(dataset$value)
     dataset <- dataset %>%
@@ -331,7 +333,7 @@ reverse_label_unordered <- function(
   dataset,
   rev_label
 ) {
-  if(rev_label == TRUE){
+  if (rev_label == TRUE){
     dataset <- dataset %>%
       dplyr::arrange(
         label = forcats::fct_inorder(.data$label)
@@ -360,7 +362,7 @@ section_ungrouped <- function(
   stacked,
   label_first
 ) {
-  if(grouped == FALSE){
+  if (grouped == FALSE) {
     dataset <- ungrouped1(dataset, specifically_ordered, inherent_order_label, label_first)
     dataset <- ungrouped2(dataset, specifically_ordered, inherent_order_label, label_first)
     dataset <- ungrouped3(dataset, stacked)
@@ -380,7 +382,7 @@ ungrouped1 <- function(
   inherent_order_label,
   label_first
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == FALSE) {
     freqs1 <- dataset %>%
       dplyr::filter(.data$label == label_first)
@@ -398,7 +400,7 @@ ungrouped1 <- function(
           stringr::str_c(.data$result * 100)
         )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -410,7 +412,7 @@ ungrouped2 <- function(
   inherent_order_label,
   label_first
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == TRUE) { # Arranging with specific label first, then inherent
     freqs1 <- dataset %>%
       dplyr::filter(.data$label == label_first)
@@ -428,7 +430,7 @@ ungrouped2 <- function(
           stringr::str_c(.data$result * 100)
         )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -438,7 +440,7 @@ ungrouped3 <- function(
   dataset,
   stacked
 ) {
-  if(stacked != 'NULL'){
+  if (stacked != 'NULL') {
     dataset <- dataset %>%
       dplyr::arrange(
         .data$value, .data$result
@@ -454,7 +456,7 @@ ungrouped3 <- function(
       dplyr::mutate(
         label = forcats::fct_rev(.data$label)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -466,7 +468,7 @@ ungrouped4 <- function(
   specifically_ordered,
   inherent_order_label
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      specifically_ordered == FALSE
   ) {
     dataset <- dataset %>%
@@ -481,7 +483,7 @@ ungrouped4 <- function(
           stringr::str_c(.data$result * 100)
         )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -492,7 +494,7 @@ ungrouped5 <- function(
   specifically_ordered,
   inherent_order_label
 ) {
-  if(inherent_order_label == TRUE &
+  if (inherent_order_label == TRUE &
      specifically_ordered == FALSE
   ) { # Arranging for inherent order labels
     dataset <- dataset %>%
@@ -507,7 +509,7 @@ ungrouped5 <- function(
           stringr::str_c(.data$result * 100)
         )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -520,7 +522,7 @@ reverse_group <- function(
   dataset,
   rev_group
 ) {
-  if(rev_group == TRUE){
+  if (rev_group == TRUE) {
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::arrange(
@@ -547,7 +549,7 @@ reverse_label_unordered2 <- function(
   dataset,
   rev_label
 ) {
-  if(rev_label == TRUE) {
+  if (rev_label == TRUE) {
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::arrange(
@@ -581,7 +583,7 @@ section_grouped_specifics <- function(
   specifically_ordered_group,
   rev_group # fix reversed groups in this section
 ) {
-  if(specifically_ordered_group == TRUE &
+  if (specifically_ordered_group == TRUE &
      specifically_ordered == TRUE
   ) {
     dataset <- dataset %>%
@@ -609,7 +611,7 @@ grouped_specific1 <- function(
   label_first,
   group_first
 ) {
-  if(inherent_order_label == FALSE & #No inherent order for group/label
+  if (inherent_order_label == FALSE & #No inherent order for group/label
      inherent_order_group == FALSE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -651,7 +653,7 @@ grouped_specific1 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -664,7 +666,7 @@ grouped_specific2 <- function(
   label_first,
   group_first
 ) {
-  if(inherent_order_label == TRUE & #label inherent
+  if (inherent_order_label == TRUE & #label inherent
      inherent_order_group == FALSE) { #group NOT
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -708,7 +710,7 @@ grouped_specific2 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -721,7 +723,7 @@ grouped_specific3 <- function(
   label_first,
   group_first
 ) {
-  if(inherent_order_label == TRUE & #Both label/group inherently ordered
+  if (inherent_order_label == TRUE & #Both label/group inherently ordered
      inherent_order_group == TRUE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -755,7 +757,7 @@ grouped_specific3 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -768,7 +770,7 @@ grouped_specific4 <- function(
   label_first,
   group_first
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      inherent_order_group == TRUE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -811,7 +813,7 @@ grouped_specific4 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -828,7 +830,7 @@ section_grouped_specifics_nolab <- function(
   rev_group, #fix reversed groups in this section
   rev_label
 ) {
-  if(specifically_ordered_group == TRUE &
+  if (specifically_ordered_group == TRUE &
      specifically_ordered == FALSE
   ) {
     dataset <- dataset %>%
@@ -858,7 +860,7 @@ grouped_specific5 <- function(
   rev_label,
   rev_group
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      inherent_order_group == FALSE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -894,7 +896,7 @@ grouped_specific5 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -908,7 +910,7 @@ grouped_specific6 <- function(
   rev_label,
   rev_group
 ) {
-  if(inherent_order_label == TRUE & #No inherent order for group/label
+  if (inherent_order_label == TRUE & #No inherent order for group/label
      inherent_order_group == FALSE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -945,7 +947,7 @@ grouped_specific6 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -959,7 +961,7 @@ grouped_specific7 <- function(
   rev_label,
   rev_group
 ) {
-  if(inherent_order_label == TRUE &
+  if (inherent_order_label == TRUE &
      inherent_order_group == TRUE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -987,7 +989,7 @@ grouped_specific7 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1001,7 +1003,7 @@ grouped_specific8 <- function(
   rev_label,
   rev_group
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      inherent_order_group == TRUE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -1026,7 +1028,7 @@ grouped_specific8 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1044,7 +1046,7 @@ section_grouped_ordered <- function(
   rev_group,
   rev_label
 ) {
-  if(specifically_ordered_group == FALSE &
+  if (specifically_ordered_group == FALSE &
      inherent_order_group == TRUE
   ) {
     dataset <- dataset %>%
@@ -1070,7 +1072,7 @@ grouped_ordered1 <- function(
   label_first,
   rev_group
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == TRUE) { # Arranging for specific label first
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -1098,7 +1100,7 @@ grouped_ordered1 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1113,7 +1115,7 @@ grouped_ordered2 <- function(
   rev_group,
   rev_label
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == FALSE) { # Arranging for specific label first
     dataset <- dataset %>% reverse_group(rev_group)
     freqs1 <- dataset %>%
@@ -1150,7 +1152,7 @@ grouped_ordered2 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1164,7 +1166,7 @@ grouped_ordered3 <- function(
   rev_group,
   rev_label
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      specifically_ordered == FALSE) {
     dataset <- dataset %>%
       dplyr::arrange(
@@ -1184,7 +1186,7 @@ grouped_ordered3 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1197,7 +1199,7 @@ grouped_ordered4 <- function(
   specifically_ordered,
   rev_group
 ) {
-  if(inherent_order_label == TRUE &
+  if (inherent_order_label == TRUE &
      specifically_ordered == FALSE
   ) {
     dataset <- dataset %>%
@@ -1218,7 +1220,7 @@ grouped_ordered4 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1237,7 +1239,7 @@ section_grouped_unordered <- function(
   rev_group,
   rev_label
 ) {
-  if(specifically_ordered_group == FALSE &
+  if (specifically_ordered_group == FALSE &
      inherent_order_group == FALSE
   ) {
     dataset <- dataset %>%
@@ -1267,7 +1269,7 @@ grouped_unordered1 <- function(
   rev_group,
   rev_label
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == FALSE) {
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -1304,7 +1306,7 @@ grouped_unordered1 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1318,7 +1320,7 @@ grouped_unordered2 <- function(
   label_first,
   rev_group
 ) {
-  if(specifically_ordered == TRUE &
+  if (specifically_ordered == TRUE &
      inherent_order_label == TRUE) { #Arranging for specific label first
     freqs1 <- dataset %>%
       dplyr::filter(
@@ -1355,7 +1357,7 @@ grouped_unordered2 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1369,7 +1371,7 @@ grouped_unordered3 <- function(
   rev_group,
   rev_label
 ) {
-  if(inherent_order_label == FALSE &
+  if (inherent_order_label == FALSE &
      specifically_ordered == FALSE
   ) {
     freqs1 <- dataset %>%
@@ -1406,7 +1408,7 @@ grouped_unordered3 <- function(
       dplyr::mutate(
         label = forcats::fct_inorder(.data$label)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1419,7 +1421,7 @@ grouped_unordered4 <- function(
   specifically_ordered,
   rev_group
 ) {
-  if(inherent_order_label == TRUE &
+  if (inherent_order_label == TRUE &
      specifically_ordered == FALSE
   ) {
     dataset <- dataset %>%
@@ -1439,7 +1441,7 @@ grouped_unordered4 <- function(
       dplyr::mutate(
         group_var = forcats::fct_inorder(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1449,18 +1451,19 @@ topbox <- function(
   dataset,
   topbox = NULL
 ) {
-  if(is.null(topbox) == FALSE) {
+  if (is.null(topbox) == FALSE) {
     top2box <- topbox
 
     dataset <- spreading_top2(dataset, top2box)
     dataset <- ordering_top2(dataset)
-  } else{ # is.null(topbox)
+  } else { # is.null(topbox)
     dataset <- dataset
   }
 }
 
 ### spreading_top2
 spreading_top2 <- function(dataset, top2box) {
+  . <- NULL
   top2_plus1 <- top2box + 1 # Need to add 1 because 1st column is group_var, not top box
 
   test1 <- dataset %>%
@@ -1484,8 +1487,8 @@ spreading_top2 <- function(dataset, top2box) {
         rowSums(na.rm = TRUE)
       ) %>%
     tidyr::gather(
-      key = value,
-      value = result,
+      key = "value",
+      value = "result",
       -.data$group_var,
       -.data$topbox
     )
@@ -1523,13 +1526,13 @@ horizontal_chart <- function(
   horizontal,
   grouped
 ) {
-  if(horizontal == TRUE) {
-    if(grouped == FALSE) {
+  if (horizontal == TRUE) {
+    if (grouped == FALSE) {
       dataset <- dataset %>%
         dplyr::mutate(
           label = forcats::fct_rev(.data$label)
         )
-    } else{ #grouped == TRUE
+    } else { #grouped == TRUE
       dataset <- dataset %>%
         dplyr::mutate(
           label = forcats::fct_rev(.data$label)
@@ -1538,7 +1541,7 @@ horizontal_chart <- function(
           group_var = forcats::fct_rev(.data$group_var)
         )
     }
-  } else{ #horizontal == FALSE
+  } else { #horizontal == FALSE
     dataset <- dataset
   }
 }
@@ -1551,13 +1554,13 @@ stacked_chart <- function(
   inherent_order_group,
   specifically_ordered
 ) {
-  if(stacked == 'gg' &
+  if (stacked == 'gg' &
      grouped == FALSE) {
     dataset <- dataset  %>%
       dplyr::mutate(
         label = forcats::fct_rev(.data$label)
       )
-  } else if(stacked == 'gg' &
+  } else if (stacked == 'gg' &
             grouped == TRUE) {
     dataset <- dataset %>%
       dplyr::mutate(
@@ -1566,7 +1569,7 @@ stacked_chart <- function(
       dplyr::mutate(
         group_var = forcats::fct_rev(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1579,13 +1582,13 @@ stacked_chart_ms <- function(
   inherent_order_group,
   specifically_ordered_group
 ) {
-  if(stacked == 'ms' &
+  if (stacked == 'ms' &
      grouped == TRUE) {
     dataset <- dataset %>%
       dplyr::mutate(
         group_var = forcats::fct_rev(.data$group_var)
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1597,7 +1600,8 @@ none_other <- function(
   none_other,
   grouped
 ) {
-  if(none_other == TRUE) {
+  options(warn = -1) # Warning about unknown levels of Other, NOA, PNTS, that's fine
+  if (none_other == TRUE) {
     dataset <- dataset %>%
       dplyr::arrange(
         label = forcats::fct_relevel(
@@ -1616,11 +1620,11 @@ none_other <- function(
           stringr::str_c(.data$result * 100)
           )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
   #For grouped
-  if(grouped == TRUE & none_other == TRUE) {
+  if (grouped == TRUE & none_other == TRUE) {
     options(warn=-1) # Warnings here are about levels not existing, but probs won't in most cases
     dataset <- dataset %>%
       dplyr::arrange(
@@ -1640,7 +1644,7 @@ none_other <- function(
           stringr::str_c(.data$result * 100)
         )
       )
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1661,7 +1665,7 @@ label_last_fun <- function(
   )
 
   # Put label_last last
-  if(label_last_dummy == TRUE & horizontal == FALSE) {
+  if (label_last_dummy == TRUE & horizontal == FALSE) {
     dataset <- dataset %>%
       dplyr::arrange(
         label = forcats::fct_relevel(
@@ -1672,9 +1676,9 @@ label_last_fun <- function(
       ) %>%
       dplyr::mutate(label = forcats::fct_inorder(.data$label))
     # Put label_last "first" to be last for horizontal
-  } else if(label_last_dummy == TRUE & horizontal == TRUE) {
-    data_rest <- dataset %>% filter(label != label_last)
-    data_label <- dataset %>% filter(label == label_last)
+  } else if (label_last_dummy == TRUE & horizontal == TRUE) {
+    data_rest <- dataset %>% dplyr::filter(.data$label != label_last)
+    data_label <- dataset %>% dplyr::filter(.data$label == label_last)
     data_rest <- data_rest %>%
       dplyr::arrange(
         label = forcats::fct_relevel(
@@ -1682,16 +1686,16 @@ label_last_fun <- function(
         )
       ) %>%
       dplyr::arrange(label = forcats::fct_rev(.data$label))
-    dataset <- bind_rows(data_label, data_rest) %>%
+    dataset <- dplyr::bind_rows(data_label, data_rest) %>%
       dplyr::mutate(label = forcats::fct_inorder(.data$label))
     # Horizontal and NOT stacked, one more reverse...
-    if(stacked == 'NULL') {
+    if (stacked == 'NULL') {
       dataset <- dataset %>%
         dplyr::arrange(label = forcats::fct_rev(.data$label)) %>%
         dplyr::mutate(label = forcats::fct_inorder(.data$label))
       return(dataset)
     }
-  } else{
+  } else {
     dataset <- dataset
   }
 }
@@ -1710,7 +1714,7 @@ group_last_fun <- function(
   )
 
   # put group_last last
-  if(group_last_dummy == TRUE & horizontal == FALSE) {
+  if (group_last_dummy == TRUE & horizontal == FALSE) {
     dataset <- dataset %>%
       dplyr::arrange(
         group_var = forcats::fct_relevel(
@@ -1721,9 +1725,9 @@ group_last_fun <- function(
       ) %>%
       dplyr::mutate(group_var = forcats::fct_inorder(.data$group_var))
     # Put group_last "first" to be last for horizontal
-  } else if(group_last_dummy == TRUE & horizontal == TRUE) {
-    data_rest <- dataset %>% filter(group_var != group_last)
-    data_label <- dataset %>% filter(group_var == group_last)
+  } else if (group_last_dummy == TRUE & horizontal == TRUE) {
+    data_rest <- dataset %>% dplyr::filter(.data$group_var != group_last)
+    data_label <- dataset %>% dplyr::filter(.data$group_var == group_last)
     data_rest <- data_rest %>%
       dplyr::arrange(
         group_var = forcats::fct_relevel(
@@ -1731,16 +1735,16 @@ group_last_fun <- function(
         )
       ) %>%
       dplyr::arrange(group_var = forcats::fct_rev(.data$group_var))
-    dataset <- bind_rows(data_label, data_rest) %>%
+    dataset <- dplyr::bind_rows(data_label, data_rest) %>%
       dplyr::mutate(group_var = forcats::fct_inorder(.data$group_var))
     # Horizontal and NOT stacked, one more reverse...
-   if(stacked == 'NULL') {
+   if (stacked == 'NULL') {
     dataset <- dataset %>%
       dplyr::arrange(group_var = forcats::fct_rev(.data$group_var)) %>%
       dplyr::mutate(group_var = forcats::fct_inorder(.data$group_var))
     return(dataset)
   }
-    } else{
+    } else {
     dataset <- dataset
   }
 }
@@ -1751,9 +1755,9 @@ num_fmt_orderlabel <- function(
   dataset,
   num_fmt
 ) {
-  if(num_fmt == "percent") {
+  if (num_fmt == "percent") {
     dataset <- dataset
-  } else{
+  } else {
     dataset <- dataset %>%
       dplyr::mutate(percent_label = as.character(.data$result))
   }

@@ -9,7 +9,6 @@
 #' @export
 #' @examples
 #' # The original frequencies, put in descending order of the result
-#' \dontrun{
 #' frequencies <- tibble::tibble(
 #'   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
 #'   result = c(.25, .15, .20, .10, .30),
@@ -25,7 +24,6 @@
 #'   value = c(1, 2, 3, 4, 5),
 #'   group_var = rep('Group B', 5)
 #' ) %>% order_same()
-#' }
 
 order_same <- function(
   dataset,

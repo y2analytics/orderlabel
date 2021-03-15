@@ -60,7 +60,6 @@ order_label(
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
 }
 \examples{
-\dontrun{
 # Ungrouped, put in descending order of the result
 frequencies <- tibble::tibble(
   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
@@ -89,7 +88,6 @@ frequencies <- tibble::tibble(
   group_var = group_var,
   stacked = 'ms'
 )
-}
 }
 \keyword{arrange}
 \keyword{label}
