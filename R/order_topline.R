@@ -1,4 +1,4 @@
-#### Final topline Function ####
+#### Final order_topline Function ####
 #' Add \%s to a topline report
 #'
 #' Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
@@ -8,13 +8,13 @@
 #' @export
 #' @examples
 #' frequencies <- y2clerk::freqs(mtcars, vs, am, gear, carb)
-#' topline(frequencies)
+#' order_topline(frequencies)
 #'
 #' frequencies <- y2clerk::freqs(mtcars, mpg, cyl, disp, stat = 'mean')
-#' topline(frequencies, 'mpg|cyl|disp')
+#' order_topline(frequencies, 'mpg|cyl|disp')
 
 
-topline <- function(
+order_topline <- function(
   dataset,
   whole_numbers = 'place your variable names here with a | (OR sign) between them'
 ) {
@@ -29,7 +29,7 @@ topline <- function(
 
 
 
-#### ***** Hidden Topline Functions ***** ####
+#### ***** Hidden order_topline Functions ***** ####
 #### var_sep ####
 var_sep <- function(dataset) {
   dataset %>%

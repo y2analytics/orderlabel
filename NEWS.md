@@ -1,3 +1,11 @@
+# orderlabel 0.2.3
+## Breaking changes
+* `topline()` function name changed to `order_topline()` because the y2_municipal package has a function called topline now.  Shouldn't be a problem because I bet no one used this function anyway. The developers didn't even use it ;)
+
+## Bugs
+* New error kept occuring when trying to use the `topbox` argument in `order_label`, but that error is now fixed!
+
+
 # orderlabel 0.2.2
 ## Bugs
 * All examples now working

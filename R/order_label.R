@@ -1469,7 +1469,8 @@ spreading_top2 <- function(dataset, top2box) {
   test1 <- dataset %>%
     dplyr::select(
       -.data$result
-    )
+    ) %>%
+    dplyr::mutate(value = as.character(.data$value))
 
   test2 <- dataset %>%
     dplyr::mutate(value1 = .data$value) %>%
@@ -1491,7 +1492,8 @@ spreading_top2 <- function(dataset, top2box) {
       value = "result",
       -.data$group_var,
       -.data$topbox
-    )
+    ) %>%
+    dplyr::mutate(value = as.character(.data$value))
   dataset <- dplyr::left_join(
     test1,
     test2
