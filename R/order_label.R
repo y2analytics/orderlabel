@@ -200,6 +200,8 @@ order_label <- function(
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
 ### num_fmt
   dataset <- num_fmt_orderlabel(dataset, num_fmt)
+### arrange_by_factor
+  dataset <- arrange_by_factor(dataset, grouped)
   return(dataset)
 }
 
@@ -1764,3 +1766,23 @@ num_fmt_orderlabel <- function(
       dplyr::mutate(percent_label = as.character(.data$result))
   }
 }
+
+
+# arrange_by_factor: mschart htmltools updated ordering --------------------------------------
+arrange_by_factor <- function(
+  dataset,
+  grouped
+  ) {
+  if (grouped == FALSE) {
+    dataset <- dataset %>%
+      dplyr::arrange(.data$label)
+  } else {
+    dataset <- dataset %>%
+      dplyr::arrange(
+        .data$label,
+        .data$group_var
+      )
+  }
+}
+
+

@@ -1,7 +1,7 @@
 Type: Package
 Package: orderlabel
 Title: Order Your Tables and Add Percent Labels
-Version: 0.2.3
+Version: 0.3.0
 Authors@R: person("Nick", "Moffitt", email = "nicksmoffitt@gmail.com", role = c("aut", "cre"))
 Description: Order your frequency tables and add percent labels for charting. 
 License: GPL-3
