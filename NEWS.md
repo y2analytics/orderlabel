@@ -1,7 +1,14 @@
+# orderlabel 0.3.1
+## Improvements
+*`add_ages()` - census_age_groups now an ordered factor variable instead of a character variable. Function also now creates "census_age_groups_6" (same as original census_age_groups, but with split 18-34 group into 18-24 & 25-34)
+## Bugs
+*`order_label()` - Problem fixed where order_label() would sometimes break when freqs was grouped by user-created variables
+
+
 # orderlabel 0.3.0
 ## Possible breaking changes
 *`order_label()` - TLDR: Order of rows in output now arranged by factor level, so order_label now works with updated versions of htmltools and mschart. Details are...
-*This update fixes the ordering problems introduced in htmltools versions > 3.6.0 and mschart versions > 2.5.0. To do this, the frequency output from order_label may look slightly different in some cases. The label/group_var are still factored in the same order as before, but the physical arrangement is different in some cases. Because mschart now pulls from the *physical order* the tables are arranged in, and not the *factor order*, the frequency table will look different in some cases to match mschart, but the charts will all be ordered correctly, regardless of if they are run in mschart or ggplot2. 
+*This update fixes the ordering problems introduced in htmltools versions > 3.6.0 and mschart versions > 2.5.0. To do this, the frequency output from order_label may look slightly different in some cases. The label/group_var are still factored in the same order as before, but the physical arrangement is different in some cases. Because mschart now pulls from the "physical order" the tables are arranged in, and not the "factor order", the frequency table will look different in some cases to match mschart, but the charts will all be ordered correctly, regardless of if they are run in mschart or ggplot2. 
 
 
 # orderlabel 0.2.3

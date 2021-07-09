@@ -59,6 +59,7 @@ test_that("add_ages - runs on age_var", {
   expect_equal(test$census_age_groups[4], NA_character_)
 })
 
+
 test_that("add_ages - use only age_var OR year_var", {
   expect_error(
     add_ages(responses, age_var = age, year_born_var = year),

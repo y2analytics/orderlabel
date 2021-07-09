@@ -1,10 +1,12 @@
 # add_ages primary function -----------------------------------------------
 #' Add age and census age groups to a data frame
 #'
-#' Takes a data frame with a year born variable or age variable and creates three new variables:
+#' Takes a data frame with a year born variable or age variable and creates four new variables:
+#'
 #' 1. year_born_numeric
 #' 2. age_numeric
 #' 3. census_age_groups
+#' 4. census_age_groups_6 (same as census_age_groups, but with split 18-34 into 18-24 & 25-34)
 #' @param dataset The name of the data frame for the function to modify, usually piped into your main data frame.
 #' @param year_born_var NO DFAULT; You may either provide a year_born_var or an age_var, not both
 #' @param age_var NO DFAULT
@@ -101,7 +103,37 @@ create_age_groups <- function(dataset){
         .data$age_numeric <= 54 ~ '45-54',
         .data$age_numeric <= 64 ~ '55-64',
         .data$age_numeric >= 65 ~ '65+'
-      )
+      ) %>%
+        # suppressWarnings added for trivial missing levels
+        suppressWarnings(
+          forcats::fct_relevel(
+          '18-34',
+          '35-44',
+          '45-54',
+          '55-64',
+          '65+'
+          )
+        ),
+      census_age_groups_6 = dplyr::case_when(
+        .data$age_numeric < 18 ~ NA_character_,
+        .data$age_numeric <= 24 ~ '18-24',
+        .data$age_numeric <= 34 ~ '25-34',
+        .data$age_numeric <= 44 ~ '35-44',
+        .data$age_numeric <= 54 ~ '45-54',
+        .data$age_numeric <= 64 ~ '55-64',
+        .data$age_numeric >= 65 ~ '65+'
+      ) %>%
+        # suppressWarnings added for trivial missing levels
+        suppressWarnings(
+          forcats::fct_relevel(
+          '18-24',
+          '25-34',
+          '35-44',
+          '45-54',
+          '55-64',
+          '65+'
+          )
+        )
     )
 }
 

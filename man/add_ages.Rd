@@ -14,10 +14,13 @@ add_ages(dataset, year_born_var, age_var)
 \item{age_var}{NO DFAULT}
 }
 \description{
-Takes a data frame with a year born variable or age variable and creates three new variables:
+Takes a data frame with a year born variable or age variable and creates four new variables:
+}
+\details{
 1. year_born_numeric
 2. age_numeric
 3. census_age_groups
+4. census_age_groups_6 (same as census_age_groups, but with split 18-34 into 18-24 & 25-34)
 }
 \examples{
 responses <- tibble::tibble(

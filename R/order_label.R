@@ -128,6 +128,7 @@ order_label <- function(
   }
 
 ### Prep work
+  dataset <- dataset %>% dplyr::ungroup()
   dataset <- reverse_label(dataset, grouped, !!group_var_flag, !!label_var_flag, rev_label)
 
 ### (1) ungrouped Section
