@@ -1,6 +1,6 @@
 # orderlabel 0.3.1
 ## Improvements
-*`add_ages()` - census_age_groups now an ordered factor variable instead of a character variable. Function also now creates "census_age_groups_6" (same as original census_age_groups, but with split 18-34 group into 18-24 & 25-34)
+*`add_ages()` - census_age_groups now an ordered factor variable instead of a character variable. Function also now creates "census_age_groups_6" (same as original census_age_groups, but with the 18-34 group split into 18-24 & 25-34)
 ## Bugs
 *`order_label()` - Problem fixed where order_label() would sometimes break when freqs was grouped by user-created variables
 
