@@ -1,3 +1,8 @@
+# orderlabel 0.3.3
+## New features 
+* `add_ages()` - New argument: "year_of_survey". DEFAULT = Whatever the current year is. Used to calculate respondent ages. If you are using old survey data from a previous year, you can input the year here as a numeric value (e.g. 1994)
+
+
 # orderlabel 0.3.1
 ## Improvements
 *`add_ages()` - census_age_groups now an ordered factor variable instead of a character variable. Function also now creates "census_age_groups_6" (same as original census_age_groups, but with the 18-34 group split into 18-24 & 25-34)

@@ -7,9 +7,10 @@
 #' 2. age_numeric
 #' 3. census_age_groups
 #' 4. census_age_groups_6 (same as census_age_groups, but with split 18-34 into 18-24 & 25-34)
-#' @param dataset The name of the data frame for the function to modify, usually piped into your main data frame.
+#' @param dataset The name of the data frame for the function to modify, usually piped into your main data frame
 #' @param year_born_var NO DFAULT; You may either provide a year_born_var or an age_var, not both
 #' @param age_var NO DFAULT
+#' @param year_of_survey DEFAULT = Whatever the current year is. Used to calculate respondent ages. If you are using old survey data from a previous year, you can input the year here as a numeric value (e.g. 1994)
 #' @export
 #' @examples
 #' responses <- tibble::tibble(
@@ -29,11 +30,12 @@
 add_ages <- function(
   dataset,
   year_born_var,
-  age_var
+  age_var,
+  year_of_survey = 0
 ) {
   if(!missing(year_born_var) & !missing(age_var))
     stop("You specified both year_born_var and age_var, please specify only one")
-  current_year <- get_current_year()
+  current_year <- get_current_year(year_of_survey)
 
   # User specified year_born_var
   if(!missing(year_born_var)){
@@ -53,9 +55,13 @@ add_ages <- function(
 
 # private functions -------------------------------------------------------
 ### Step 1 - get current date
-get_current_year <- function(){
+get_current_year <- function(year_of_survey){
+  if (year_of_survey == 0) {
   date <- Sys.Date()
   current_year <- stringr::str_remove_all(date, '-.*') %>% as.numeric()
+  } else {
+  current_year <- year_of_survey
+  }
 }
 
 

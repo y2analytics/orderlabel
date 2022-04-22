@@ -4,14 +4,16 @@
 \alias{add_ages}
 \title{Add age and census age groups to a data frame}
 \usage{
-add_ages(dataset, year_born_var, age_var)
+add_ages(dataset, year_born_var, age_var, year_of_survey = 0)
 }
 \arguments{
-\item{dataset}{The name of the data frame for the function to modify, usually piped into your main data frame.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped into your main data frame}
 
 \item{year_born_var}{NO DFAULT; You may either provide a year_born_var or an age_var, not both}
 
 \item{age_var}{NO DFAULT}
+
+\item{year_of_survey}{DEFAULT = Whatever the current year is. Used to calculate respondent ages. If you are using old survey data from a previous year, you can input the year here as a numeric value (e.g. 1994)}
 }
 \description{
 Takes a data frame with a year born variable or age variable and creates four new variables:
