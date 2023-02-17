@@ -140,7 +140,7 @@ add_regions <- function(
         stringr::str_detect(.data$state_new_var, 'D.') ~ 'South'
       )
     ) %>%
-    dplyr::select(-.data$state_new_var)
+    dplyr::select(-'state_new_var')
   return(dataset)
 }
 

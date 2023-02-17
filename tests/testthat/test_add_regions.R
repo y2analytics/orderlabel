@@ -1,33 +1,24 @@
-# add_regions set up ---------------------------------------------------------
-library(testthat)
-library(dplyr)
-library(orderlabel)
-
-responses <- tibble::tibble(
-  state = c(
-  'Virginia',
-  'UTAH',
-  'New York',
-  'michigan',
-  'Washington DC',
-  'Puerto Rico'
-  ),
-  abbreviations= c(
-    'VA',
-    'UT',
-    'NY',
-    'MI',
-    'DC',
-    NA_character_
-  )
-)
-
-
-# tests -------------------------------------------------------------------
-context("add_regions")
-
 
 test_that("add_regions - upper/lower case", {
+  responses <- tibble::tibble(
+    state = c(
+      'Virginia',
+      'UTAH',
+      'New York',
+      'michigan',
+      'Washington DC',
+      'Puerto Rico'
+    ),
+    abbreviations= c(
+      'VA',
+      'UT',
+      'NY',
+      'MI',
+      'DC',
+      NA_character_
+    )
+  )
+
   test <- add_regions(responses, state_var = state)
 
   expect_equal(test$census_region[1], "South")
@@ -40,6 +31,25 @@ test_that("add_regions - upper/lower case", {
 
 
 test_that("add_regions - abbreviations", {
+  responses <- tibble::tibble(
+    state = c(
+      'Virginia',
+      'UTAH',
+      'New York',
+      'michigan',
+      'Washington DC',
+      'Puerto Rico'
+    ),
+    abbreviations= c(
+      'VA',
+      'UT',
+      'NY',
+      'MI',
+      'DC',
+      NA_character_
+    )
+  )
+
   test <- add_regions(responses, state_var = abbreviations)
 
   expect_equal(test$census_region[1], "South")
@@ -51,6 +61,25 @@ test_that("add_regions - abbreviations", {
 
 
 test_that("add_regions - rename variable", {
+  responses <- tibble::tibble(
+    state = c(
+      'Virginia',
+      'UTAH',
+      'New York',
+      'michigan',
+      'Washington DC',
+      'Puerto Rico'
+    ),
+    abbreviations= c(
+      'VA',
+      'UT',
+      'NY',
+      'MI',
+      'DC',
+      NA_character_
+    )
+  )
+
   test <- add_regions(responses, state_var = abbreviations, new_name = testy_test)
   expect_equal(names(test)[3], "testy_test")
 })

@@ -18,11 +18,13 @@ order_topline(
 Takes a dataframe (frequencies) and for the first Y (result) of every X (variable), adds a \%. Also changes all 0 to <1 if n >=1
 }
 \examples{
-frequencies <- y2clerk::freqs(mtcars, vs, am, gear, carb)
+\dontrun{
+frequencies <- freqs(mtcars, vs, am, gear, carb)
 order_topline(frequencies)
 
-frequencies <- y2clerk::freqs(mtcars, mpg, cyl, disp, stat = 'mean')
+frequencies <- freqs(mtcars, mpg, cyl, disp, stat = 'mean')
 order_topline(frequencies, 'mpg|cyl|disp')
+}
 }
 \keyword{label}
 \keyword{percent}

@@ -7,11 +7,13 @@
 #' @keywords topline percent label
 #' @export
 #' @examples
-#' frequencies <- y2clerk::freqs(mtcars, vs, am, gear, carb)
+#' \dontrun{
+#' frequencies <- freqs(mtcars, vs, am, gear, carb)
 #' order_topline(frequencies)
 #'
-#' frequencies <- y2clerk::freqs(mtcars, mpg, cyl, disp, stat = 'mean')
+#' frequencies <- freqs(mtcars, mpg, cyl, disp, stat = 'mean')
 #' order_topline(frequencies, 'mpg|cyl|disp')
+#' }
 
 
 order_topline <- function(
@@ -83,11 +85,11 @@ add_lessthan <- function(dataset) {
     ) %>%
     dplyr::ungroup() %>%
     dplyr::select(
-      -.data$variable1,
-      -.data$variable2,
-      -.data$variable3,
-      -.data$variable4,
-      -.data$sort_var
+      -'variable1',
+      -'variable2',
+      -'variable3',
+      -'variable4',
+      -'sort_var'
     )
 }
 

@@ -1,10 +1,5 @@
-#### order_same ####
-library(testthat)
-library(dplyr)
-library(orderlabel)
 
 #### Private functions ####
-context("order_same")
 
 ### grouped_vector
 test_that("grouped_vector", {
@@ -58,6 +53,7 @@ test_that("grouped_vector", {
   expect_equal(lab_lev1, lab_lev2)
   expect_equal(group_lev1, group_lev2)
 })
+
 
 ### Create group var
 test_that("Create group var", {
@@ -115,7 +111,6 @@ test_that("Ungrouped", {
 
   expect_equal(ordered_levels, unordered_levels)
 })
-
 
 
 #### Grouped - full function ####

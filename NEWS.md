@@ -1,3 +1,8 @@
+# orderlabel 0.3.4
+## New features 
+* `add_ages()` - New argument: *survey_date_var* A date variable in the dataset that specifies when the survey was taken. If specified, ages will be calculated off this and not the year_of_survey argument. Especially helpful for trended data that spans multiple years. For example, this argument would calculate that someone born in 2000 taking a survey in 2020 was only 20 when they took the survey. However, if the same respondent took another wave of the survey in 2021, they would now be calculated as 21 years old in the new round but still 20 years old for the previous round.
+
+
 # orderlabel 0.3.3
 ## New features 
 * `add_ages()` - New argument: "year_of_survey". DEFAULT = Whatever the current year is. Used to calculate respondent ages. If you are using old survey data from a previous year, you can input the year here as a numeric value (e.g. 1994)

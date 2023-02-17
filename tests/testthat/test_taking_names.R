@@ -1,12 +1,4 @@
-# prep work ------------------------------------------------------
-library(testthat)
-library(orderlabel)
-library(dplyr)
 
-# taking_names tests ------------------------------------------------------
-
-
-context("taking_names")
 ### unlabelled vars
 test_that("unlabelled vars", {
   df <- data.frame(
@@ -24,7 +16,7 @@ test_that("unlabelled vars", {
 })
 
 ### vars with question wording
-test_that("unlabelled vars", {
+test_that("labelled vars", {
   df <- data.frame(
     Q1 = c(1:5),
     Q2 = rep(.2, 5),

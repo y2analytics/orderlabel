@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# y2clerk
+# orderlabel
 
 <!-- badges: start -->
 <!-- badges: end -->

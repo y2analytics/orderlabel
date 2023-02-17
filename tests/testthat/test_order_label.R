@@ -1,77 +1,5 @@
-#### order_label setup ####
-library(testthat)
-library(tibble)
-library(dplyr)
-library(forcats)
-library(y2clerk)
-library(orderlabel)
-
-stacked_df <- tibble(
-  group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-  value = rep(c('1', '2', '3'), 2),
-  label = rep(c('top1', 'top2', 'top3'), 2),
-  result = c(.1, .2, .7, .2, .05, .65)
-)
-stacked_df_top <- tibble(
-  group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-  value = rep(c('1', '2', '3'), 2),
-  label = rep(c('top1', 'top2', 'top3'), 2),
-  result = c(.1, .2, .7, .2, .05, .65),
-  topbox = c(rep(.3, 3), rep(.25, 3))
-)
-
-ungrouped_df <- tibble(
-  variable = rep('X', 5),
-  value = c('1', '2', '3', '4', '5'),
-  label = c('One', 'Two', 'Three', 'Four', 'Five'),
-  result = c(.1, .2, .3, .4, .5),
-  n = rep(100, 5)
-)
-groups <- tibble(
-  group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-)
-grouped_df <- bind_rows(ungrouped_df, ungrouped_df) %>%
-  bind_cols(groups)
-
-noneother_df <- tibble(
-  variable = rep('X', 8),
-  value = c('1', '2', '3', '4', '5', '6', '7', '8'),
-  label = c(
-    'One',
-    'Two',
-    'Other',
-    'None of the above',
-    'Prefer not to say',
-    'Three',
-    'Four',
-    'Five'
-    ),
-  result = c(.1, .2, .3, .4, .5, .6, .7, .8),
-  n = rep(100, 8)
-)
-groups <- tibble(
-  group_var = c(rep('Brand 1', 8), rep('Brand 2', 8))
-)
-other_grouped_df <- bind_rows(noneother_df, noneother_df) %>%
-  bind_cols(groups)
-noneother_grouped2 <- tibble(
-  group_var = c(
-    'Brand 1', 'Brand 1',
-    'Brand 2', 'Brand 2',
-    'Other', 'Other',
-    'None of the above', 'None of the above',
-    'Prefer not to say', 'Prefer not to say',
-    'Brand 3', 'Brand 3'
-    ),
-  variable = rep('X', 12),
-  value = rep(c('1', '2'), 6),
-  label = rep(c('One', 'Two'), 6),
-  result = rep(c(.1, .2), 6),
-  n = rep(100, 12)
-)
 
 #### Private Functions *************************************** ####
-context("order_label")
 
 
 #### PRE- grouped internal functions ####
@@ -169,7 +97,7 @@ test_that("factors: value was non existant", {
 })
 # value = x, likely made that from missing values
 test_that("factors: value = x", {
-  df <- tibble(
+  df <- tibble::tibble(
     value = c(rep('x', 5)),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
@@ -181,7 +109,7 @@ test_that("factors: value = x", {
 })
 # value = 3, out of order?
 test_that("factors: value out of order", {
-  df <- tibble(
+  df <- tibble::tibble(
     value = c(3, 2, 1, 4, 5),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
@@ -225,14 +153,14 @@ test_that("reverse_label: inherent order", {
 
 ### reverse_label_unordered
 test_that("reverse_label_unordered", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
   ) %>%
     reverse_label_unordered(rev_label = FALSE)
   values <- purrr::as_vector(df$label)
-  df_rev <- tibble(
+  df_rev <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = rep(.2, 5),
     n = rep(100, 5)
@@ -247,7 +175,7 @@ test_that("reverse_label_unordered", {
 #### (1) Ungrouped Section ####
 ### Ungrouped1: label_first
 test_that("Ungrouped1: label_first", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
@@ -271,7 +199,7 @@ test_that("Ungrouped1: label_first", {
 
 ### Ungrouped2: label_first, inherent_order
 test_that("Ungrouped2: label_first, inherent_order", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
@@ -295,7 +223,7 @@ test_that("Ungrouped2: label_first, inherent_order", {
 
 ### Ungrouped3: stacked
 test_that("Ungrouped3: stacked", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
@@ -317,7 +245,7 @@ test_that("Ungrouped3: stacked", {
 
 ### Ungrouped4: unordered
 test_that("Ungrouped4: unordered", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
@@ -340,7 +268,7 @@ test_that("Ungrouped4: unordered", {
 
 ### Ungrouped5: unordered
 test_that("Ungrouped5: unordered", {
-  df <- tibble(
+  df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5)
@@ -390,14 +318,14 @@ test_that("add_group", {
 })
 ### factors
 test_that("factors: is grouped", {
-  df_ungrouped <- tibble(
+  df_ungrouped <- tibble::tibble(
     label = rep(c('One', 'Two'), 2),
     result = rep(.2, 4),
     n = rep(100, 4),
     group_var = c(1, 1, 2, 2)
   ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
 
-  df_grouped <- tibble(
+  df_grouped <- tibble::tibble(
     label = rep(c('One', 'Two'), 2),
     result = rep(.2, 4),
     n = rep(100, 4),
@@ -409,7 +337,7 @@ test_that("factors: is grouped", {
 })
 ### reverse_group
 test_that("reverse_group", {
-  group_forward <- tibble(
+  group_forward <- tibble::tibble(
     label = c(rep('One', 4), rep('Two', 4)),
     result = rep(.2, 8),
     n = rep(100, 8),
@@ -417,7 +345,7 @@ test_that("reverse_group", {
   ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
   purrr::as_vector(group_forward$group_var)
 
-  group_backward <- tibble(
+  group_backward <- tibble::tibble(
     label = c(rep('One', 4), rep('Two', 4)),
     result = rep(.2, 8),
     n = rep(100, 8),
@@ -437,33 +365,62 @@ test_that("reverse_group", {
 #### topbox ####
 # spreading_top2
 test_that("spreading_top2 - top1box", {
+  stacked_df <- tibble::tibble(
+    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
+    value = rep(c('1', '2', '3'), 2),
+    label = rep(c('top1', 'top2', 'top3'), 2),
+    result = c(.1, .2, .7, .2, .05, .65)
+  )
+
   test <- spreading_top2(stacked_df, 1)
-  created_vector <- test %>% pull(topbox)
+  created_vector <- test %>% dplyr::pull(topbox)
   expected_vector <- c(rep(.1, 3), rep(.2, 3))
 
   expect_equal(created_vector, expected_vector)
 })
 test_that("spreading_top2 - top2box", {
+  stacked_df <- tibble::tibble(
+    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
+    value = rep(c('1', '2', '3'), 2),
+    label = rep(c('top1', 'top2', 'top3'), 2),
+    result = c(.1, .2, .7, .2, .05, .65)
+  )
+
   test <- spreading_top2(stacked_df, 2)
-  created_vector <- test %>% pull(topbox)
+  created_vector <- test %>% dplyr::pull(topbox)
   expected_vector <- c(rep(.3, 3), rep(.25, 3))
 
   expect_equal(created_vector, expected_vector)
 })
 test_that("spreading_top2 - top3box", {
+  stacked_df <- tibble::tibble(
+    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
+    value = rep(c('1', '2', '3'), 2),
+    label = rep(c('top1', 'top2', 'top3'), 2),
+    result = c(.1, .2, .7, .2, .05, .65)
+  )
+
   test <- spreading_top2(stacked_df, 3)
-  created_vector <- test %>% pull(topbox)
+  created_vector <- test %>% dplyr::pull(topbox)
   expected_vector <- c(rep(1, 3), rep(.9, 3))
 
   expect_equal(created_vector, expected_vector)
 })
 # ordering_top2
 test_that("ordering_top2 - top2box", {
+  stacked_df_top <- tibble::tibble(
+    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
+    value = rep(c('1', '2', '3'), 2),
+    label = rep(c('top1', 'top2', 'top3'), 2),
+    result = c(.1, .2, .7, .2, .05, .65),
+    topbox = c(rep(.3, 3), rep(.25, 3))
+  )
+
   test <- ordering_top2(stacked_df_top)
-  created_groups <- test %>% pull(group_var) %>% as.character()
+  created_groups <- test %>% dplyr::pull(group_var) %>% as.character()
   expected_groups <- c(rep('Brand 1', 3), rep('Brand 2', 3))
-  top_percent <- test %>% pull(percent_label)
-  created_labels <- test %>% pull(label) %>% as.character()
+  top_percent <- test %>% dplyr::pull(percent_label)
+  created_labels <- test %>% dplyr::pull(label) %>% as.character()
   expected_labels <- rep(c('top1', 'top2', 'top3'), 2)
 
   expect_equal(created_groups, expected_groups) # group in order
@@ -472,11 +429,18 @@ test_that("ordering_top2 - top2box", {
 })
 # topbox
 test_that("topbox - top2box", {
+  stacked_df <- tibble::tibble(
+    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
+    value = rep(c('1', '2', '3'), 2),
+    label = rep(c('top1', 'top2', 'top3'), 2),
+    result = c(.1, .2, .7, .2, .05, .65)
+  )
+
   test <- topbox(stacked_df, 2)
-  created_groups <- test %>% pull(group_var) %>% as.character()
+  created_groups <- test %>% dplyr::pull(group_var) %>% as.character()
   expected_groups <- c(rep('Brand 1', 3), rep('Brand 2', 3))
-  top_percent <- test %>% pull(percent_label)
-  created_labels <- test %>% pull(label) %>% as.character()
+  top_percent <- test %>% dplyr::pull(percent_label)
+  created_labels <- test %>% dplyr::pull(label) %>% as.character()
   expected_labels <- rep(c('top1', 'top2', 'top3'), 2)
   if_null <- topbox(stacked_df)
 
@@ -489,7 +453,16 @@ test_that("topbox - top2box", {
 #### label_last & group_last ####
 # label_last_fun
 test_that("label_last_fun", {
-  factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  factored_df <- ungrouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label))
+
   test <- factored_df %>% label_last_fun(label_last = 'Three', FALSE, 'NULL')
   last_levels <- levels(test$label)
   test <- factored_df %>% label_last_fun(label_last = 'Three', TRUE, 'NULL')
@@ -503,8 +476,22 @@ test_that("label_last_fun", {
 
 # group_last_fun
 test_that("group_last_fun", {
-  factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
+  factored_df <- grouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+
   test <- factored_df %>% group_last_fun(group_last = 'Brand 1', FALSE, 'NULL')
   last_levels <- levels(test$group_var)
   test <- factored_df %>% group_last_fun(group_last = 'Brand 1', TRUE, 'NULL')
@@ -516,6 +503,19 @@ test_that("group_last_fun", {
 
 # label_last/group_last in order_label
 test_that("label_last & group_last", {
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
+
   test <- grouped_df %>% order_label(
     group_var = group_var,
     label_last = 'Three',
@@ -529,6 +529,19 @@ test_that("label_last & group_last", {
 
 # mixing label_last with other arguments
 test_that("label_last & group_last, pt2", {
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
+
   test <- grouped_df %>% order_label( #these guys are backwards
     group_var = group_var,
     label_last = 'Three')
@@ -561,12 +574,29 @@ test_that("label_last & group_last, pt2", {
 #### horizontal_chart ####
 # Not horizontal
 test_that("horizontal_chart - not horizontal", {
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+
   test <- horizontal_chart(ungrouped_df, horizontal = FALSE)
   expect_equal(test, ungrouped_df)
 })
 # Ungrouped
 test_that("horizontal_chart - ungrouped", {
-  factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+
+  factored_df <- ungrouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label))
   test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = FALSE)
   hor_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
@@ -575,9 +605,21 @@ test_that("horizontal_chart - ungrouped", {
 })
 # Grouped
 test_that("horizontal_chart - grouped", {
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
   factored_df <- grouped_df %>%
-    mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
 
   test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = TRUE)
   hor_levels <- levels(test$label)
@@ -592,7 +634,16 @@ test_that("horizontal_chart - grouped", {
 #### stacked_chart + stacked_chart_ms ####
 # stacked_chart
 test_that("stacked_chart  - ungrouped", {
-  factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  factored_df <- ungrouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label))
+
   test <- stacked_chart(factored_df, stacked = 'gg', grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
@@ -600,8 +651,22 @@ test_that("stacked_chart  - ungrouped", {
   expect_equal(created_levels, expected_levels)
 })
 test_that("stacked_chart  - grouped", {
-  factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
+  factored_df <- grouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+
   test <- stacked_chart(factored_df, stacked = 'gg', grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
@@ -614,7 +679,16 @@ test_that("stacked_chart  - grouped", {
 
 # stacked_chart
 test_that("stacked_chart_ms  - ungrouped", {
-  factored_df <- ungrouped_df %>% mutate(label = fct_inorder(label))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  factored_df <- ungrouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label))
+
   test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
@@ -622,8 +696,22 @@ test_that("stacked_chart_ms  - ungrouped", {
   expect_equal(created_levels, expected_levels)
 })
 test_that("stacked_chart_ms  - grouped", {
-  factored_df <- grouped_df %>% mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+  ungrouped_df <- tibble::tibble(
+    variable = rep('X', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(.1, .2, .3, .4, .5),
+    n = rep(100, 5)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
+  )
+  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
+    dplyr::bind_cols(groups)
+  factored_df <- grouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+
   test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
@@ -638,12 +726,47 @@ test_that("stacked_chart_ms  - grouped", {
 #### none_other ####
 # Not horizontal
 test_that("none_other - none_other = FALSE", {
+  noneother_df <- tibble::tibble(
+    variable = rep('X', 8),
+    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
+    label = c(
+      'One',
+      'Two',
+      'Other',
+      'None of the above',
+      'Prefer not to say',
+      'Three',
+      'Four',
+      'Five'
+    ),
+    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
+    n = rep(100, 8)
+  )
+
   test <- none_other(noneother_df, none_other = FALSE, grouped = FALSE)
   expect_equal(test, noneother_df)
 })
 # Ungrouped
 test_that("none_other - ungrouped", {
-  factored_df <- noneother_df %>% mutate(label = fct_inorder(label))
+  noneother_df <- tibble::tibble(
+    variable = rep('X', 8),
+    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
+    label = c(
+      'One',
+      'Two',
+      'Other',
+      'None of the above',
+      'Prefer not to say',
+      'Three',
+      'Four',
+      'Five'
+    ),
+    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
+    n = rep(100, 8)
+  )
+  factored_df <- noneother_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label))
+
   test <- none_other(factored_df, none_other = TRUE, grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
@@ -653,8 +776,31 @@ test_that("none_other - ungrouped", {
 })
 # Grouped
 test_that("none_other - grouped (labels)", {
-  factored_df <- other_grouped_df %>% mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+  noneother_df <- tibble::tibble(
+    variable = rep('X', 8),
+    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
+    label = c(
+      'One',
+      'Two',
+      'Other',
+      'None of the above',
+      'Prefer not to say',
+      'Three',
+      'Four',
+      'Five'
+    ),
+    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
+    n = rep(100, 8)
+  )
+  groups <- tibble::tibble(
+    group_var = c(rep('Brand 1', 8), rep('Brand 2', 8))
+  )
+  other_grouped_df <- dplyr::bind_rows(noneother_df, noneother_df) %>%
+    dplyr::bind_cols(groups)
+  factored_df <- other_grouped_df %>%
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+
   test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
@@ -663,8 +809,25 @@ test_that("none_other - grouped (labels)", {
   expect_equal(created_levels, expected_levels)
 })
 test_that("none_other - grouped (group_var)", {
-  factored_df <- noneother_grouped2 %>% mutate(label = fct_inorder(label)) %>%
-    mutate(group_var = fct_inorder(group_var))
+  noneother_grouped2 <- tibble::tibble(
+    group_var = c(
+      'Brand 1', 'Brand 1',
+      'Brand 2', 'Brand 2',
+      'Other', 'Other',
+      'None of the above', 'None of the above',
+      'Prefer not to say', 'Prefer not to say',
+      'Brand 3', 'Brand 3'
+    ),
+    variable = rep('X', 12),
+    value = rep(c('1', '2'), 6),
+    label = rep(c('One', 'Two'), 6),
+    result = rep(c(.1, .2), 6),
+    n = rep(100, 12)
+  )
+  factored_df <- noneother_grouped2 %>%
+    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
+    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
+
   test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$group_var)
   expected_levels <- c('Brand 1', 'Brand 2', 'Brand 3',
@@ -675,7 +838,7 @@ test_that("none_other - grouped (group_var)", {
 
 #### num_fmt ####
 test_that("num_fmt - error if not percent/general", {
-  df_stat <- tibble(
+  df_stat <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(1, 2, 3, 4, 5),
     n = rep(100, 5)
@@ -684,7 +847,7 @@ test_that("num_fmt - error if not percent/general", {
   expect_error(df_stat %>% order_label(num_fmt = "gnral"))
 })
 test_that("num_fmt - percents", {
-  df_stat <- tibble(
+  df_stat <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5),
@@ -696,7 +859,7 @@ vectors <- c('10', '20', '30', '40', '50%')
   expect_equal(df_stat$percent_label,vectors)
 })
 test_that("num_fmt - general", {
-  df_stat <- tibble(
+  df_stat <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
     result = c(1, 2, 3, 4, 5),
     n = rep(100, 5),
@@ -707,5 +870,4 @@ vectors <- c('1', '2', '3', '4', '5')
 
   expect_equal(df_stat$percent_label,vectors)
 })
-
 

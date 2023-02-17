@@ -1471,20 +1471,20 @@ spreading_top2 <- function(dataset, top2box) {
 
   test1 <- dataset %>%
     dplyr::select(
-      -.data$result
+      -'result'
     ) %>%
     dplyr::mutate(value = as.character(.data$value))
 
   test2 <- dataset %>%
     dplyr::mutate(value1 = .data$value) %>%
     dplyr::select(
-      .data$group_var,
-      .data$value1,
-      .data$result
+      'group_var',
+      'value1',
+      'result'
     ) %>%
     tidyr::spread(
-      key = .data$value1,
-      value = .data$result
+      key = 'value1',
+      value = 'result'
     ) %>%
     dplyr::mutate(
       topbox = dplyr::select(., 2:tidyselect::all_of(top2_plus1)) %>%
@@ -1493,8 +1493,8 @@ spreading_top2 <- function(dataset, top2box) {
     tidyr::gather(
       key = "value",
       value = "result",
-      -.data$group_var,
-      -.data$topbox
+      -'group_var',
+      -'topbox'
     ) %>%
     dplyr::mutate(value = as.character(.data$value))
   dataset <- dplyr::left_join(

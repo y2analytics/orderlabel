@@ -11,6 +11,7 @@
 #' @param year_born_var NO DFAULT; You may either provide a year_born_var or an age_var, not both
 #' @param age_var NO DFAULT
 #' @param year_of_survey DEFAULT = Whatever the current year is. Used to calculate respondent ages. If you are using old survey data from a previous year, you can input the year here as a numeric value (e.g. 1994)
+#' @param survey_date_var DEFAULT = 'NULL'. A date variable in the dataset that specifies when the survey was taken. If specified, ages will be calculated off this and not the year_of_survey argument. Especially helpful for trended data that spans multiple years
 #' @export
 #' @examples
 #' responses <- tibble::tibble(
@@ -31,20 +32,49 @@ add_ages <- function(
   dataset,
   year_born_var,
   age_var,
-  year_of_survey = 0
+  year_of_survey = 0,
+  survey_date_var = 'NULL'
 ) {
+  variable_quoed <- rlang::enquo(survey_date_var)
+  variable_char <- rlang::quo_name(variable_quoed)
+
+  # Error #1
+  if(variable_char != 'NULL') {
+  class_of_survey_date_var <- dataset %>%
+    dplyr::pull({{ survey_date_var }}) %>%
+    class()
+
+  if(
+    class_of_survey_date_var[1] != 'Date' &
+    class_of_survey_date_var[1] != 'POSIXct' &
+    class_of_survey_date_var[1] != 'POSIXt'
+    )
+    stop(stringr::str_c('survey_date_var must be a type of date variable, not a ', class_of_survey_date_var[1]))
+  }
+
+  # Error #2
   if(!missing(year_born_var) & !missing(age_var))
-    stop("You specified both year_born_var and age_var, please specify only one")
-  current_year <- get_current_year(year_of_survey)
+    stop('You specified both year_born_var and age_var, please specify only one')
+
+  # Error #3
+  if(year_of_survey != 0 & variable_char != 'NULL')
+    stop('You specified both year_of_survey and survey_date_var, please specify only one')
+
+  calculated_year <- calculate_current_v_survey_date(
+    dataset,
+    variable_char,
+    year_of_survey,
+    {{ survey_date_var }}
+    )
 
   # User specified year_born_var
   if(!missing(year_born_var)){
-    dataset <- year_born_var_specified(dataset, {{ year_born_var }}, current_year)
+    dataset <- year_born_var_specified(dataset, {{ year_born_var }}, calculated_year)
     }
 
   # User specified age_var
   if(!missing(age_var)){
-    dataset <- age_var_specified(dataset, {{ age_var }}, current_year)
+    dataset <- age_var_specified(dataset, {{ age_var }}, calculated_year)
     }
 
   dataset <- create_age_groups(dataset)
@@ -54,7 +84,7 @@ add_ages <- function(
 
 
 # private functions -------------------------------------------------------
-### Step 1 - get current date
+### Step 1 - get current date or date of survey
 get_current_year <- function(year_of_survey){
   if (year_of_survey == 0) {
   date <- Sys.Date()
@@ -64,33 +94,48 @@ get_current_year <- function(year_of_survey){
   }
 }
 
+calculate_current_v_survey_date <- function(
+    dataset,
+    variable_char,
+    year_of_survey,
+    survey_date_var
+  ) {
+  if(variable_char == 'NULL') {
+    calculated_year <- get_current_year(year_of_survey)
+  } else {
+    calculated_year <- dataset %>%
+      dplyr::mutate(survey_year = lubridate::year({{ survey_date_var }})) %>%
+      dplyr::pull()
+  }
+}
+
 
 ### Step 2 - create 1.year_born_numeric and 2.age_numeric
 year_born_var_specified <- function(
   dataset,
   year_born_var,
-  current_year
+  calculated_year
 ){
   dataset <- dataset %>%
     dplyr::mutate(
       year_born_numeric = forcats::as_factor({{ year_born_var }}) %>%
         as.character() %>%
         as.numeric(),
-      age_numeric = current_year - .data$year_born_numeric
+      age_numeric = calculated_year - .data$year_born_numeric
     )
 }
 
 age_var_specified <- function(
   dataset,
   age_var,
-  current_year
+  calculated_year
 ){
   dataset <- dataset %>%
     dplyr::mutate(
       age_numeric = forcats::as_factor({{ age_var }}) %>%
         as.character() %>%
         as.numeric(),
-      year_born_numeric = current_year - .data$age_numeric
+      year_born_numeric = calculated_year - .data$age_numeric
     )
 }
 
