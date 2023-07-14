@@ -3,8 +3,8 @@
 #'
 #' Takes a dataframe (frequencies) and orders it in the same order as another frequencies table in your R environment called "ordered_df".
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs
-#' @param orders DEFAULT = ordered_df; First create an ordered dataframe called ordered_df using order_label. Your new dataframe created using order_same will have variables and groups in the same order as ordered_df
-#' @param group_var DEFAULT = 'NULL'. Leave as default if there is no grouping variable or if the grouping variable is valled "group_var". Otherwise, specify the group_var here in quotes
+#' @param orders DEFAULT = ordered_df; First create an ordered dataframe called ordered_df using order_label. Your new dataframe created using order_same will have the "label" and "group_var" columns in the same order as the dataframe specified in this argument.
+#' @param group_var DEFAULT = 'NULL'. Leave as default if there is no grouping variable or if the grouping variable is called group_var. Otherwise, specify the group_var here - not in quotes. If you specify a variable name, this variable will be converted to the new "group_var" column, and the data will be ordered by that column.
 #' @keywords order label equal same
 #' @export
 #' @examples
@@ -14,7 +14,7 @@
 #'   result = c(.25, .15, .20, .10, .30),
 #'   value = c(1, 2, 3, 4, 5),
 #'   group_var = rep('Group A', 5)
-#' ) %>% order_label()
+#' ) %>% order_label(group_var = group_var)
 #' ordered_df <- frequencies
 #'
 #' # The second frequencies that you want to be ordered the same as the original
@@ -26,35 +26,53 @@
 #' ) %>% order_same()
 
 order_same <- function(
-  dataset,
-  orders = ordered_df,
-  group_var = 'NULL'
-  ) {
-  label_flag <- purrr::as_vector(orders$label) %>% levels()
+    dataset,
+    orders = ordered_df,
+    group_var = 'NULL'
+) {
+  label_orders <- purrr::as_vector(orders$label) %>% levels()
+  group_quoed <- rlang::enquo(group_var)
+  group_character <- rlang::quo_name(group_quoed)
+
+  if (is.null(label_orders)) {
+    stop('The "label" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')
+  }
 
   # run ordering functions
- if(any(names(orders) == 'group_var') == TRUE |
-    group_var != 'NULL'
-   ) {
-   dataset <- create_group_var(dataset, group_var)
-   group_flag <- purrr::as_vector(orders$group_var) %>% levels()
-   dataset <- grouped_vector(dataset, label_flag1 = label_flag, group_flag1 = group_flag)
- } else{ # NOT grouped
-   dataset <- ungrouped_vector(dataset, label_flag1 = label_flag)
- }
+  if (any(names(orders) == 'group_var') == TRUE |
+      group_character != 'NULL'
+  ) {
+
+    if (any(names(orders) == 'group_var') == FALSE) {
+      stop('If using the group_var argument, the data frame from the "orders" argument must have a column named "group_var". This will be the column by which your new data frame is ordered.')
+    }
+
+    dataset <- create_group_var(dataset, group_quoed, group_character)
+    group_orders <- purrr::as_vector(orders$group_var) %>% levels()
+
+    if (is.null(group_orders)) {
+      stop('The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')
+    }
+
+    dataset <- grouped_vector(dataset, label_flag1 = label_orders, group_flag1 = group_orders)
+  } else{ # NOT grouped
+    dataset <- ungrouped_vector(dataset, label_flag1 = label_orders)
+  }
   return(dataset)
 }
 
 
 #### ***** Hidden Functions ***** ####
 #### Create group_var ####
-create_group_var <- function(dataset, group_var){
-  if(group_var != 'NULL'){
-    group_var_old <- dplyr::enquo(group_var)
-
+create_group_var <- function(
+    dataset,
+    group_quoed,
+    group_character
+    ) {
+  if (group_character != 'NULL' & group_character != 'group_var') {
   dataset <- dataset %>%
     dplyr::rename(
-      group_var = !!group_var_old
+      group_var = !!group_quoed
     )
   }
   dataset <- dataset
@@ -66,7 +84,7 @@ grouped_vector <- function(
   dataset,
   label_flag1,
   group_flag1
-){
+) {
   dataset %>%
     dplyr::ungroup() %>%
     dplyr::arrange(
