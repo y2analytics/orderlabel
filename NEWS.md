@@ -1,3 +1,14 @@
+# orderlabel 0.4.0
+## Breaking changes
+* `order_same` - the *group_var* argument now takes variables outside of quotes instead of inside quotes. Done this way to match formatting of order_label and other tidy functions.
+## New features
+* `order_label` - new argument *percent_all* DEFAULT = FALSE; When FALSE, will put a % next to only the first number label on the chart (this is how order_label has always previously functioned). If set to TRUE, will put %s next to all numbers labels.
+* `other_rm` - new argument *var*. Previously other_rm always removed parenthetical text only on the variables of 'label,' 'variable,' and 'group_var.' Now you can specify an additional variable with with the *var* argument. 
+## Bug fixes
+* `order_same` - fixed problems with *group_var* argument sometimes not working as expected
+* `other_rm` and `preamble_rm` - More robust in removing edge cases with extra types of white space 
+
+
 # orderlabel 0.3.4
 ## New features 
 * `add_ages()` - New argument: *survey_date_var* A date variable in the dataset that specifies when the survey was taken. If specified, ages will be calculated off this and not the year_of_survey argument. Especially helpful for trended data that spans multiple years. For example, this argument would calculate that someone born in 2000 taking a survey in 2020 was only 20 when they took the survey. However, if the same respondent took another wave of the survey in 2021, they would now be calculated as 21 years old in the new round but still 20 years old for the previous round.

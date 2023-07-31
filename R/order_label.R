@@ -1,5 +1,4 @@
-#### Final order_label Function ####
-### Description of order_label
+# Executive function ----------------------------------------------------------
 #' Order your data and add percent labels
 #'
 #' Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
@@ -19,6 +18,7 @@
 #' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @param none_other DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart
 #' @param num_fmt DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
+#' @param percent_all DEFAULT = FALSE; When FALSE, will put a \% next to only the first number label on the chart. If set to TRUE, will put \%s next to all numbers labels.
 #' @keywords order label arrange
 #' @importFrom rlang .data
 #' @examples
@@ -52,7 +52,6 @@
 #' )
 #' @export
 
-### Final Function
 order_label <- function(
   dataset, #will likely be frequencies
   label_var = label,
@@ -69,7 +68,8 @@ order_label <- function(
   stacked = c('NULL', 'ms', 'gg'),
   topbox = NULL,
   none_other = TRUE,
-  num_fmt = c("percent", "general")
+  num_fmt = c("percent", "general"),
+  percent_all = FALSE
 ) {
 
 ### Test matching arguments
@@ -133,7 +133,14 @@ order_label <- function(
 
 ### (1) ungrouped Section
   if (grouped == FALSE) {
-    dataset <- section_ungrouped(dataset, grouped, specifically_ordered, inherent_order_label, stacked, label_first)
+    dataset <- section_ungrouped(
+      dataset,
+      grouped,
+      specifically_ordered,
+      inherent_order_label,
+      stacked,
+      label_first
+      )
 ### Arranging WITH grouping variables
   } else {
   # (2) Grouped Section: arranging for specific group and label to be first
@@ -200,7 +207,7 @@ order_label <- function(
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
 ### num_fmt
-  dataset <- num_fmt_orderlabel(dataset, num_fmt)
+  dataset <- num_fmt_orderlabel(dataset, num_fmt, percent_all)
 ### arrange_by_factor
   dataset <- arrange_by_factor(dataset, grouped)
   return(dataset)
@@ -1758,9 +1765,14 @@ group_last_fun <- function(
 #### num_fmt ####
 num_fmt_orderlabel <- function(
   dataset,
-  num_fmt
+  num_fmt,
+  percent_all
 ) {
   if (num_fmt == "percent") {
+    if (percent_all == TRUE) {
+      dataset <- dataset %>%
+        dplyr::mutate(percent_label = stringr::str_c(.data$result * 100, '%'))
+    }
     dataset <- dataset
   } else {
     dataset <- dataset %>%

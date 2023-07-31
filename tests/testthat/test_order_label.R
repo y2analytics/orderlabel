@@ -1,8 +1,6 @@
 
-#### Private Functions *************************************** ####
+# PRE grouped internal functions -----------------------------------------------
 
-
-#### PRE- grouped internal functions ####
 ### blank_values
 test_that("blank_values - creates value var", {
   df_blank <- data.frame(
@@ -172,8 +170,10 @@ test_that("reverse_label_unordered", {
 })
 
 
-#### (1) Ungrouped Section ####
-### Ungrouped1: label_first
+
+
+# Ungrouped section -------------------------------------------------------
+
 test_that("Ungrouped1: label_first", {
   df <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
@@ -288,7 +288,9 @@ test_that("Ungrouped5: unordered", {
   expect_equal(values, as.vector(c('One', 'Two', 'Three', 'Four', 'Five')))
 })
 
-#### Grouping functions - not complete ####
+
+# Grouping functions ------------------------------------------------------
+
 ### add_group
 test_that("add_group", {
   df_ungrouped <- data.frame(
@@ -362,7 +364,9 @@ test_that("reverse_group", {
 
 ### reverse_label_unordered2
 
-#### topbox ####
+
+# Topbox ------------------------------------------------------------------
+
 # spreading_top2
 test_that("spreading_top2 - top1box", {
   stacked_df <- tibble::tibble(
@@ -450,7 +454,8 @@ test_that("topbox - top2box", {
   expect_equal(if_null, stacked_df)
 })
 
-#### label_last & group_last ####
+# label_last and group_last -----------------------------------------------
+
 # label_last_fun
 test_that("label_last_fun", {
   ungrouped_df <- tibble::tibble(
@@ -571,7 +576,8 @@ test_that("label_last & group_last, pt2", {
 })
 
 
-#### horizontal_chart ####
+# Horizontal charts -------------------------------------------------------
+
 # Not horizontal
 test_that("horizontal_chart - not horizontal", {
   ungrouped_df <- tibble::tibble(
@@ -631,7 +637,8 @@ test_that("horizontal_chart - grouped", {
   expect_equal(hor_groups, expected_groups)
 })
 
-#### stacked_chart + stacked_chart_ms ####
+# Stacked charts ----------------------------------------------------------
+
 # stacked_chart
 test_that("stacked_chart  - ungrouped", {
   ungrouped_df <- tibble::tibble(
@@ -723,7 +730,8 @@ test_that("stacked_chart_ms  - grouped", {
 })
 
 
-#### none_other ####
+# none_other --------------------------------------------------------------
+
 # Not horizontal
 test_that("none_other - none_other = FALSE", {
   noneother_df <- tibble::tibble(
@@ -836,7 +844,8 @@ test_that("none_other - grouped (group_var)", {
   expect_equal(created_levels, expected_levels)
 })
 
-#### num_fmt ####
+# num_fmt -----------------------------------------------------------------
+
 test_that("num_fmt - error if not percent/general", {
   df_stat <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
@@ -852,11 +861,23 @@ test_that("num_fmt - percents", {
     result = c(.1, .2, .3, .4, .5),
     n = rep(100, 5),
     percent_label = c('10', '20', '30', '40', '50%')
-  ) %>%
-    num_fmt_orderlabel(num_fmt = 'percent')
-vectors <- c('10', '20', '30', '40', '50%')
+  )
 
-  expect_equal(df_stat$percent_label,vectors)
+  vectors_1p <- c('10', '20', '30', '40', '50%')
+  vectors_allp <- c('10%', '20%', '30%', '40%', '50%')
+
+  expect_equal(
+    df_stat %>%
+      num_fmt_orderlabel(num_fmt = 'percent', percent_all = FALSE) %>%
+      dplyr::pull(percent_label),
+    vectors_1p
+    )
+  expect_equal(
+    df_stat %>%
+      num_fmt_orderlabel(num_fmt = 'percent', percent_all = TRUE) %>%
+      dplyr::pull(percent_label),
+    vectors_allp
+  )
 })
 test_that("num_fmt - general", {
   df_stat <- tibble::tibble(
@@ -865,7 +886,7 @@ test_that("num_fmt - general", {
     n = rep(100, 5),
     percent_label = as.character(result)
   ) %>%
-    num_fmt_orderlabel(num_fmt = 'general')
+    num_fmt_orderlabel(num_fmt = 'general', percent_all = FALSE)
 vectors <- c('1', '2', '3', '4', '5')
 
   expect_equal(df_stat$percent_label,vectors)

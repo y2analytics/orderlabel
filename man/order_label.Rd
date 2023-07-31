@@ -20,7 +20,8 @@ order_label(
   stacked = c("NULL", "ms", "gg"),
   topbox = NULL,
   none_other = TRUE,
-  num_fmt = c("percent", "general")
+  num_fmt = c("percent", "general"),
+  percent_all = FALSE
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ order_label(
 \item{none_other}{DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart}
 
 \item{num_fmt}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
+
+\item{percent_all}{DEFAULT = FALSE; When FALSE, will put a \% next to only the first number label on the chart. If set to TRUE, will put \%s next to all numbers labels.}
 }
 \description{
 Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.

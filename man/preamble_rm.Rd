@@ -29,15 +29,15 @@ frequencies <- tibble::tibble(
   'What is your favorite color? - Orange'
   ),
   prompt2 = c(
-  'What is your favorite color? \nBlue',
-  'What is your favorite color? \nGreen',
-  'What is your favorite color? \nYellow',
-  'What is your favorite color? \nPurple',
-  'What is your favorite color? \nOrange'
+  'What is your favorite color? ... Blue',
+  'What is your favorite color? ... Green',
+  'What is your favorite color? ... Yellow',
+  'What is your favorite color? ... Purple',
+  'What is your favorite color? ... Orange'
   )
 )
 
 preamble_rm(frequencies)
-preamble_rm(frequencies, var = prompt2, before_symbol = '\n')
+preamble_rm(frequencies, var = prompt2, before_symbol = '\\\\. ')
 frequencies \%>\% preamble_rm()
 }
