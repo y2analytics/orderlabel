@@ -354,7 +354,7 @@ test_that("reverse_group", {
     group_var = rep(c('One', 'Two', 'Three', 'Four'), 2)
   ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label) %>%
     reverse_group(rev_group = TRUE)
-  group_levels <- purrr::as_vector(group_backward$group_var)
+  group_levels <- purrr::as_vector(group_backward$group_var) %>% as.character
 
   expect_equal(
     group_levels,
@@ -440,13 +440,13 @@ test_that("topbox - top2box", {
     result = c(.1, .2, .7, .2, .05, .65)
   )
 
-  test <- topbox(stacked_df, 2)
+  test <- topbox_fun(stacked_df, 2)
   created_groups <- test %>% dplyr::pull(group_var) %>% as.character()
   expected_groups <- c(rep('Brand 1', 3), rep('Brand 2', 3))
   top_percent <- test %>% dplyr::pull(percent_label)
   created_labels <- test %>% dplyr::pull(label) %>% as.character()
   expected_labels <- rep(c('top1', 'top2', 'top3'), 2)
-  if_null <- topbox(stacked_df)
+  if_null <- topbox_fun(stacked_df)
 
   expect_equal(created_groups, expected_groups) # group in order
   expect_equal(top_percent[1], '10%') # top percent should be 10% even though 10<20
@@ -751,7 +751,7 @@ test_that("none_other - none_other = FALSE", {
     n = rep(100, 8)
   )
 
-  test <- none_other(noneother_df, none_other = FALSE, grouped = FALSE)
+  test <- none_other_fun(noneother_df, none_other = FALSE, grouped = FALSE)
   expect_equal(test, noneother_df)
 })
 # Ungrouped
@@ -775,7 +775,7 @@ test_that("none_other - ungrouped", {
   factored_df <- noneother_df %>%
     dplyr::mutate(label = forcats::fct_inorder(label))
 
-  test <- none_other(factored_df, none_other = TRUE, grouped = FALSE)
+  test <- none_other_fun(factored_df, none_other = TRUE, grouped = FALSE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
                        'Other', 'None of the above', 'Prefer not to say')
@@ -809,7 +809,7 @@ test_that("none_other - grouped (labels)", {
     dplyr::mutate(label = forcats::fct_inorder(label)) %>%
     dplyr::mutate(group_var = forcats::fct_inorder(group_var))
 
-  test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
+  test <- none_other_fun(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$label)
   expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
                        'Other', 'None of the above', 'Prefer not to say')
@@ -836,7 +836,7 @@ test_that("none_other - grouped (group_var)", {
     dplyr::mutate(label = forcats::fct_inorder(label)) %>%
     dplyr::mutate(group_var = forcats::fct_inorder(group_var))
 
-  test <- none_other(factored_df, none_other = TRUE, grouped = TRUE)
+  test <- none_other_fun(factored_df, none_other = TRUE, grouped = TRUE)
   created_levels <- levels(test$group_var)
   expected_levels <- c('Brand 1', 'Brand 2', 'Brand 3',
                        'Other', 'None of the above', 'Prefer not to say')
