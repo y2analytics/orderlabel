@@ -1,7 +1,7 @@
 Type: Package
 Package: orderlabel
 Title: Order Your Tables and Add Percent Labels
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Nick", "Moffitt", email = "nicksmoffitt@gmail.com", role = c("aut", "cre")),
     person('Danny', 'Cowser', email = 'danny@y2analytics.com', role = 'ctb'),

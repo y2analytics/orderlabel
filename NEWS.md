@@ -1,3 +1,8 @@
+# orderlabel 0.4.1
+## Bug fixes
+* `order_label` - fixed a few bugs around rev_group not always working with other arguments
+
+
 # orderlabel 0.4.0
 ## Breaking changes
 * `order_same` - the *group_var* argument now takes variables outside of quotes instead of inside quotes. Done this way to match formatting of order_label and other tidy functions.

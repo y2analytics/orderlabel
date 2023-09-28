@@ -7,7 +7,7 @@
 order_label(
   dataset,
   label_var = label,
-  group_var = FALSE,
+  group_var = "NULL",
   inherent_order_label = FALSE,
   inherent_order_group = FALSE,
   label_first = NA,
@@ -29,7 +29,7 @@ order_label(
 
 \item{label_var}{DEFAULT = label; name of variable to be ordered}
 
-\item{group_var}{DEFAULT = FALSE; Add the name of the grouping variable if your data is grouped}
+\item{group_var}{DEFAULT = 'NULL'; Add the unquoted name of the grouping variable if your data is grouped}
 
 \item{inherent_order_label}{DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE, puts labels in the inherent order from survey (Strongly agree to strongly disagree)}
 
