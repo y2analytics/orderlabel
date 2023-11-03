@@ -1,3 +1,12 @@
+# orderlabel 0.4.2
+## New feautres
+* `order_label` - new error messages added, documentation updated
+## Bug fixes
+* `order_label` - fixed bugs with rev_label in ungrouped data
+## Tests
+* `order_label` - Test suite redone to match tidy testing best practices: tests written by use case and not by private function performance. Expanded tests beyond current coverage
+
+
 # orderlabel 0.4.1
 ## Bug fixes
 * `order_label` - fixed a few bugs around rev_group not always working with other arguments

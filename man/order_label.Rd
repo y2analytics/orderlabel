@@ -25,15 +25,15 @@ order_label(
 )
 }
 \arguments{
-\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs.}
+\item{dataset}{The name of the data frame for the function to modify, usually piped in after running freqs}
 
 \item{label_var}{DEFAULT = label; name of variable to be ordered}
 
 \item{group_var}{DEFAULT = 'NULL'; Add the unquoted name of the grouping variable if your data is grouped}
 
-\item{inherent_order_label}{DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE, puts labels in the inherent order from survey (Strongly agree to strongly disagree)}
+\item{inherent_order_label}{DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE, puts labels in the inherent order from survey (e.g., Strongly agree to strongly disagree). Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = TRUE}
 
-\item{inherent_order_group}{DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (District 1, District 2...)}
+\item{inherent_order_group}{DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (e.g., District 1, District 2...)}
 
 \item{label_first}{DEFAULT = NA; If specified, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels}
 
@@ -47,7 +47,7 @@ order_label(
 
 \item{group_last}{DEFAULT = NA; If specified, puts the specified group last ex: 'brand1' would put group called brand1 after all other groups}
 
-\item{horizontal}{DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = TRUE}
+\item{horizontal}{DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes horizontal = TRUE}
 
 \item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
 
@@ -57,10 +57,10 @@ order_label(
 
 \item{num_fmt}{DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions}
 
-\item{percent_all}{DEFAULT = FALSE; When FALSE, will put a \% next to only the first number label on the chart. If set to TRUE, will put \%s next to all numbers labels.}
+\item{percent_all}{DEFAULT = FALSE; When FALSE, will put a \% next to only the first number label on the chart. If set to TRUE, will put \%s next to all numbers labels}
 }
 \description{
-Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot.
+Takes a dataframe (frequencies) and orders the labels and groups while adding percent labels for use in ggplot
 }
 \examples{
 # Ungrouped, put in descending order of the result

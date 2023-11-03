@@ -1,894 +1,2181 @@
 
-# PRE grouped internal functions -----------------------------------------------
+# Errors and Warnings -----------------------------------------------------
 
-### blank_values
-test_that("blank_values - creates value var", {
-  df_blank <- data.frame(
-    a = c(1:5),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  )
-  df_normal <- data.frame(
-    value = c(1:5),
+test_that("Errors and Warnings on grouped data", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .15, .15, .2, .4)
   )
 
-  test_blank <- blank_values(df_blank) %>% names()
-  test_normal <- blank_values(df_normal)
-  # Test that blank_values create values if missing
-  expect_equal(test_blank, c('a', 'result', 'n', 'value', 'label'))
-  # If not missing, test that it doesn't overwrite the labels/values
-  expect_equal(df_normal, test_normal)
+  expect_error(
+    frequencies %>% order_label(inherent_order_group = TRUE),
+    'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
+  )
+  expect_error(
+    frequencies %>% order_label(rev_group = TRUE),
+    'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
+  )
+  expect_error(
+    frequencies %>% order_label(group_first = 's_test'),
+    'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
+  )
+  expect_error(
+    frequencies %>% order_label(group_last = 's_test'),
+    'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
+  )
+  expect_warning(
+    frequencies %>% order_label(stacked = 'ms'),
+    'You used a "stacked" ordering system without specifying group_var. Is your data grouped?'
+  )
 })
 
 
-### add_label
-test_that("add_label", {
-  df_blank <- data.frame(
-    a = c(1:5),
-    result = rep(.2, 5),
-    n = rep(100, 5)
+test_that("Errors and Warnings on grouped data", {
+  expect_error(
+    tibble::tibble(
+      variable = rep('s_test', 5),
+      value = c('1', '2', '3', '4', '5'),
+      label = c('One', 'Two', 'Three', 'Four', 'Five'),
+      n = c(10, 15, 15, 20, 40),
+      stat = rep('percent', 5),
+      result = c(.1, .3, .4, .05, .01)
+    ) %>%
+      order_label(topbox = 2),
+    'You cannot use the topbox argument on ungrouped data.'
   )
-  df_normal <- data.frame(
-    value = c(1:5),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  )
-
-  test_blank <- add_label(df_blank, label) %>% names()
-  test_normal <- add_label(df_normal, label) %>% names()
-  expect_equal(test_blank, c('a', 'result', 'n', 'value', 'label'))
-  expect_equal(test_normal, c('value', 'label', 'result', 'n'))
 })
 
 
-### add_group
-test_that("add_group", {
-  df_ungrouped <- data.frame(
-    value = c(1:5),
+test_that("Error num_fmt not percent/general", {
+  df_stat <- tibble::tibble(
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5),
-    change = c(1, 1, 1, 2, 2)
-  ) %>% add_group(grouped = FALSE, group_var = change, label_var = label)
-  df_grouped <- data.frame(
-    value = c(1:5),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5),
-    change = c(1, 1, 1, 2, 2)
-  ) %>% add_group(grouped = TRUE, group_var = change, label_var = label)
+    result = c(1, 2, 3, 4, 5),
+    n = rep(100, 5)
+  )
 
-  test_ungrouped <- df_ungrouped %>% names()
-  test_grouped <- df_grouped %>% names()
-  expect_equal(test_ungrouped, c('value', 'label', 'result', 'n', 'change'))
-  expect_equal(test_grouped, c('value', 'label', 'result', 'n', 'change', 'group_var'))
+  expect_error(
+    df_stat %>% order_label(num_fmt = "gnral")
+    )
 })
 
 
-### factors
-# value = label
-test_that("factors: value = label", {
-  df <- data.frame(
+test_that("Error stacked not NULL, ms, gg", {
+  df_stat <- tibble::tibble(
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    result = c(1, 2, 3, 4, 5),
+    n = rep(100, 5)
+  )
+
+  expect_error(
+    df_stat %>% order_label(stacked = "mschart")
+  )
+})
+
+
+test_that("Grouped, stacked gg, inherent_order_group, rev_group", {
+  expect_error(
+    tibble::tibble(
+      group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+      variable = rep('s_test', 9),
+      value = rep(c('1', '2', '3'), 3),
+      label = rep(c('One', 'Two', 'Three'), 3),
+      n = rep(10, 9),
+      stat = rep('percent', 9),
+      result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+    ) %>%
+      order_label(
+        group_var = group_var,
+        stacked = 'gg',
+        inherent_order_group = TRUE,
+        topbox = 2
+      ),
+    'You cannot use the topbox argument when inherent_order_group is TRUE.'
+  )
+})
+
+
+# Overall -----------------------------------------------------------------
+
+test_that("Output structure", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .15, .15, .2, .4)
+  ) %>%
+    order_label(
+      label_var = value
+    )
+
+  expect_equal(
+    class(frequencies)[1],
+    c('tbl_df')
+  )
+  expect_equal(
+    class(frequencies$label),
+    c('factor')
+  )
+  expect_equal(
+    class(frequencies$value),
+    c('numeric')
+  )
+})
+
+
+test_that("Adds values", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
     value = c('One', 'Two', 'Three', 'Four', 'Five'),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
-  value_values <- unique(df$value)
-
-  expect_equal(value_values, c(1:5))
-})
-# value was non existant
-test_that("factors: value was non existant", {
-  df <- data.frame(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
-  value_values <- unique(df$value)
-
-  expect_equal(value_values, c(1:5))
-})
-# value = x, likely made that from missing values
-test_that("factors: value = x", {
-  df <- tibble::tibble(
-    value = c(rep('x', 5)),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
-  value_values <- unique(df$value)
-
-  expect_equal(value_values, c(1:5))
-})
-# value = 3, out of order?
-test_that("factors: value out of order", {
-  df <- tibble::tibble(
-    value = c(3, 2, 1, 4, 5),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% factors(grouped = FALSE, group_var = NULL, label_var = label)
-  value_values <- unique(df$value)
-
-  expect_equal(value_values, c(1:5))
-})
-
-
-### reverse_label (inherent order)
-test_that("reverse_label: inherent order", {
-  df <- data.frame(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% reverse_label(
-    grouped = FALSE,
-    group_var = NULL,
-    label_var = label,
-    rev_label = FALSE
-    )
-  values <- purrr::as_vector(df$value)
-  df_rev <- data.frame(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% reverse_label(
-    grouped = FALSE,
-    group_var = NULL,
-    label_var = label,
-    rev_label = TRUE
-    )
-  values_rev <- purrr::as_vector(df_rev$value)
-
-  expect_equal(values, c(1:5))
-  expect_equal(values_rev, c(5:1))
-})
-
-
-### reverse_label_unordered
-test_that("reverse_label_unordered", {
-  df <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .2, .3, .4, .5)
   ) %>%
-    reverse_label_unordered(rev_label = FALSE)
-  values <- purrr::as_vector(df$label)
-  df_rev <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = rep(.2, 5),
-    n = rep(100, 5)
-  ) %>% reverse_label_unordered(rev_label = TRUE)
-  values_rev <- purrr::as_vector(df_rev$label)
-
-  expect_equal(values, as.vector(c('One', 'Two', 'Three', 'Four', 'Five')))
-  expect_equal(values_rev, rev(as.vector(c('One', 'Two', 'Three', 'Four', 'Five'))))
-})
-
-
-
-
-# Ungrouped section -------------------------------------------------------
-
-test_that("Ungrouped1: label_first", {
-  df <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  ) %>%
-    reverse_label(
-      grouped = FALSE,
-      group_var = FALSE,
-      label_var = label,
-      rev_label = FALSE
-      ) %>%
-    ungrouped1(
-      specifically_ordered = TRUE,
-      inherent_order_label = FALSE,
-      label_first = 'Three'
+    order_label(
+      label_var = value
     )
-  values <- purrr::as_vector(df$label) %>% levels()
-
-  expect_equal(values, as.vector(c('Three', 'Five', 'Four', 'Two', 'One')))
+  expect_equal(
+    frequencies %>% dplyr::pull(value),
+    c(5, 4, 3, 2, 1)
+  )
 })
 
 
-### Ungrouped2: label_first, inherent_order
-test_that("Ungrouped2: label_first, inherent_order", {
-  df <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
+test_that("label_var", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .15, .15, .2, .4)
   ) %>%
-    reverse_label(
-      grouped = FALSE,
-      group_var = FALSE,
-      label_var = label,
-      rev_label = FALSE
-      ) %>%
-    ungrouped2(
-      specifically_ordered = TRUE,
+    order_label(
+      label_var = value
+    )
+  expect_equal(
+    names(frequencies),
+    c('variable', 'value', 'label', 'n', 'stat', 'result', 'percent_label')
+  )
+})
+
+
+# Ungrouped Data - one argument only -------------------------------------------
+
+# num_fmt & percent_all in single but not multiple arguments because...
+# they don't have to do with ordering, just formatting
+
+# NO ARGUMENTS *******************************************************
+test_that("Ungrouped, no arguments", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label()
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Two', 'One', 'Four', 'Five')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% levels(),
+    c('Three', 'Two', 'One', 'Four', 'Five')
+  )
+})
+
+
+# ONE ARGUMENT *******************************************************
+test_that("Ungrouped, inherent_order_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(inherent_order_label = TRUE)
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Two', 'Three', 'Four', 'Five')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% levels(),
+    c('One', 'Two', 'Three', 'Four', 'Five')
+  )
+})
+
+test_that("Ungrouped, label_first", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(label_first = 'Two')
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Three', 'One', 'Four', 'Five')
+  )
+})
+
+
+test_that("Ungrouped, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(rev_label = TRUE)
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'One', 'Two', 'Three')
+  )
+})
+
+
+test_that("Ungrouped, label_last", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(label_last = 'Two')
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'One', 'Four', 'Five', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(horizontal = TRUE)
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'One', 'Two', 'Three')
+  )
+})
+
+
+test_that("Ungrouped, stacked gg", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(stacked = 'gg')
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'Three', 'Two', 'One')
+  )
+})
+
+
+test_that("Ungrouped, stacked ms", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(stacked = 'ms')
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Two', 'Three', 'Four', 'Five')
+  )
+})
+
+
+test_that("Ungrouped, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .31, .9)
+  )
+
+  freqs_other_true <- frequencies %>%
+    order_label(none_other = TRUE)
+  expect_equal(
+    freqs_other_true %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Two', 'One', 'Other', 'None of the above')
+  )
+
+  freqs_other_false <- frequencies %>%
+    order_label(none_other = FALSE)
+  expect_equal(
+    freqs_other_false %>% dplyr::pull(label) %>% as.character(),
+    c('None of the above', 'Three', 'Other', 'Two', 'One')
+  )
+})
+
+
+test_that("Ungrouped, num_fmt", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .31, .9)
+  )
+
+  freqs_numfmt_true <- frequencies %>%
+    order_label(num_fmt = 'percent')
+  expect_equal(
+    freqs_numfmt_true %>% dplyr::pull(percent_label),
+    c('90%', '40', '31', '30', '10')
+  )
+
+  freqs_numfmt_false <- frequencies %>%
+    order_label(num_fmt = 'general')
+  expect_equal(
+    freqs_numfmt_false %>% dplyr::pull(percent_label),
+    c('0.9', '0.4', '0.31', '0.3', '0.1')
+  )
+})
+
+test_that("Ungrouped, percent_all", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .31, .9)
+  ) %>%
+    order_label(percent_all = TRUE)
+
+  expect_equal(
+    frequencies %>% dplyr::pull(percent_label),
+    c('90%', '40%', '31%', '30%', '10%')
+  )
+})
+
+
+
+# Ungrouped Data - descending, 2 arguments -------------------------------
+
+# TWO ARGUMENTS *******************************************************
+test_that("Ungrouped, label_first, label_last", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Four'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Three', 'One', 'Five', 'Four')
+  )
+})
+
+
+test_that("Ungrouped, label_first, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Five', 'Four', 'One', 'Three')
+  )
+})
+
+test_that("Ungrouped, label_first, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'One', 'Three', 'Two')
+  )
+  expect_equal(
+    frequencies$percent_label[5],
+    c('30%')
+  )
+})
+
+
+test_that("Ungrouped, label_first, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'None of the above', 'Three', 'Other', 'One')
+  )
+})
+
+
+test_that("Ungrouped, label_last, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'One', 'Three', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_last, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Five', 'Four', 'One', 'Three')
+  )
+})
+
+
+test_that("Ungrouped, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Two', 'One', 'Four', 'Five')
+  )
+})
+
+
+test_that("Ungrouped, rev_label, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      rev_label = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Other', 'Two', 'Three', 'None of the above')
+  )
+})
+
+
+test_that("Ungrouped, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Other', 'Two', 'Three', 'None of the above')
+  )
+})
+
+
+
+# Ungrouped Data - descending, 3 arguments -------------------------------
+
+# THREE ARGUMENTS **********************************************
+test_that("Ungrouped, label_first, label_last, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Four',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Five', 'One', 'Three', 'Four')
+  )
+})
+
+
+test_that("Ungrouped, label_first, label_last, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Four',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Four', 'Five', 'One', 'Three', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_first, label_last, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Other',
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'None of the above', 'Three', 'One', 'Other')
+  )
+})
+
+
+test_that("Ungrouped, label_first, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'One', 'Four', 'Five', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_first, rev_label, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      rev_label = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'One', 'Other', 'Three', 'None of the above')
+  )
+})
+
+
+test_that("Ungrouped, label_first, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Other', 'Three', 'None of the above', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_last, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'Three', 'One', 'Four', 'Five')
+  )
+})
+
+
+test_that("Ungrouped, label_last, rev_label, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      rev_label = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Other', 'Three', 'None of the above', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_last, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two', 'One', 'Other', 'Three', 'None of the above')
+  )
+})
+
+
+test_that("Ungrouped, rev_label, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      rev_label = TRUE,
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('None of the above', 'Three', 'Two', 'Other', 'One')
+  )
+})
+
+
+
+# Ungrouped Data - descending, 4-5 arguments -------------------------------
+
+# FOUR ARGUMENTS **********************************************
+test_that("Ungrouped, label_first, label_last, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Four',
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Four', 'Three', 'One', 'Five', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_first, label_last, rev_label, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Other',
+      rev_label = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Two','One', 'Three', 'None of the above', 'Other')
+  )
+})
+
+
+test_that("Ungrouped, label_first, label_last, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Other',
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    rev(c('Two', 'None of the above', 'Three', 'One', 'Other'))
+  )
+})
+
+
+test_that("Ungrouped, label_first, rev_label, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      rev_label = TRUE,
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('None of the above', 'Three', 'Other', 'One', 'Two')
+  )
+})
+
+
+test_that("Ungrouped, label_last, rev_label, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_last = 'Two',
+      rev_label = TRUE,
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c( 'Two', 'None of the above', 'Three', 'Other', 'One')
+  )
+})
+
+
+# FIVE ARGUMENTS **********************************************
+test_that("Ungrouped, label_first, label_last, rev_label, horizontal, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Other', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .29, .9)
+  ) %>%
+    order_label(
+      label_first = 'Two',
+      label_last = 'Other',
+      rev_label = TRUE,
+      horizontal = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Other', 'None of the above', 'Three', 'One', 'Two')
+  )
+})
+
+
+# Ungrouped Data - inherent_order, 2 arguments -------------------------
+
+# Will not be including none_other in inherent_order sections after this
+# because none_other options should come at the end anyway
+
+# TWO ARGUMENTS *************************************************
+test_that("Ungrouped, inherent_order_label, label_first", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
       inherent_order_label = TRUE,
       label_first = 'Three'
-    )
-  values <- purrr::as_vector(df$label) %>% levels()
+      )
 
-  expect_equal(values, as.vector(c('Three', 'One', 'Two', 'Four', 'Five')))
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'One', 'Two', 'Four', 'Five')
+  )
 })
 
 
-### Ungrouped3: stacked
-test_that("Ungrouped3: stacked", {
-  df <- tibble::tibble(
+test_that("Ungrouped, inherent_order_label, label_last", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
   ) %>%
-    reverse_label(
-      grouped = FALSE,
-      group_var = FALSE,
-      label_var = label,
-      rev_label = FALSE
-      ) %>%
-    ungrouped3(
-      stacked = 'gg'
+    order_label(
+      inherent_order_label = TRUE,
+      label_last = 'Three'
     )
-  values <- purrr::as_vector(df$label) %>% levels()
 
-  expect_equal(values, as.vector(c('Five', 'Four', 'Three', 'Two', 'One')))
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Two', 'Four', 'Five', 'Three')
+  )
 })
 
 
-### Ungrouped4: unordered
-test_that("Ungrouped4: unordered", {
-  df <- tibble::tibble(
+test_that("Ungrouped, inherent_order_label, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
   ) %>%
-    reverse_label(
-      grouped = FALSE,
-      group_var = FALSE,
-      label_var = label,
-      rev_label = FALSE
-      ) %>%
-    ungrouped4(
-      specifically_ordered = FALSE,
-      inherent_order_label = FALSE
+    order_label(
+      inherent_order_label = TRUE,
+      rev_label = TRUE
     )
-  values <- purrr::as_vector(df$label) %>% levels()
 
-  expect_equal(values, as.vector(c('Five', 'Four', 'Three', 'Two', 'One')))
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    rev(c('One', 'Two', 'Three', 'Four', 'Five'))
+  )
 })
 
 
-### Ungrouped5: unordered
-test_that("Ungrouped5: unordered", {
-  df <- tibble::tibble(
+test_that("Ungrouped, inherent_order_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
     label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
   ) %>%
-    reverse_label(
-      grouped = FALSE,
-      group_var = FALSE,
-      label_var = label,
-      rev_label = FALSE
-      ) %>%
-    ungrouped5(
-      specifically_ordered = FALSE,
+    order_label(
+      inherent_order_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    rev(c('One', 'Two', 'Three', 'Four', 'Five'))
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, none_other", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'None of the above'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .5)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      none_other = FALSE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Two', 'Three', 'Four', 'None of the above')
+  )
+})
+
+
+
+# Ungrouped Data - inherent_order, 3 arguments -------------------------
+
+# THREE ARGUMENTS *************************************************
+test_that("Ungrouped, inherent_order_label, label_first, label_last", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      label_last = 'Four'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'One', 'Two', 'Five', 'Four')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_first, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Five', 'Four', 'Two', 'One')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_first, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    rev(c('Three', 'One', 'Two', 'Four', 'Five'))
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_last, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_last = 'Three',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Five', 'Four', 'Two', 'One', 'Three')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_last, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_last = 'Three',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Five', 'Four', 'Two', 'One')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    rev(c('Five', 'Four', 'Three', 'Two', 'One'))
+  )
+})
+
+
+# Ungrouped Data - inherent_order, 4-5 arguments -------------------------
+
+# FOUR ARGUMENTS *************************************************
+test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      label_last = 'Four',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Three', 'Five', 'Two', 'One', 'Four')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_first, label_last, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      label_last = 'Four',
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Four', 'Five', 'Two', 'One', 'Three')
+  )
+})
+
+
+test_that("Ungrouped, inherent_order_label, label_last, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('One', 'Two', 'Four', 'Five', 'Three')
+  )
+})
+
+
+# FIVE ARGUMENTS *************************************************
+test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label, horizontal", {
+  frequencies <- tibble::tibble(
+    variable = rep('s_test', 5),
+    value = c('1', '2', '3', '4', '5'),
+    label = c('One', 'Two', 'Three', 'Four', 'Five'),
+    n = c(10, 15, 15, 20, 40),
+    stat = rep('percent', 5),
+    result = c(.1, .3, .4, .05, .01)
+  ) %>%
+    order_label(
+      inherent_order_label = TRUE,
+      label_first = 'Three',
+      label_last = 'Four',
+      rev_label = TRUE,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character(),
+    c('Four', 'One', 'Two', 'Five', 'Three')
+  )
+})
+
+
+# Grouped Data - one argument only ----------------------------------------
+
+# NO ARGUMENTS *******************************************************
+test_that("Grouped, no other arguments", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c( 'Two', 'One', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+})
+
+
+# ONE ARGUMENT *******************************************************
+test_that("Grouped, inherent_order_label", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
       inherent_order_label = TRUE
     )
-  values <- purrr::as_vector(df$label) %>% levels()
 
-  expect_equal(values, as.vector(c('One', 'Two', 'Three', 'Four', 'Five')))
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('One', 'Two', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
 })
 
 
-# Grouping functions ------------------------------------------------------
-
-### add_group
-test_that("add_group", {
-  df_ungrouped <- data.frame(
-    label = rep(c('One', 'Two'), 2),
-    result = rep(.2, 4),
-    n = rep(100, 4),
-    group_var = c(1, 1, 2, 2)
+test_that("Grouped, inherent_order_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
   ) %>%
-    add_group(
-      grouped = TRUE,
+    order_label(
       group_var = group_var,
-      label_var = label
+      inherent_order_group = TRUE
     )
-  df_grouped <- data.frame(
-    label = rep(c('One', 'Two'), 2),
-    result = rep(.2, 4),
-    n = rep(100, 4),
-    group_var = c(1, 1, 2, 2)
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('Three', 'Two', 'One')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, label_first", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
   ) %>%
-    dplyr::group_by(group_var) %>%
-    add_group(
-      grouped = TRUE,
+    order_label(
       group_var = group_var,
-      label_var = label
-  )
-  expect_equal(df_ungrouped, df_grouped)
-})
-### factors
-test_that("factors: is grouped", {
-  df_ungrouped <- tibble::tibble(
-    label = rep(c('One', 'Two'), 2),
-    result = rep(.2, 4),
-    n = rep(100, 4),
-    group_var = c(1, 1, 2, 2)
-  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
-
-  df_grouped <- tibble::tibble(
-    label = rep(c('One', 'Two'), 2),
-    result = rep(.2, 4),
-    n = rep(100, 4),
-    group_var = c(1, 1, 2, 2)
-  ) %>%
-    dplyr::group_by(group_var) %>%
-    factors(grouped = TRUE, group_var = group_var, label_var = label)
-  expect_equal(df_ungrouped, df_grouped)
-})
-### reverse_group
-test_that("reverse_group", {
-  group_forward <- tibble::tibble(
-    label = c(rep('One', 4), rep('Two', 4)),
-    result = rep(.2, 8),
-    n = rep(100, 8),
-    group_var = rep(c('One', 'Two', 'Three', 'Four'), 2)
-  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label)
-  purrr::as_vector(group_forward$group_var)
-
-  group_backward <- tibble::tibble(
-    label = c(rep('One', 4), rep('Two', 4)),
-    result = rep(.2, 8),
-    n = rep(100, 8),
-    group_var = rep(c('One', 'Two', 'Three', 'Four'), 2)
-  ) %>% factors(grouped = TRUE, group_var = group_var, label_var = label) %>%
-    reverse_group(rev_group = TRUE)
-  group_levels <- purrr::as_vector(group_backward$group_var) %>% as.character
-
-  expect_equal(
-    group_levels,
-    c('Four', 'Four', 'Three', 'Three', 'Two', 'Two', 'One', 'One')
+      label_first = 'Three'
     )
-})
-
-### reverse_label_unordered2
-
-
-# Topbox ------------------------------------------------------------------
-
-# spreading_top2
-test_that("spreading_top2 - top1box", {
-  stacked_df <- tibble::tibble(
-    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-    value = rep(c('1', '2', '3'), 2),
-    label = rep(c('top1', 'top2', 'top3'), 2),
-    result = c(.1, .2, .7, .2, .05, .65)
-  )
-
-  test <- spreading_top2(stacked_df, 1)
-  created_vector <- test %>% dplyr::pull(topbox)
-  expected_vector <- c(rep(.1, 3), rep(.2, 3))
-
-  expect_equal(created_vector, expected_vector)
-})
-test_that("spreading_top2 - top2box", {
-  stacked_df <- tibble::tibble(
-    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-    value = rep(c('1', '2', '3'), 2),
-    label = rep(c('top1', 'top2', 'top3'), 2),
-    result = c(.1, .2, .7, .2, .05, .65)
-  )
-
-  test <- spreading_top2(stacked_df, 2)
-  created_vector <- test %>% dplyr::pull(topbox)
-  expected_vector <- c(rep(.3, 3), rep(.25, 3))
-
-  expect_equal(created_vector, expected_vector)
-})
-test_that("spreading_top2 - top3box", {
-  stacked_df <- tibble::tibble(
-    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-    value = rep(c('1', '2', '3'), 2),
-    label = rep(c('top1', 'top2', 'top3'), 2),
-    result = c(.1, .2, .7, .2, .05, .65)
-  )
-
-  test <- spreading_top2(stacked_df, 3)
-  created_vector <- test %>% dplyr::pull(topbox)
-  expected_vector <- c(rep(1, 3), rep(.9, 3))
-
-  expect_equal(created_vector, expected_vector)
-})
-# ordering_top2
-test_that("ordering_top2 - top2box", {
-  stacked_df_top <- tibble::tibble(
-    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-    value = rep(c('1', '2', '3'), 2),
-    label = rep(c('top1', 'top2', 'top3'), 2),
-    result = c(.1, .2, .7, .2, .05, .65),
-    topbox = c(rep(.3, 3), rep(.25, 3))
-  )
-
-  test <- ordering_top2(stacked_df_top)
-  created_groups <- test %>% dplyr::pull(group_var) %>% as.character()
-  expected_groups <- c(rep('Brand 1', 3), rep('Brand 2', 3))
-  top_percent <- test %>% dplyr::pull(percent_label)
-  created_labels <- test %>% dplyr::pull(label) %>% as.character()
-  expected_labels <- rep(c('top1', 'top2', 'top3'), 2)
-
-  expect_equal(created_groups, expected_groups) # group in order
-  expect_equal(top_percent[1], '10%') # top percent should be 10% even though 10<20
-  expect_equal(created_labels, expected_labels) # labels should be ordered for stacked
-})
-# topbox
-test_that("topbox - top2box", {
-  stacked_df <- tibble::tibble(
-    group_var = c('Brand 1', 'Brand 1', 'Brand 1', 'Brand 2', 'Brand 2', 'Brand 2'),
-    value = rep(c('1', '2', '3'), 2),
-    label = rep(c('top1', 'top2', 'top3'), 2),
-    result = c(.1, .2, .7, .2, .05, .65)
-  )
-
-  test <- topbox_fun(stacked_df, 2)
-  created_groups <- test %>% dplyr::pull(group_var) %>% as.character()
-  expected_groups <- c(rep('Brand 1', 3), rep('Brand 2', 3))
-  top_percent <- test %>% dplyr::pull(percent_label)
-  created_labels <- test %>% dplyr::pull(label) %>% as.character()
-  expected_labels <- rep(c('top1', 'top2', 'top3'), 2)
-  if_null <- topbox_fun(stacked_df)
-
-  expect_equal(created_groups, expected_groups) # group in order
-  expect_equal(top_percent[1], '10%') # top percent should be 10% even though 10<20
-  expect_equal(created_labels, expected_labels) # labels should be ordered for stacked
-  expect_equal(if_null, stacked_df)
-})
-
-# label_last and group_last -----------------------------------------------
-
-# label_last_fun
-test_that("label_last_fun", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  factored_df <- ungrouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label))
-
-  test <- factored_df %>% label_last_fun(label_last = 'Three', FALSE, 'NULL')
-  last_levels <- levels(test$label)
-  test <- factored_df %>% label_last_fun(label_last = 'Three', TRUE, 'NULL')
-  last_levels_hor <- levels(test$label)
-
-  expect_equal(last_levels[5], 'Three')
-  expect_equal(last_levels[4], 'Five')
-  expect_equal(last_levels_hor[5], 'Three')
-  expect_equal(last_levels_hor[4], 'Five')
-})
-
-# group_last_fun
-test_that("group_last_fun", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-  factored_df <- grouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- factored_df %>% group_last_fun(group_last = 'Brand 1', FALSE, 'NULL')
-  last_levels <- levels(test$group_var)
-  test <- factored_df %>% group_last_fun(group_last = 'Brand 1', TRUE, 'NULL')
-  last_levels_hor <- levels(test$group_var)
-
-  expect_equal(last_levels[2], 'Brand 1')
-  expect_equal(last_levels_hor[2], 'Brand 1')
-})
-
-# label_last/group_last in order_label
-test_that("label_last & group_last", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-
-  test <- grouped_df %>% order_label(
-    group_var = group_var,
-    label_last = 'Three',
-    group_last = 'Brand 1')
-  last_labels <- levels(test$label)
-  last_group <- levels(test$group_var)
-
-  expect_equal(last_labels[5], 'Three')
-  expect_equal(last_group[2], 'Brand 1')
-})
-
-# mixing label_last with other arguments
-test_that("label_last & group_last, pt2", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-
-  test <- grouped_df %>% order_label( #these guys are backwards
-    group_var = group_var,
-    label_last = 'Three')
-  last_original <- levels(test$label)
-  test <- grouped_df %>% order_label( #these guys are backwards
-    group_var = group_var,
-    horizontal = TRUE,
-    label_last = 'Three')
-  last_horizontal <- levels(test$label)
-
-  test <- grouped_df %>% order_label( #these guys are backwards
-    group_var = group_var,
-    stacked = 'gg',
-    label_last = 'Three')
-  last_stacked_gg <- levels(test$label)
-
-  test <- grouped_df %>% order_label(
-    group_var = group_var,
-    stacked = 'ms',
-    label_last = 'Three')
-  last_stacked_ms <- levels(test$label)
-
-  expect_equal(last_original[5], 'Three')
-  expect_equal(last_horizontal[1], 'Three') # Will be reversed with horizontal
-  expect_equal(last_stacked_gg[1], 'Three') # Will be reversed with horizontal
-  expect_equal(last_stacked_ms[5], 'Three')
-})
-
-
-# Horizontal charts -------------------------------------------------------
-
-# Not horizontal
-test_that("horizontal_chart - not horizontal", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-
-  test <- horizontal_chart(ungrouped_df, horizontal = FALSE)
-  expect_equal(test, ungrouped_df)
-})
-# Ungrouped
-test_that("horizontal_chart - ungrouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-
-  factored_df <- ungrouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label))
-  test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = FALSE)
-  hor_levels <- levels(test$label)
-  expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
-
-  expect_equal(hor_levels, expected_levels)
-})
-# Grouped
-test_that("horizontal_chart - grouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-  factored_df <- grouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- horizontal_chart(factored_df, horizontal = TRUE, grouped = TRUE)
-  hor_levels <- levels(test$label)
-  expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
-  hor_groups <- levels(test$group_var)
-  expected_groups <- c('Brand 2', 'Brand 1')
-
-  expect_equal(hor_levels, expected_levels)
-  expect_equal(hor_groups, expected_groups)
-})
-
-# Stacked charts ----------------------------------------------------------
-
-# stacked_chart
-test_that("stacked_chart  - ungrouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  factored_df <- ungrouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label))
-
-  test <- stacked_chart(factored_df, stacked = 'gg', grouped = FALSE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
-
-  expect_equal(created_levels, expected_levels)
-})
-test_that("stacked_chart  - grouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-  factored_df <- grouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- stacked_chart(factored_df, stacked = 'gg', grouped = TRUE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('Five', 'Four', 'Three', 'Two', 'One')
-  created_group <- levels(test$group_var)
-  expected_group <- c('Brand 2', 'Brand 1')
-
-  expect_equal(created_levels, expected_levels)
-  expect_equal(created_group, expected_group)
-})
-
-# stacked_chart
-test_that("stacked_chart_ms  - ungrouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  factored_df <- ungrouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label))
-
-  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = FALSE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
-
-  expect_equal(created_levels, expected_levels)
-})
-test_that("stacked_chart_ms  - grouped", {
-  ungrouped_df <- tibble::tibble(
-    variable = rep('X', 5),
-    value = c('1', '2', '3', '4', '5'),
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 5), rep('Brand 2', 5))
-  )
-  grouped_df <- dplyr::bind_rows(ungrouped_df, ungrouped_df) %>%
-    dplyr::bind_cols(groups)
-  factored_df <- grouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- stacked_chart_ms(factored_df, stacked = 'ms', grouped = TRUE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five')
-  created_group <- levels(test$group_var)
-  expected_group <- c('Brand 2', 'Brand 1')
-
-  expect_equal(created_levels, expected_levels)
-  expect_equal(created_group, expected_group)
-})
-
-
-# none_other --------------------------------------------------------------
-
-# Not horizontal
-test_that("none_other - none_other = FALSE", {
-  noneother_df <- tibble::tibble(
-    variable = rep('X', 8),
-    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
-    label = c(
-      'One',
-      'Two',
-      'Other',
-      'None of the above',
-      'Prefer not to say',
-      'Three',
-      'Four',
-      'Five'
-    ),
-    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
-    n = rep(100, 8)
-  )
-
-  test <- none_other_fun(noneother_df, none_other = FALSE, grouped = FALSE)
-  expect_equal(test, noneother_df)
-})
-# Ungrouped
-test_that("none_other - ungrouped", {
-  noneother_df <- tibble::tibble(
-    variable = rep('X', 8),
-    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
-    label = c(
-      'One',
-      'Two',
-      'Other',
-      'None of the above',
-      'Prefer not to say',
-      'Three',
-      'Four',
-      'Five'
-    ),
-    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
-    n = rep(100, 8)
-  )
-  factored_df <- noneother_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label))
-
-  test <- none_other_fun(factored_df, none_other = TRUE, grouped = FALSE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
-                       'Other', 'None of the above', 'Prefer not to say')
-
-  expect_equal(created_levels, expected_levels)
-})
-# Grouped
-test_that("none_other - grouped (labels)", {
-  noneother_df <- tibble::tibble(
-    variable = rep('X', 8),
-    value = c('1', '2', '3', '4', '5', '6', '7', '8'),
-    label = c(
-      'One',
-      'Two',
-      'Other',
-      'None of the above',
-      'Prefer not to say',
-      'Three',
-      'Four',
-      'Five'
-    ),
-    result = c(.1, .2, .3, .4, .5, .6, .7, .8),
-    n = rep(100, 8)
-  )
-  groups <- tibble::tibble(
-    group_var = c(rep('Brand 1', 8), rep('Brand 2', 8))
-  )
-  other_grouped_df <- dplyr::bind_rows(noneother_df, noneother_df) %>%
-    dplyr::bind_cols(groups)
-  factored_df <- other_grouped_df %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- none_other_fun(factored_df, none_other = TRUE, grouped = TRUE)
-  created_levels <- levels(test$label)
-  expected_levels <- c('One', 'Two', 'Three', 'Four', 'Five',
-                       'Other', 'None of the above', 'Prefer not to say')
-
-  expect_equal(created_levels, expected_levels)
-})
-test_that("none_other - grouped (group_var)", {
-  noneother_grouped2 <- tibble::tibble(
-    group_var = c(
-      'Brand 1', 'Brand 1',
-      'Brand 2', 'Brand 2',
-      'Other', 'Other',
-      'None of the above', 'None of the above',
-      'Prefer not to say', 'Prefer not to say',
-      'Brand 3', 'Brand 3'
-    ),
-    variable = rep('X', 12),
-    value = rep(c('1', '2'), 6),
-    label = rep(c('One', 'Two'), 6),
-    result = rep(c(.1, .2), 6),
-    n = rep(100, 12)
-  )
-  factored_df <- noneother_grouped2 %>%
-    dplyr::mutate(label = forcats::fct_inorder(label)) %>%
-    dplyr::mutate(group_var = forcats::fct_inorder(group_var))
-
-  test <- none_other_fun(factored_df, none_other = TRUE, grouped = TRUE)
-  created_levels <- levels(test$group_var)
-  expected_levels <- c('Brand 1', 'Brand 2', 'Brand 3',
-                       'Other', 'None of the above', 'Prefer not to say')
-
-  expect_equal(created_levels, expected_levels)
-})
-
-# num_fmt -----------------------------------------------------------------
-
-test_that("num_fmt - error if not percent/general", {
-  df_stat <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(1, 2, 3, 4, 5),
-    n = rep(100, 5)
-  )
-
-  expect_error(df_stat %>% order_label(num_fmt = "gnral"))
-})
-test_that("num_fmt - percents", {
-  df_stat <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(.1, .2, .3, .4, .5),
-    n = rep(100, 5),
-    percent_label = c('10', '20', '30', '40', '50%')
-  )
-
-  vectors_1p <- c('10', '20', '30', '40', '50%')
-  vectors_allp <- c('10%', '20%', '30%', '40%', '50%')
 
   expect_equal(
-    df_stat %>%
-      num_fmt_orderlabel(num_fmt = 'percent', percent_all = FALSE) %>%
-      dplyr::pull(percent_label),
-    vectors_1p
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('Three', 'Two', 'One')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, label_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      label_last = 'Three'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c( 'Two', 'One', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+})
+
+
+test_that("Grouped, group_first", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      group_first = 'Group 3'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c( 'Two', 'One', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+})
+
+
+test_that("Grouped, group_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      group_last = 'Group 3'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c( 'Two', 'One', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, rev_label", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('Three', 'One', 'Two')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      rev_group = TRUE
+    )
+
+  # Reverses groups as expected, but then do labels order after first group?
+  # Or do labels order after the originally first group, which is now last?
+  # Or do they order after overall highest numbers, no matter which group
+  # expect_equal(
+  #   frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+  #   c('Three', 'One', 'Two')
+  # )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 1', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, horizontal", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      horizontal = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('Three', 'One', 'Two')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 1', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, none_other", {
+  # none_other TRUE
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Other', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      none_other = TRUE
+    )
+    expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('One', 'Three', 'Other')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+
+  # none_other FALSE
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Other', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      none_other = FALSE
     )
   expect_equal(
-    df_stat %>%
-      num_fmt_orderlabel(num_fmt = 'percent', percent_all = TRUE) %>%
-      dplyr::pull(percent_label),
-    vectors_allp
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('Other', 'One', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
   )
 })
-test_that("num_fmt - general", {
-  df_stat <- tibble::tibble(
-    label = c('One', 'Two', 'Three', 'Four', 'Five'),
-    result = c(1, 2, 3, 4, 5),
-    n = rep(100, 5),
-    percent_label = as.character(result)
-  ) %>%
-    num_fmt_orderlabel(num_fmt = 'general', percent_all = FALSE)
-vectors <- c('1', '2', '3', '4', '5')
 
-  expect_equal(df_stat$percent_label,vectors)
+
+# Grouped Data - descending, 2 arguments ---------------------------------------
+
+# TWO ARGUMENTS *******************************************************
+
+
+# Stacked data, gg - one argument only ----------------------------------------
+
+# ONE ARGUMENT *********************************************************
+# For stacked, arguments to test are:
+# inherent_order_group, group_first, group_last, rev_group, topbox
+test_that("Grouped, stacked gg", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg'
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 1', 'Group 3')
+  )
 })
+
+
+test_that("Grouped, stacked gg, inherent_order_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 2', 'Group 1')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_first", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_first = 'Group 1'
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 3', 'Group 1')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_last = 'Group 1'
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      rev_group = TRUE
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+})
+
+
+test_that("Grouped, stacked gg, topbox", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .4, .4, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      topbox = 2
+    )
+
+  # Stacked gg is like horizontal in that bottom of table is first on chart
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    rev(c('One', 'Two', 'Three'))
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+
+# Stacked data, gg - 2 arguments ----------------------------------------------
+
+# TWO ARGUMENTS *********************************************************
+# For stacked, arguments to test are:
+# inherent_order_group, group_first, group_last, rev_group, topbox
+
+
+test_that("Grouped, stacked gg, inherent_order_group, group_first", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      group_first = 'Group 2'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 1', 'Group 2')
+  )
+})
+
+
+test_that("Grouped, stacked gg, inherent_order_group, group_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      group_last = 'Group 1'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 3', 'Group 2')
+  )
+})
+
+
+test_that("Grouped, stacked gg, inherent_order_group, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      rev_group = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_first, group_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_first = 'Group 1',
+      group_last = 'Group 3'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 2', 'Group 1')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_first, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_first = 'Group 1',
+      rev_group = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 3', 'Group 2', 'Group 1')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_first, topbox", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_first = 'Group 1',
+      topbox = 2
+    )
+
+  # Come back to this
+  # expect_equal(
+  #   frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+  #   c('Group 3', 'Group 2', 'Group 1')
+  # )
+})
+
+
+test_that("Grouped, stacked gg, group_last, rev_label", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_last = 'Group 1',
+      rev_label = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_last, topbox", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_last = 'Group 2',
+      topbox = 2
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 1', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, rev_group, topbox", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      rev_group = TRUE,
+      topbox = 2
+    )
+
+  # expect_equal(
+  #   frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+  #   c('Group 2', 'Group 1', 'Group 3')
+  # )
+})
+
+
+# Stacked data, gg - 3-4 arguments ----------------------------------------------
+
+# THREE ARGUMENTS *********************************************************
+# For stacked, arguments to test are:
+# inherent_order_group, group_first, group_last, rev_group
+
+test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    variable = rep('s_test', 12),
+    value = rep(c('1', '2', '3'), 4),
+    label = rep(c('One', 'Two', 'Three'), 4),
+    n = rep(10, 12),
+    stat = rep('percent', 12),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      group_first = 'Group 3',
+      group_last = 'Group 1'
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 4', 'Group 2', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    variable = rep('s_test', 12),
+    value = rep(c('1', '2', '3'), 4),
+    label = rep(c('One', 'Two', 'Three'), 4),
+    n = rep(10, 12),
+    stat = rep('percent', 12),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      group_first = 'Group 3',
+      rev_group = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 4', 'Group 3')
+  )
+})
+
+
+test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    variable = rep('s_test', 12),
+    value = rep(c('1', '2', '3'), 4),
+    label = rep(c('One', 'Two', 'Three'), 4),
+    n = rep(10, 12),
+    stat = rep('percent', 12),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      group_first = 'Group 3',
+      group_last = 'Group 1',
+      rev_group = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 4', 'Group 2', 'Group 3')
+  )
+})
+
+
+# FOUR ARGUMENTS *********************************************************
+test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last, rev_group", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    variable = rep('s_test', 12),
+    value = rep(c('1', '2', '3'), 4),
+    label = rep(c('One', 'Two', 'Three'), 4),
+    n = rep(10, 12),
+    stat = rep('percent', 12),
+    result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'gg',
+      inherent_order_group = TRUE,
+      group_first = 'Group 3',
+      group_last = 'Group 1',
+      rev_group = TRUE
+    )
+
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 1', 'Group 2', 'Group 4', 'Group 3')
+  )
+})
+
+# GG TESTING
+# chart <- gg_grouped_y2(
+#   font_family = 'sans',
+#   fills = c('red', 'orange', 'yellow'),
+#   direction = 'horizontal'
+# )
+# chart <- gg_stacked_y2(
+#   font_family = 'sans',
+#   fills = c('red', 'orange', 'yellow')
+# )
+# print(chart)
+# rm(chart)
+
+# Stacked data, ms - one argument --------------------------------------------------------
+
+test_that("Grouped, stacked ms", {
+  frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  ) %>%
+    order_label(
+      group_var = group_var,
+      stacked = 'ms'
+    )
+
+  # Stacked ms has groups reversed but labels descending
+  expect_equal(
+    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    c('One', 'Two', 'Three')
+  )
+  expect_equal(
+    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    c('Group 2', 'Group 1', 'Group 3')
+  )
+})
+
+
+
+# MS TESTING
+# text_settings_stacked <- set_text_settings_y2()
+# color_settings_stacked <- set_color_settings_y2('blue', 'yellow', 'red')
+# chart <- ms_stacked_y2(
+#   font_family = 'sans',
+#   direction = 'horizontal'
+# )
+# print(chart, preview = TRUE)
+
+
+
 
