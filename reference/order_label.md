@@ -1,0 +1,153 @@
+# Order your data and add percent labels
+
+Takes a dataframe (frequencies) and orders the labels and groups while
+adding percent labels for use in ggplot
+
+## Usage
+
+``` r
+order_label(
+  dataset,
+  label_var = label,
+  group_var = "NULL",
+  inherent_order_label = FALSE,
+  inherent_order_group = FALSE,
+  label_first = NA,
+  group_first = NA,
+  rev_label = FALSE,
+  rev_group = FALSE,
+  label_last = NA,
+  group_last = NA,
+  horizontal = FALSE,
+  stacked = c("NULL", "ms", "gg"),
+  topbox = NULL,
+  none_other = TRUE,
+  num_fmt = c("percent", "general"),
+  percent_all = FALSE
+)
+```
+
+## Arguments
+
+- dataset:
+
+  The name of the data frame for the function to modify, usually piped
+  in after running freqs
+
+- label_var:
+
+  DEFAULT = label; name of variable to be ordered
+
+- group_var:
+
+  DEFAULT = 'NULL'; Add the unquoted name of the grouping variable if
+  your data is grouped
+
+- inherent_order_label:
+
+  DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE,
+  puts labels in the inherent order from survey (e.g., Strongly agree to
+  strongly disagree). Specifying stacked = 'gg' or 'ms' automatically
+  makes inherent_order_label = TRUE
+
+- inherent_order_group:
+
+  DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE,
+  puts groups in the order they are factored (e.g., District 1, District
+  2...)
+
+- label_first:
+
+  DEFAULT = NA; If specified, puts the specified label first. ex:
+  'brand1' would put label called brand1 before all other labels
+
+- group_first:
+
+  DEFAULT = NA; If specified, puts the specified group first. ex:
+  'brand1' would put group called brand1 before all other groups
+
+- rev_label:
+
+  DEFAULT = FALSE; To reverse the order of labels in a chart, use
+  rev_label = TRUE
+
+- rev_group:
+
+  DEFAULT = FALSE; To reverse the order of groups in a chart, use
+  rev_group = TRUE
+
+- label_last:
+
+  DEFAULT = NA; If specified, puts the specified label last ex: 'brand1'
+  would put label called brand1 after all other labels
+
+- group_last:
+
+  DEFAULT = NA; If specified, puts the specified group last ex: 'brand1'
+  would put group called brand1 after all other groups
+
+- horizontal:
+
+  DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use
+  horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically
+  makes horizontal = TRUE
+
+- stacked:
+
+  DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot
+  and 'ms' for mschart
+
+- topbox:
+
+  DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order
+  by top2box instead of topbox
+
+- none_other:
+
+  DEFAULT = TRUE; Automatically puts "Other", "None of the above", and
+  "Prefer not to say" options at the bottom. Change to FALSE to let them
+  stay ordered elsewhere in the chart
+
+- num_fmt:
+
+  DEFAULT = "percent"; Other option is "general", use this when working
+  with whole numbers rather than percents/proportions
+
+- percent_all:
+
+  DEFAULT = FALSE; When FALSE, will put a % next to only the first
+  number label on the chart. If set to TRUE, will put %s next to all
+  numbers labels
+
+## Examples
+
+``` r
+# Ungrouped, put in descending order of the result
+frequencies <- tibble::tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.25, .15, .20, .10, .30),
+  value = c(1, 2, 3, 4, 5)
+) %>% order_label()
+
+# Grouped, with an inherent order for the label, or the brand
+frequencies <- tibble::tibble(
+  label = rep(c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'), 2),
+  result = c(.20, .20, .30, .10, .20, .20, .30, .20, .20, .10),
+  value = rep(c(1, 2, 3, 4, 5), 2),
+  group_var = c(rep('Group A', 5), rep('Group B', 5))
+) %>% order_label(
+  group_var = group_var,
+  inherent_order_label = TRUE
+)
+
+# Stacked, will be using this frequencies in an mschart later on
+frequencies <- tibble::tibble(
+  label = rep(c('Promoter', 'Passive', 'Detractor'), 3),
+  result = c(.33, .33, .34, .20, .30, .50, .25, .50, .25),
+  value = rep(c(1, 2, 3), 3),
+  group_var = c(rep('Group A', 3), rep('Group B', 3), rep('Group C', 3))
+) %>% order_label(
+  group_var = group_var,
+  stacked = 'ms'
+)
+```

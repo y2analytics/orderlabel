@@ -1,0 +1,42 @@
+# Add %s to a topline report
+
+Takes a dataframe (frequencies) and for the first Y (result) of every X
+(variable), adds a %. Also changes all 0 to \<1 if n \>=1
+
+## Usage
+
+``` r
+order_topline(
+  dataset,
+  whole_numbers = "place your variable names here with a | (OR sign) between them"
+)
+```
+
+## Arguments
+
+- dataset:
+
+  The name of the data frame that the mscharts pulls from, usually piped
+  in after running freqs. Please note that the variable column must be
+  "variable" and the percentage column must be "result"
+
+- whole_numbers:
+
+  DEFAULT = If you have only variables that are percentages, and no
+  whole number variables, you can leave this argument blank. Otherwise,
+  add the names of the variables that are not percentages here separated
+  by a "\|" (OR sign). You do not have to type out the whole variable
+  name/each option of a multiple select. A unique portion of the var
+  name will work as well because this argument uses str_detect().
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+frequencies <- freqs(mtcars, vs, am, gear, carb)
+order_topline(frequencies)
+
+frequencies <- freqs(mtcars, mpg, cyl, disp, stat = 'mean')
+order_topline(frequencies, 'mpg|cyl|disp')
+} # }
+```

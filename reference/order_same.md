@@ -1,0 +1,54 @@
+# Auto order a freqs table to match another freqs table
+
+Takes a dataframe (frequencies) and orders it in the same order as
+another frequencies table in your R environment called "ordered_df".
+
+## Usage
+
+``` r
+order_same(dataset, orders = ordered_df, group_var = "NULL")
+```
+
+## Arguments
+
+- dataset:
+
+  The name of the data frame for the function to modify, usually piped
+  in after running freqs
+
+- orders:
+
+  DEFAULT = ordered_df; First create an ordered dataframe called
+  ordered_df using order_label. Your new dataframe created using
+  order_same will have the "label" and "group_var" columns in the same
+  order as the dataframe specified in this argument.
+
+- group_var:
+
+  DEFAULT = 'NULL'. Leave as default if there is no grouping variable or
+  if the grouping variable is called group_var. Otherwise, specify the
+  group_var here - not in quotes. If you specify a variable name, this
+  variable will be converted to the new "group_var" column, and the data
+  will be ordered by that column.
+
+## Examples
+
+``` r
+# The original frequencies, put in descending order of the result
+frequencies <- tibble::tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.25, .15, .20, .10, .30),
+  value = c(1, 2, 3, 4, 5),
+  group_var = rep('Group A', 5)
+) %>% order_label(group_var = group_var)
+ordered_df <- frequencies
+
+# The second frequencies that you want to be ordered the same as the original
+frequencies <- tibble::tibble(
+  label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
+  result = c(.30, .10, .15, .20, .25),
+  value = c(1, 2, 3, 4, 5),
+  group_var = rep('Group B', 5)
+) %>% order_same()
+#> Error in order_same(.): object 'ordered_df' not found
+```
