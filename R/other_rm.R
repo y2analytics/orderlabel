@@ -46,7 +46,7 @@ other_rm <- function(
             stringr::str_detect({{ symb_var }}, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
             stringr::str_detect({{ symb_var }}, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
             {{ symb_var }} == 'None' ~ 'None of the above',
-            TRUE ~ {{ symb_var }}
+            .default = {{ symb_var }}
           ),
           '{{symb_var}}' := stringr::str_remove_all({{ symb_var }}, ' \\(.*')
         )
