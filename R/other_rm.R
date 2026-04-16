@@ -20,8 +20,8 @@
 #'   other_var = c('x', 'y', 'z', 'z (test)', 'None')
 #' )
 #'
-#' frequencies %>% other_rm(remove = TRUE)
-#' frequencies %>% other_rm(var = other_var)
+#' frequencies |> other_rm(remove = TRUE)
+#' frequencies |> other_rm(var = other_var)
 
 other_rm <- function(
     dataset,
@@ -35,8 +35,8 @@ other_rm <- function(
   for(i in vars_to_edit) {
     if (any(names(dataset) == i) == TRUE) {
       symb_var <- rlang::sym(i)
-      dataset <- dataset %>%
-        dplyr::ungroup() %>%
+      dataset <- dataset |>
+        dplyr::ungroup() |>
         dplyr::mutate(
           '{{symb_var}}' := as.character({{ symb_var }}),
           '{{symb_var}}' := stringr::str_squish({{ symb_var }}),
@@ -66,13 +66,13 @@ remove_argument <- function(
     remove
 ) {
   if (remove == TRUE) {
-    dataset <- dataset %>%
+    dataset <- dataset |>
       dplyr::filter_all(
         ~stringr::str_detect(., 'Other') == FALSE
-      ) %>%
+      ) |>
       dplyr::filter_all(
         ~stringr::str_detect(., 'None of the above') == FALSE
-      )  %>%
+      )  |>
       dplyr::filter_all(
         ~stringr::str_detect(., 'Prefer not to ') == FALSE
       )

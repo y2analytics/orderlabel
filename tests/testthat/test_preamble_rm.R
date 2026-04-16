@@ -72,11 +72,11 @@ test_that("preamble_rm - white space", {
     prompt5 = c('What is your favorite color?  -  Blue')
   )
 
-  test1 <- preamble_rm(frequencies, var = prompt1) %>% dplyr::pull(prompt1)
-  test2 <- preamble_rm(frequencies, var = prompt2) %>% dplyr::pull(prompt2)
-  test3 <- preamble_rm(frequencies, var = prompt3) %>% dplyr::pull(prompt3)
-  test4 <- preamble_rm(frequencies, var = prompt4) %>% dplyr::pull(prompt4)
-  test5 <- preamble_rm(frequencies, var = prompt5) %>% dplyr::pull(prompt5)
+  test1 <- preamble_rm(frequencies, var = prompt1) |> dplyr::pull(prompt1)
+  test2 <- preamble_rm(frequencies, var = prompt2) |> dplyr::pull(prompt2)
+  test3 <- preamble_rm(frequencies, var = prompt3) |> dplyr::pull(prompt3)
+  test4 <- preamble_rm(frequencies, var = prompt4) |> dplyr::pull(prompt4)
+  test5 <- preamble_rm(frequencies, var = prompt5) |> dplyr::pull(prompt5)
   correct_answer <- c("Blue")
 
   expect_equal(test1, correct_answer)

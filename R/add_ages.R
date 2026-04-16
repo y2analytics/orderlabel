@@ -40,8 +40,8 @@ add_ages <- function(
 
   # Error #1
   if(variable_char != 'NULL') {
-  class_of_survey_date_var <- dataset %>%
-    dplyr::pull({{ survey_date_var }}) %>%
+  class_of_survey_date_var <- dataset |>
+    dplyr::pull({{ survey_date_var }}) |>
     class()
 
   if(
@@ -88,7 +88,7 @@ add_ages <- function(
 get_current_year <- function(year_of_survey){
   if (year_of_survey == 0) {
   date <- Sys.Date()
-  current_year <- stringr::str_remove_all(date, '-.*') %>% as.numeric()
+  current_year <- stringr::str_remove_all(date, '-.*') |> as.numeric()
   } else {
   current_year <- year_of_survey
   }
@@ -103,8 +103,8 @@ calculate_current_v_survey_date <- function(
   if(variable_char == 'NULL') {
     calculated_year <- get_current_year(year_of_survey)
   } else {
-    calculated_year <- dataset %>%
-      dplyr::mutate(survey_year = lubridate::year({{ survey_date_var }})) %>%
+    calculated_year <- dataset |>
+      dplyr::mutate(survey_year = lubridate::year({{ survey_date_var }})) |>
       dplyr::pull()
   }
 }
@@ -116,10 +116,10 @@ year_born_var_specified <- function(
   year_born_var,
   calculated_year
 ){
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::mutate(
-      year_born_numeric = forcats::as_factor({{ year_born_var }}) %>%
-        as.character() %>%
+      year_born_numeric = forcats::as_factor({{ year_born_var }}) |>
+        as.character() |>
         as.numeric(),
       age_numeric = calculated_year - .data$year_born_numeric
     )
@@ -130,10 +130,10 @@ age_var_specified <- function(
   age_var,
   calculated_year
 ){
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::mutate(
-      age_numeric = forcats::as_factor({{ age_var }}) %>%
-        as.character() %>%
+      age_numeric = forcats::as_factor({{ age_var }}) |>
+        as.character() |>
         as.numeric(),
       year_born_numeric = calculated_year - .data$age_numeric
     )
@@ -142,7 +142,7 @@ age_var_specified <- function(
 
 ### Step 3 - census_age_groups
 create_age_groups <- function(dataset){
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::mutate(
       census_age_groups = dplyr::case_when(
         # If born in 2012, could still be 17 (as of 2020)
@@ -154,7 +154,7 @@ create_age_groups <- function(dataset){
         .data$age_numeric <= 54 ~ '45-54',
         .data$age_numeric <= 64 ~ '55-64',
         .data$age_numeric >= 65 ~ '65+'
-      ) %>%
+      ) |>
         # suppressWarnings added for trivial missing levels
         suppressWarnings(
           forcats::fct_relevel(
@@ -173,7 +173,7 @@ create_age_groups <- function(dataset){
         .data$age_numeric <= 54 ~ '45-54',
         .data$age_numeric <= 64 ~ '55-64',
         .data$age_numeric >= 65 ~ '65+'
-      ) %>%
+      ) |>
         # suppressWarnings added for trivial missing levels
         suppressWarnings(
           forcats::fct_relevel(

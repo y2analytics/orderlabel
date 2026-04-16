@@ -29,8 +29,8 @@ frequencies <- tibble::tibble(
   other_var = c('x', 'y', 'z', 'z (test)', 'None')
 )
 
-frequencies \%>\% other_rm(remove = TRUE)
-frequencies \%>\% other_rm(var = other_var)
+frequencies |> other_rm(remove = TRUE)
+frequencies |> other_rm(var = other_var)
 }
 \keyword{extra}
 \keyword{none}

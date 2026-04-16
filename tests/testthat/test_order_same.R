@@ -13,7 +13,7 @@ test_that("Error - label not factored", {
   )
 
   expect_error(
-    ordered_df %>% order_same(ordered_df),
+    ordered_df |> order_same(ordered_df),
     'The "label" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.'
   )
 })
@@ -33,13 +33,13 @@ test_that("Error - group_var not factored", {
       'Brand 4'
     ),
     result = rep(c(1:4),3)
-  ) %>%
+  ) |>
     dplyr::mutate(
       label = forcats::fct_inorder(label)
     )
 
   expect_error(
-    frequencies %>% order_same(frequencies),
+    frequencies |> order_same(frequencies),
     'The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.'
   )
 })
@@ -60,14 +60,14 @@ test_that("Error - group_var in orders", {
     ),
     result = rep(c(1:4),3)
   )
-  ordered_df <-  frequencies %>%
+  ordered_df <-  frequencies |>
     dplyr::mutate(
       label = forcats::fct_inorder(label)
-    ) %>%
+    ) |>
     dplyr::select(-group_var)
 
   expect_error(
-    frequencies %>% order_same(ordered_df, group_var = group_var),
+    frequencies |> order_same(ordered_df, group_var = group_var),
     'If using the group_var argument, the data frame from the "orders" argument must have a column named "group_var". This will be the column by which your new data frame is ordered.'
   )
 })
@@ -88,13 +88,13 @@ test_that("Ungrouped frequencies", {
     ),
     result = c(1:6)
   )
-  ordered_df <- frequencies %>%
+  ordered_df <- frequencies |>
     dplyr::mutate(
       label = forcats::fct_inorder(label)
     )
   label_og <- levels(ordered_df$label)
 
-  frequencies_same <- frequencies %>% order_same(ordered_df)
+  frequencies_same <- frequencies |> order_same(ordered_df)
   label_same <- levels(frequencies_same$label)
 
   expect_equal(label_og, label_same)
@@ -116,17 +116,17 @@ test_that("Grouped frequencies", {
     ),
     result = rep(c(1:4),3)
   )
-  ordered_df <-  frequencies %>%
+  ordered_df <-  frequencies |>
     dplyr::mutate(
       label = forcats::fct_inorder(label)
-    ) %>%
+    ) |>
     dplyr::mutate(
       group_var = forcats::fct_inorder(group_var)
     )
   label_og <- levels(ordered_df$label)
   group_og <- levels(ordered_df$group_var)
 
-  frequencies_same <- frequencies %>% order_same(ordered_df)
+  frequencies_same <- frequencies |> order_same(ordered_df)
   label_same <- levels(frequencies_same$label)
   group_same <- levels(frequencies_same$group_var)
 
@@ -154,17 +154,17 @@ test_that("group_var argument", {
     ),
     result = rep(c(1:4),3)
   )
-  ordered_df <-  frequencies %>%
+  ordered_df <-  frequencies |>
     dplyr::mutate(
       label = forcats::fct_inorder(label)
-    ) %>%
+    ) |>
     dplyr::mutate(
       group_var = forcats::fct_inorder(groupedy_group_group)
     )
   label_og <- levels(ordered_df$label)
   group_og <- levels(ordered_df$group_var)
 
-  frequencies_same <- frequencies %>% order_same(ordered_df, group_var = groupedy_group_group)
+  frequencies_same <- frequencies |> order_same(ordered_df, group_var = groupedy_group_group)
   label_same <- levels(frequencies_same$label)
   group_same <- levels(frequencies_same$group_var)
 

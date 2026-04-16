@@ -14,7 +14,7 @@
 #'   result = c(.25, .15, .20, .10, .30),
 #'   value = c(1, 2, 3, 4, 5),
 #'   group_var = rep('Group A', 5)
-#' ) %>% order_label(group_var = group_var)
+#' ) |> order_label(group_var = group_var)
 #' ordered_df <- frequencies
 #'
 #' # The second frequencies that you want to be ordered the same as the original
@@ -23,14 +23,14 @@
 #'   result = c(.30, .10, .15, .20, .25),
 #'   value = c(1, 2, 3, 4, 5),
 #'   group_var = rep('Group B', 5)
-#' ) %>% order_same()
+#' ) |> order_same()
 
 order_same <- function(
     dataset,
     orders = ordered_df,
     group_var = 'NULL'
 ) {
-  label_orders <- purrr::as_vector(orders$label) %>% levels()
+  label_orders <- purrr::as_vector(orders$label) |> levels()
   group_quoed <- rlang::enquo(group_var)
   group_character <- rlang::quo_name(group_quoed)
 
@@ -48,7 +48,7 @@ order_same <- function(
     }
 
     dataset <- create_group_var(dataset, group_quoed, group_character)
-    group_orders <- purrr::as_vector(orders$group_var) %>% levels()
+    group_orders <- purrr::as_vector(orders$group_var) |> levels()
 
     if (is.null(group_orders)) {
       stop('The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')
@@ -70,7 +70,7 @@ create_group_var <- function(
     group_character
     ) {
   if (group_character != 'NULL' & group_character != 'group_var') {
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::rename(
       group_var = !!group_quoed
     )
@@ -85,8 +85,8 @@ grouped_vector <- function(
   label_flag1,
   group_flag1
 ) {
-  dataset %>%
-    dplyr::ungroup() %>%
+  dataset |>
+    dplyr::ungroup() |>
     dplyr::arrange(
       # first arrange by groups
       group_var = forcats::fct_relevel(
@@ -98,13 +98,13 @@ grouped_vector <- function(
         .data$label,
         label_flag1
       )
-    ) %>%
+    ) |>
     dplyr::mutate(
       label = forcats::fct_inorder(.data$label)
-    ) %>%
+    ) |>
     dplyr::mutate(
       group_var = forcats::fct_inorder(.data$group_var)
-    ) %>%
+    ) |>
     dplyr::mutate(
       percent_label =  stringr::str_c(.data$result * 100)
     )
@@ -116,16 +116,16 @@ ungrouped_vector <- function(
   dataset,
   label_flag1
 ) {
-  dataset %>%
+  dataset |>
     dplyr::arrange(
       label = forcats::fct_relevel(
         .data$label,
         label_flag1
       )
-    ) %>%
+    ) |>
     dplyr::mutate(
       label = forcats::fct_inorder(.data$label)
-    ) %>%
+    ) |>
     dplyr::mutate(
       percent_label = stringr::str_c(.data$result * 100)
     )

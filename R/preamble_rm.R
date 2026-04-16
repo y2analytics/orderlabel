@@ -30,7 +30,7 @@
 #'
 #' preamble_rm(frequencies)
 #' preamble_rm(frequencies, var = prompt2, before_symbol = '\\. ')
-#' frequencies %>% preamble_rm()
+#' frequencies |> preamble_rm()
 
 preamble_rm <- function(
   dataset,
@@ -40,7 +40,7 @@ preamble_rm <- function(
   prompt <- NULL
   combined_remove_symbol <- stringr::str_c('.*', before_symbol)
 
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::mutate(
       '{{var}}' := as.character({{ var }}),
       '{{var}}' := stringr::str_squish({{ var }}),

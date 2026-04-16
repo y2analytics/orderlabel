@@ -56,7 +56,7 @@ frequencies <- tibble(
   label = c('Brand 1', 'Brand 2', 'Brand 3', 'Brand 4', 'Brand 5'),
   result = c(.25, .15, .20, .10, .30),
   value = c(1, 2, 3, 4, 5)
-) %>% order_label()
+) |> order_label()
 
 # # Grouped, with an inherent order for the label, or the brand
 # frequencies <- tibble(
@@ -64,7 +64,7 @@ frequencies <- tibble(
 #   result = c(.20, .20, .30, .10, .20, .20, .30, .20, .20, .10),
 #   value = rep(c(1, 2, 3, 4, 5), 2),
 #   group_var = c(rep('Group A', 5), rep('Group B', 5))
-# ) %>% order_label(
+# ) |> order_label(
 #   group_var = group_var,
 #   inherent_order_label = T
 # )
@@ -75,7 +75,7 @@ frequencies <- tibble(
 #   result = c(.33, .33, .34, .20, .30, .50, .25, .50, .25),
 #   value = rep(c(1, 2, 3), 3),
 #   group_var = c(rep('Group A', 3), rep('Group B', 3), rep('Group C', 3))
-# ) %>% order_label(
+# ) |> order_label(
 #   group_var = group_var,
 #   stacked = 'ms'
 # )

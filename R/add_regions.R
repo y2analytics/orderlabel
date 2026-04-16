@@ -25,11 +25,11 @@ add_regions <- function(
   new_name = census_region
 ) {
   census_region <- NULL
-  dataset <- dataset %>%
+  dataset <- dataset |>
     dplyr::mutate(
       state_new_var = {{ state_var }},
-      state_new_var = forcats::as_factor(.data$state_new_var) %>%
-        as.character() %>%
+      state_new_var = forcats::as_factor(.data$state_new_var) |>
+        as.character() |>
         stringr::str_to_title(),
       "{{new_name}}" := dplyr::case_when(
         # Full State Names
@@ -139,7 +139,7 @@ add_regions <- function(
         stringr::str_detect(.data$state_new_var, 'Dc') ~ 'South',
         stringr::str_detect(.data$state_new_var, 'D.') ~ 'South'
       )
-    ) %>%
+    ) |>
     dplyr::select(-'state_new_var')
   return(dataset)
 }

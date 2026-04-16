@@ -15,7 +15,7 @@ test_that("other_rm - label", {
       'Brand 7 (some description)'
     ),
     result = c(1:10)
-  ) %>%
+  ) |>
     dplyr::mutate(
       group_var = label,
       variable = label
@@ -44,7 +44,7 @@ test_that("other_rm - variable", {
       'Brand 7 (some description)'
     ),
     result = c(1:10)
-  ) %>%
+  ) |>
     dplyr::mutate(
       group_var = label,
       variable = label
@@ -73,7 +73,7 @@ test_that("other_rm - group_var", {
       'Brand 7 (some description)'
     ),
     result = c(1:10)
-  ) %>%
+  ) |>
     dplyr::mutate(
       group_var = label,
       variable = label
@@ -130,13 +130,13 @@ test_that("other_rm - remove argument", {
       'Brand 7 (some description)'
     ),
     result = c(1:10)
-  ) %>%
+  ) |>
     dplyr::mutate(
       group_var = label,
       variable = label
     )
-  filtered_df <- df %>%
-    dplyr::filter(stringr::str_detect(label, 'Brand')) %>%
+  filtered_df <- df |>
+    dplyr::filter(stringr::str_detect(label, 'Brand')) |>
     dplyr::mutate_all(~ifelse(stringr::str_detect(., '7'), 'Brand 7', .))
 
   test <- other_rm(df, remove = TRUE)
@@ -159,12 +159,12 @@ test_that("other_rm - var argument", {
       'Brand 7 (some description)'
     ),
     result = c(1:10)
-  ) %>%
+  ) |>
     dplyr::mutate(
       other_var = label
     )
 
-  test <- df %>% other_rm(var = other_var)
+  test <- df |> other_rm(var = other_var)
   expect_equal(test$other_var[6], 'Other')
   expect_equal(test$other_var[7], 'Prefer not to say')
   expect_equal(test$other_var[8], 'None of the above')

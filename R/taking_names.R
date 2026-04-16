@@ -15,6 +15,6 @@ taking_names <- function(dataset = responses) {
   labels <- sapply(dataset, function(x) attr(x, "label"))
   tibble::tibble(
     name = names(labels),
-    label = labels %>% as.character())
+    label = labels |> as.character())
 }
 
