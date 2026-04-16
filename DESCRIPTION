@@ -23,7 +23,8 @@ Imports:
     tibble,
     tidyselect,
     tidyr,
-    lifecycle
+    lifecycle,
+    withr
 Suggests:
     labelled,
     testthat (>= 3.0.0)

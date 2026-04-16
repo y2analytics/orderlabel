@@ -2,6 +2,10 @@
 
     Code
       order_label(frequencies, group_var = group_var, horizontal = TRUE, stacked = "ms")
+    Condition
+      Warning:
+      The `horizontal` argument of `order_label()` is deprecated as of orderlabel 0.4.2.
+      i Please use the `direction` argument instead.
     Output
       # A tibble: 9 x 8
         group_var variable value label     n stat    result percent_label

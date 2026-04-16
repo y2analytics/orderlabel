@@ -575,7 +575,7 @@ reverse_group <- function(
   rev_group
 ) {
   if (rev_group == TRUE) {
-    options(warn = -1) # Warning about unknown levels of Other, NOA, PNTS, that's fine
+    withr::local_options(list(warn = -1)) # Warning about unknown levels of Other, NOA, PNTS, that's fine
     dataset <- dataset %>%
       dplyr::ungroup() %>%
       dplyr::arrange(
@@ -1673,7 +1673,7 @@ none_other_fun <- function(
   grouped
 ) {
   if (none_other == TRUE) {
-  options(warn = -1) # Warning about unknown levels of Other, NOA, PNTS, that's fine
+  withr::local_options(list(warn = -1)) # Warning about unknown levels of Other, NOA, PNTS, that's fine
     dataset <- dataset %>%
       dplyr::arrange(
         label = forcats::fct_relevel(
@@ -1697,7 +1697,7 @@ none_other_fun <- function(
   }
   #For grouped
   if (grouped == TRUE & none_other == TRUE) {
-    options(warn=-1) # Warnings here are about levels not existing, but probs won't in most cases
+    withr::local_options(list(warn = -1)) # Warnings here are about levels not existing, but probs won't in most cases
     dataset <- dataset %>%
       dplyr::arrange(
         group_var = forcats::fct_relevel(
