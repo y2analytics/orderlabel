@@ -74,11 +74,6 @@ order_label <- function(
   percent_all = FALSE
 ) {
 
-### Test matching arguments
-  num_fmt <- rlang::arg_match(num_fmt)
-  stacked <- rlang::arg_match(stacked)
-  direction <- rlang::arg_match(direction)
-
   # Soft-deprecate `horizontal` if user supplied it, mapping to `direction`.
   if (lifecycle::is_present(horizontal)) {
     lifecycle::deprecate_warn(
@@ -86,7 +81,7 @@ order_label <- function(
       what = "order_label(horizontal)",
       with = "order_label(direction = 'horizontal')"
     )
-    if(!lifecycle::is_present(direction)) {
+    if(!rlang::is_missing(direction)) {
       if (isTRUE(horizontal)) {
         direction <- "horizontal"
       } else {
@@ -98,6 +93,11 @@ order_label <- function(
 
   }
 
+
+  ### Test matching arguments
+  num_fmt <- rlang::arg_match(num_fmt)
+  stacked <- rlang::arg_match(stacked)
+  direction <- rlang::arg_match(direction)
 
 ### Flags
   # Enquo flags
