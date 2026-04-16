@@ -135,9 +135,21 @@ test_that("other_rm - remove argument", {
       group_var = label,
       variable = label
     )
+
   filtered_df <- df |>
-    dplyr::filter(stringr::str_detect(label, 'Brand')) |>
-    dplyr::mutate_all(~ifelse(stringr::str_detect(., '7'), 'Brand 7', .))
+    dplyr::filter(stringr::str_detect(label, "Brand")) |>
+    dplyr::mutate(
+      dplyr::across(
+        dplyr::everything(),
+        \(x) dplyr::if_else(
+            stringr::str_detect(x, "7"),
+            "Brand 7",
+            as.character(x)
+          )
+      )
+    ) |>
+    dplyr::mutate(result = as.numeric(result))
+
 
   test <- other_rm(df, remove = TRUE)
   expect_equal(test, filtered_df)

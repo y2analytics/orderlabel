@@ -62,21 +62,25 @@ other_rm <- function(
 #### hidden functions ####
 # remove_function
 remove_argument <- function(
-    dataset,
-    remove
+  dataset,
+  remove
 ) {
-  if (remove == TRUE) {
-    dataset <- dataset |>
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'Other') == FALSE
-      ) |>
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'None of the above') == FALSE
-      )  |>
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'Prefer not to ') == FALSE
+  if (remove) {
+    dataset |>
+      dplyr::filter(
+        !dplyr::if_any(where(is.character), \(x) {
+          stringr::str_detect(x, "Other")
+        }),
+        !dplyr::if_any(
+          where(is.character),
+          \(x) stringr::str_detect(x, "None of the above")
+        ),
+        !dplyr::if_any(
+          where(is.character),
+          \(x) stringr::str_detect(x, "Prefer not to")
+        )
       )
   } else {
-    dataset <- dataset
+    dataset
   }
 }
