@@ -13,7 +13,8 @@
 #' @param rev_group DEFAULT = FALSE; To reverse the order of groups in a chart, use rev_group = TRUE
 #' @param label_last DEFAULT = NA; If specified, puts the specified label last ex: 'brand1' would put label called brand1 after all other labels
 #' @param group_last DEFAULT = NA; If specified, puts the specified group last ex: 'brand1' would put group called brand1 after all other groups
-#' @param horizontal DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes horizontal = TRUE
+#' @param horizontal (Deprecated) Use direction instead. 
+#' @param direction DEFAULT = "vertical"; Use "vertical" (default) or "horizontal". Replaces the deprecated `horizontal` argument.
 #' @param stacked DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart
 #' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @param none_other DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart
@@ -64,7 +65,8 @@ order_label <- function(
   rev_group = FALSE,
   label_last = NA,
   group_last = NA,
-  horizontal = FALSE,
+  horizontal = lifecycle::deprecated(),
+  direction = c("vertical", "horizontal"),
   stacked = c('NULL', 'ms', 'gg'),
   topbox = NULL,
   none_other = TRUE,
@@ -75,6 +77,26 @@ order_label <- function(
 ### Test matching arguments
   num_fmt <- rlang::arg_match(num_fmt)
   stacked <- rlang::arg_match(stacked)
+  direction <- rlang::arg_match(direction)
+
+  # Soft-deprecate `horizontal` if user supplied it, mapping to `direction`.
+  if (lifecycle::is_present(horizontal)) {
+    lifecycle::deprecate_warn(
+      when = "0.3.0",
+      what = "order_label(horizontal)",
+      with = "order_label(direction = 'horizontal')"
+    )
+    if(!lifecycle::is_present(direction)) {
+      if (isTRUE(horizontal)) {
+        direction <- "horizontal"
+      } else {
+        direction <- "vertical"
+      }
+    } else {
+      stop('Please remove the horizontal argument')
+    }
+
+  }
 
 
 ### Flags
@@ -200,12 +222,12 @@ order_label <- function(
 ### topbox
   dataset <- topbox_fun(dataset, topbox)
 ### label_last & group_last
-  dataset <- label_last_fun(dataset, label_last, horizontal, stacked)
-  dataset <- group_last_fun(dataset, group_last, horizontal, stacked)
+  dataset <- label_last_fun(dataset, label_last, direction, stacked)
+  dataset <- group_last_fun(dataset, group_last, direction, stacked)
 ### Put "None" & "Other" at bottom
   dataset <- none_other_fun(dataset, none_other, grouped)
 ### Horizontal
-  dataset <- horizontal_chart(dataset, horizontal, grouped)
+  dataset <- horizontal_chart(dataset, direction, grouped)
 ### Stacked
   dataset <- stacked_chart(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
   dataset <- stacked_chart_ms(dataset, stacked, grouped, inherent_order_group, specifically_ordered_group)
@@ -1573,10 +1595,10 @@ ordering_top2 <- function(dataset) {
 #### Horizontal ####
 horizontal_chart <- function(
   dataset,
-  horizontal,
+  direction,
   grouped
 ) {
-  if (horizontal == TRUE) {
+  if (direction == 'horizontal') {
     if (grouped == FALSE) {
       dataset <- dataset %>%
         dplyr::mutate(
@@ -1591,7 +1613,7 @@ horizontal_chart <- function(
           group_var = forcats::fct_rev(.data$group_var)
         )
     }
-  } else { #horizontal == FALSE
+  } else { #direction == 'vertical
     dataset <- dataset
   }
 }
@@ -1705,7 +1727,7 @@ none_other_fun <- function(
 label_last_fun <- function(
   dataset,
   label_last,
-  horizontal,
+  direction,
   stacked
 ) {
   label_last_dummy = ifelse(
@@ -1715,7 +1737,7 @@ label_last_fun <- function(
   )
 
   # Put label_last last
-  if (label_last_dummy == TRUE & horizontal == FALSE) {
+  if (label_last_dummy == TRUE & direction == 'vertical') {
     dataset <- dataset %>%
       dplyr::arrange(
         label = forcats::fct_relevel(
@@ -1727,7 +1749,7 @@ label_last_fun <- function(
       dplyr::mutate(label = forcats::fct_inorder(.data$label))
     return(dataset)
     # Put label_last "first" to be last for horizontal
-  } else if (label_last_dummy == TRUE & horizontal == TRUE) {
+  } else if (label_last_dummy == TRUE & direction == 'horizontal') {
     data_rest <- dataset %>% dplyr::filter(.data$label != label_last)
     data_label <- dataset %>% dplyr::filter(.data$label == label_last)
     data_rest <- data_rest %>%
@@ -1755,7 +1777,7 @@ label_last_fun <- function(
 group_last_fun <- function(
   dataset,
   group_last,
-  horizontal,
+  direction,
   stacked
 ) {
   group_last_dummy = ifelse(
@@ -1765,7 +1787,7 @@ group_last_fun <- function(
   )
 
   # put group_last last
-  if (group_last_dummy == TRUE & horizontal == FALSE) {
+  if (group_last_dummy == TRUE & direction == 'vertical') {
     dataset <- dataset %>%
       dplyr::arrange(
         group_var = forcats::fct_relevel(
@@ -1777,7 +1799,7 @@ group_last_fun <- function(
       dplyr::mutate(group_var = forcats::fct_inorder(.data$group_var))
     return(dataset)
     # Put group_last "first" to be last for horizontal
-  } else if (group_last_dummy == TRUE & horizontal == TRUE) {
+  } else if (group_last_dummy == TRUE & direction == 'horizontal') {
     data_rest <- dataset %>% dplyr::filter(.data$group_var != group_last)
     data_label <- dataset %>% dplyr::filter(.data$group_var == group_last)
     data_rest <- data_rest %>%
