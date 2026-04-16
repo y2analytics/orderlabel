@@ -295,12 +295,10 @@ test_that("Ungrouped, stacked gg", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
-    order_label(stacked = 'gg')
+  )
 
-  expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
-    c('Five', 'Four', 'Three', 'Two', 'One')
+  expect_snapshot(
+    frequencies %>% order_label(stacked = 'gg') |> dplyr::pull(label) %>% as.character()
   )
 })
 
@@ -313,12 +311,10 @@ test_that("Ungrouped, stacked ms", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
-    order_label(stacked = 'ms')
+  )
 
-  expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
-    c('One', 'Two', 'Three', 'Four', 'Five')
+  expect_snapshot(
+    frequencies %>% order_label(stacked = 'ms') |> dplyr::pull(label) %>% as.character()
   )
 })
 

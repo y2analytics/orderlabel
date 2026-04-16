@@ -1,3 +1,25 @@
+# Ungrouped, stacked gg
+
+    Code
+      dplyr::pull(frequencies %>% order_label(stacked = "gg"), label) %>%
+        as.character()
+    Condition
+      Warning in `order_label()`:
+      You used a "stacked" ordering system without specifying group_var. Is your data grouped?
+    Output
+      [1] "Five"  "Four"  "Three" "Two"   "One"  
+
+# Ungrouped, stacked ms
+
+    Code
+      dplyr::pull(frequencies %>% order_label(stacked = "ms"), label) %>%
+        as.character()
+    Condition
+      Warning in `order_label()`:
+      You used a "stacked" ordering system without specifying group_var. Is your data grouped?
+    Output
+      [1] "One"   "Two"   "Three" "Four"  "Five" 
+
 # horizontal = TRUE is deprecated
 
     Code
