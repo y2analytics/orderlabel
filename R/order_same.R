@@ -30,7 +30,7 @@ order_same <- function(
     orders = ordered_df,
     group_var = 'NULL'
 ) {
-  label_orders <- purrr::as_vector(orders$label) |> levels()
+  label_orders <- levels(orders$label)
   group_quoed <- rlang::enquo(group_var)
   group_character <- rlang::quo_name(group_quoed)
 
@@ -48,7 +48,7 @@ order_same <- function(
     }
 
     dataset <- create_group_var(dataset, group_quoed, group_character)
-    group_orders <- purrr::as_vector(orders$group_var) |> levels()
+    group_orders <- levels(orders$group_var)
 
     if (is.null(group_orders)) {
       stop('The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')

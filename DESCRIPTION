@@ -16,7 +16,6 @@ Imports:
     forcats,
     lubridate,
     magrittr,
-    purrr,
     readxl,
     rlang,
     stringr,
