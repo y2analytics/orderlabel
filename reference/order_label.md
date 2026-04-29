@@ -18,7 +18,8 @@ order_label(
   rev_group = FALSE,
   label_last = NA,
   group_last = NA,
-  horizontal = FALSE,
+  horizontal = lifecycle::deprecated(),
+  direction = c("vertical", "horizontal"),
   stacked = c("NULL", "ms", "gg"),
   topbox = NULL,
   none_other = TRUE,
@@ -88,9 +89,12 @@ order_label(
 
 - horizontal:
 
-  DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use
-  horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically
-  makes horizontal = TRUE
+  (Deprecated) Use direction instead.
+
+- direction:
+
+  DEFAULT = "vertical"; Use "vertical" (default) or "horizontal".
+  Replaces the deprecated \`horizontal\` argument.
 
 - stacked:
 
