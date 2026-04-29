@@ -40,7 +40,7 @@ frequencies <- tibble::tibble(
   result = c(.25, .15, .20, .10, .30),
   value = c(1, 2, 3, 4, 5),
   group_var = rep('Group A', 5)
-) %>% order_label(group_var = group_var)
+) |> order_label(group_var = group_var)
 ordered_df <- frequencies
 
 # The second frequencies that you want to be ordered the same as the original
@@ -49,6 +49,6 @@ frequencies <- tibble::tibble(
   result = c(.30, .10, .15, .20, .25),
   value = c(1, 2, 3, 4, 5),
   group_var = rep('Group B', 5)
-) %>% order_same()
-#> Error in order_same(.): object 'ordered_df' not found
+) |> order_same()
+#> Error in order_same(tibble::tibble(label = c("Brand 1", "Brand 2", "Brand 3",     "Brand 4", "Brand 5"), result = c(0.3, 0.1, 0.15, 0.2, 0.25),     value = c(1, 2, 3, 4, 5), group_var = rep("Group B", 5))): object 'ordered_df' not found
 ```

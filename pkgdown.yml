@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2026-04-29T16:24Z
+last_built: 2026-04-29T16:33Z
 urls:
   reference: https://y2analytics.github.io/orderlabel/reference
   article: https://y2analytics.github.io/orderlabel/articles

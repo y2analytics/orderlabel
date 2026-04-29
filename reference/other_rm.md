@@ -46,14 +46,14 @@ frequencies <- tibble::tibble(
   other_var = c('x', 'y', 'z', 'z (test)', 'None')
 )
 
-frequencies %>% other_rm(remove = TRUE)
+frequencies |> other_rm(remove = TRUE)
 #> # A tibble: 3 × 3
 #>   label   result other_var
 #>   <chr>    <dbl> <chr>    
 #> 1 Brand 1   0.25 x        
 #> 2 Brand 2   0.15 y        
 #> 3 Brand 3   0.2  z        
-frequencies %>% other_rm(var = other_var)
+frequencies |> other_rm(var = other_var)
 #> # A tibble: 5 × 3
 #>   label             result other_var        
 #>   <chr>              <dbl> <chr>            

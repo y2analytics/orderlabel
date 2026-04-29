@@ -68,7 +68,7 @@ preamble_rm(frequencies, var = prompt2, before_symbol = '\\. ')
 #> 3 Selected   0.2  What is your favorite color? - Yellow Yellow 
 #> 4 Selected   0.1  What is your favorite color? - Purple Purple 
 #> 5 Selected   0.3  What is your favorite color? - Orange Orange 
-frequencies %>% preamble_rm()
+frequencies |> preamble_rm()
 #> # A tibble: 5 × 4
 #>   label    result prompt prompt2                                
 #>   <chr>     <dbl> <chr>  <chr>                                  
