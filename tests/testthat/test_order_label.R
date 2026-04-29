@@ -278,7 +278,7 @@ test_that("Ungrouped, horizontal", {
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
   ) |>
-    order_label(horizontal = TRUE)
+    order_label(direction = 'horizontal')
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character(),
@@ -295,12 +295,10 @@ test_that("Ungrouped, stacked gg", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) |>
-    order_label(stacked = 'gg')
+  )
 
-  expect_equal(
-    frequencies |> dplyr::pull(label) |> as.character(),
-    c('Five', 'Four', 'Three', 'Two', 'One')
+  expect_snapshot(
+    frequencies |> order_label(stacked = 'gg') |> dplyr::pull(label) |> as.character()
   )
 })
 
@@ -313,12 +311,10 @@ test_that("Ungrouped, stacked ms", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) |>
-    order_label(stacked = 'ms')
+  )
 
-  expect_equal(
-    frequencies |> dplyr::pull(label) |> as.character(),
-    c('One', 'Two', 'Three', 'Four', 'Five')
+  expect_snapshot(
+    frequencies |> order_label(stacked = 'ms') |> dplyr::pull(label) |> as.character()
   )
 })
 
@@ -448,7 +444,7 @@ test_that("Ungrouped, label_first, horizontal", {
   ) |>
     order_label(
       label_first = 'Two',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -515,7 +511,7 @@ test_that("Ungrouped, label_last, horizontal", {
   ) |>
     order_label(
       label_last = 'Two',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -536,7 +532,7 @@ test_that("Ungrouped, rev_label, horizontal", {
   ) |>
     order_label(
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -577,7 +573,7 @@ test_that("Ungrouped, horizontal, none_other", {
     result = c(.1, .3, .4, .29, .9)
   ) |>
     order_label(
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -626,7 +622,7 @@ test_that("Ungrouped, label_first, label_last, horizontal", {
     order_label(
       label_first = 'Two',
       label_last = 'Four',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -670,7 +666,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal", {
     order_label(
       label_first = 'Two',
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -713,7 +709,7 @@ test_that("Ungrouped, label_first, horizontal, none_other", {
   ) |>
     order_label(
       label_first = 'Two',
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -736,7 +732,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal", {
     order_label(
       label_last = 'Two',
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -779,7 +775,7 @@ test_that("Ungrouped, label_last, horizontal, none_other", {
   ) |>
     order_label(
       label_last = 'Two',
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -801,7 +797,7 @@ test_that("Ungrouped, rev_label, horizontal, none_other", {
   ) |>
     order_label(
       rev_label = TRUE,
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -829,7 +825,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal", {
       label_first = 'Two',
       label_last = 'Four',
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -874,7 +870,7 @@ test_that("Ungrouped, label_first, label_last, horizontal, none_other", {
     order_label(
       label_first = 'Two',
       label_last = 'Other',
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -897,7 +893,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal, none_other", {
     order_label(
       label_first = 'Two',
       rev_label = TRUE,
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -920,7 +916,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal, none_other", {
     order_label(
       label_last = 'Two',
       rev_label = TRUE,
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -945,7 +941,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal, none_other
       label_first = 'Two',
       label_last = 'Other',
       rev_label = TRUE,
-      horizontal = TRUE,
+      direction = 'horizontal',
       none_other = FALSE
     )
 
@@ -1036,7 +1032,7 @@ test_that("Ungrouped, inherent_order_label, horizontal", {
   ) |>
     order_label(
       inherent_order_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1127,7 +1123,7 @@ test_that("Ungrouped, inherent_order_label, label_first, horizontal", {
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1171,7 +1167,7 @@ test_that("Ungrouped, inherent_order_label, label_last, horizontal", {
     order_label(
       inherent_order_label = TRUE,
       label_last = 'Three',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1193,7 +1189,7 @@ test_that("Ungrouped, inherent_order_label, rev_label, horizontal", {
     order_label(
       inherent_order_label = TRUE,
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1242,7 +1238,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, horizontal"
       inherent_order_label = TRUE,
       label_first = 'Three',
       label_last = 'Four',
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1265,7 +1261,7 @@ test_that("Ungrouped, inherent_order_label, label_last, rev_label, horizontal", 
       inherent_order_label = TRUE,
       label_first = 'Three',
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1290,7 +1286,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label, 
       label_first = 'Three',
       label_last = 'Four',
       rev_label = TRUE,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -1552,7 +1548,7 @@ test_that("Grouped, horizontal", {
   ) |>
     order_label(
       group_var = group_var,
-      horizontal = TRUE
+      direction = 'horizontal'
     )
 
   expect_equal(
@@ -2176,6 +2172,25 @@ test_that("Grouped, stacked ms", {
 # )
 # print(chart, preview = TRUE)
 
+# Testing deprication ---------
+test_that('horizontal = TRUE is deprecated', {
+   frequencies <- tibble::tibble(
+    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
+    variable = rep('s_test', 9),
+    value = rep(c('1', '2', '3'), 3),
+    label = rep(c('One', 'Two', 'Three'), 3),
+    n = rep(10, 9),
+    stat = rep('percent', 9),
+    result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
+  )
 
+  expect_snapshot(
+    order_label(
+      frequencies,
+      group_var = group_var,
+      horizontal = TRUE,
+      stacked = 'ms'
+    ))
+})
 
 

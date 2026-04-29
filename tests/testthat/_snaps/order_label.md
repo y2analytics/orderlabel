@@ -1,0 +1,44 @@
+# Ungrouped, stacked gg
+
+    Code
+      dplyr::pull(frequencies %>% order_label(stacked = "gg"), label) %>%
+        as.character()
+    Condition
+      Warning in `order_label()`:
+      You used a "stacked" ordering system without specifying group_var. Is your data grouped?
+    Output
+      [1] "Five"  "Four"  "Three" "Two"   "One"  
+
+# Ungrouped, stacked ms
+
+    Code
+      dplyr::pull(frequencies %>% order_label(stacked = "ms"), label) %>%
+        as.character()
+    Condition
+      Warning in `order_label()`:
+      You used a "stacked" ordering system without specifying group_var. Is your data grouped?
+    Output
+      [1] "One"   "Two"   "Three" "Four"  "Five" 
+
+# horizontal = TRUE is deprecated
+
+    Code
+      order_label(frequencies, group_var = group_var, horizontal = TRUE, stacked = "ms")
+    Condition
+      Warning:
+      The `horizontal` argument of `order_label()` is deprecated as of orderlabel 0.4.2.
+      i Please use the `direction` argument instead.
+    Output
+      # A tibble: 9 x 8
+        group_var variable value label     n stat    result percent_label
+        <fct>     <chr>    <dbl> <fct> <dbl> <chr>    <dbl> <chr>        
+      1 Group 3   s_test       3 Three    10 percent   0.01 1            
+      2 Group 1   s_test       3 Three    10 percent   0.3  30           
+      3 Group 2   s_test       3 Three    10 percent   0.03 3            
+      4 Group 3   s_test       2 Two      10 percent   0.8  80           
+      5 Group 1   s_test       2 Two      10 percent   0.2  20           
+      6 Group 2   s_test       2 Two      10 percent   0.02 2            
+      7 Group 3   s_test       1 One      10 percent   0.5  50%          
+      8 Group 1   s_test       1 One      10 percent   0.1  10           
+      9 Group 2   s_test       1 One      10 percent   0.01 1            
+
