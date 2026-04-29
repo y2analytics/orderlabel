@@ -1,8 +1,7 @@
 # Ungrouped, stacked gg
 
     Code
-      dplyr::pull(frequencies %>% order_label(stacked = "gg"), label) %>%
-        as.character()
+      as.character(dplyr::pull(order_label(frequencies, stacked = "gg"), label))
     Condition
       Warning in `order_label()`:
       You used a "stacked" ordering system without specifying group_var. Is your data grouped?
@@ -12,8 +11,7 @@
 # Ungrouped, stacked ms
 
     Code
-      dplyr::pull(frequencies %>% order_label(stacked = "ms"), label) %>%
-        as.character()
+      as.character(dplyr::pull(order_label(frequencies, stacked = "ms"), label))
     Condition
       Warning in `order_label()`:
       You used a "stacked" ordering system without specifying group_var. Is your data grouped?

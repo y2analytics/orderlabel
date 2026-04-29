@@ -20,33 +20,48 @@
 #'   other_var = c('x', 'y', 'z', 'z (test)', 'None')
 #' )
 #'
-#' frequencies %>% other_rm(remove = TRUE)
-#' frequencies %>% other_rm(var = other_var)
+#' frequencies |> other_rm(remove = TRUE)
+#' frequencies |> other_rm(var = other_var)
 
 other_rm <- function(
-    dataset,
-    var = NULL,
-    remove = FALSE
+  dataset,
+  var = NULL,
+  remove = FALSE
 ) {
   variable_quoed <- dplyr::enquo(var)
   variable_char <- dplyr::quo_name(variable_quoed)
   vars_to_edit <- c('variable', 'prompt', 'group_var', 'label', variable_char)
 
-  for(i in vars_to_edit) {
+  for (i in vars_to_edit) {
     if (any(names(dataset) == i) == TRUE) {
       symb_var <- rlang::sym(i)
-      dataset <- dataset %>%
-        dplyr::ungroup() %>%
+      dataset <- dataset |>
+        dplyr::ungroup() |>
         dplyr::mutate(
           '{{symb_var}}' := as.character({{ symb_var }}),
           '{{symb_var}}' := stringr::str_squish({{ symb_var }}),
           '{{symb_var}}' := stringr::str_remove_all({{ symb_var }}, '/n'),
           '{{symb_var}}' := dplyr::case_when(
-            stringr::str_detect({{ symb_var }}, stringr::regex('prefer not to', ignore_case = TRUE)) == TRUE ~ 'Prefer not to say',
-            stringr::str_detect({{ symb_var }}, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
-            stringr::str_detect({{ symb_var }}, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('prefer not to', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'Prefer not to say',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('please specify', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'Other',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('none of the', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'None of the above',
             {{ symb_var }} == 'None' ~ 'None of the above',
-            TRUE ~ {{ symb_var }}
+            .default = {{ symb_var }}
           ),
           '{{symb_var}}' := stringr::str_remove_all({{ symb_var }}, ' \\(.*')
         )
@@ -62,21 +77,25 @@ other_rm <- function(
 #### hidden functions ####
 # remove_function
 remove_argument <- function(
-    dataset,
-    remove
+  dataset,
+  remove
 ) {
-  if (remove == TRUE) {
-    dataset <- dataset %>%
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'Other') == FALSE
-      ) %>%
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'None of the above') == FALSE
-      )  %>%
-      dplyr::filter_all(
-        ~stringr::str_detect(., 'Prefer not to ') == FALSE
+  if (remove) {
+    dataset |>
+      dplyr::filter(
+        !dplyr::if_any(where(is.character), \(x) {
+          stringr::str_detect(x, "Other")
+        }),
+        !dplyr::if_any(
+          where(is.character),
+          \(x) stringr::str_detect(x, "None of the above")
+        ),
+        !dplyr::if_any(
+          where(is.character),
+          \(x) stringr::str_detect(x, "Prefer not to")
+        )
       )
   } else {
-    dataset <- dataset
+    dataset
   }
 }

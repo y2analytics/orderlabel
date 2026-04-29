@@ -23,7 +23,7 @@ frequencies <- tibble::tibble(
   result = c(.25, .15, .20, .10, .30),
   value = c(1, 2, 3, 4, 5),
   group_var = rep('Group A', 5)
-) \%>\% order_label(group_var = group_var)
+) |> order_label(group_var = group_var)
 ordered_df <- frequencies
 
 # The second frequencies that you want to be ordered the same as the original
@@ -32,7 +32,7 @@ frequencies <- tibble::tibble(
   result = c(.30, .10, .15, .20, .25),
   value = c(1, 2, 3, 4, 5),
   group_var = rep('Group B', 5)
-) \%>\% order_same()
+) |> order_same()
 }
 \keyword{equal}
 \keyword{label}

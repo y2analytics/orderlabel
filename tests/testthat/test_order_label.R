@@ -1,4 +1,3 @@
-
 # Errors and Warnings -----------------------------------------------------
 
 test_that("Errors and Warnings on grouped data", {
@@ -12,23 +11,23 @@ test_that("Errors and Warnings on grouped data", {
   )
 
   expect_error(
-    frequencies %>% order_label(inherent_order_group = TRUE),
+    frequencies |> order_label(inherent_order_group = TRUE),
     'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
   )
   expect_error(
-    frequencies %>% order_label(rev_group = TRUE),
+    frequencies |> order_label(rev_group = TRUE),
     'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
   )
   expect_error(
-    frequencies %>% order_label(group_first = 's_test'),
+    frequencies |> order_label(group_first = 's_test'),
     'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
   )
   expect_error(
-    frequencies %>% order_label(group_last = 's_test'),
+    frequencies |> order_label(group_last = 's_test'),
     'You specified a grouping argument but not the group_var. Either add in a variable for group_var or do not run other grouping arguments.'
   )
   expect_warning(
-    frequencies %>% order_label(stacked = 'ms'),
+    frequencies |> order_label(stacked = 'ms'),
     'You used a "stacked" ordering system without specifying group_var. Is your data grouped?'
   )
 })
@@ -43,7 +42,7 @@ test_that("Errors and Warnings on grouped data", {
       n = c(10, 15, 15, 20, 40),
       stat = rep('percent', 5),
       result = c(.1, .3, .4, .05, .01)
-    ) %>%
+    ) |>
       order_label(topbox = 2),
     'You cannot use the topbox argument on ungrouped data.'
   )
@@ -58,8 +57,8 @@ test_that("Error num_fmt not percent/general", {
   )
 
   expect_error(
-    df_stat %>% order_label(num_fmt = "gnral")
-    )
+    df_stat |> order_label(num_fmt = "gnral")
+  )
 })
 
 
@@ -71,7 +70,7 @@ test_that("Error stacked not NULL, ms, gg", {
   )
 
   expect_error(
-    df_stat %>% order_label(stacked = "mschart")
+    df_stat |> order_label(stacked = "mschart")
   )
 })
 
@@ -86,7 +85,7 @@ test_that("Grouped, stacked gg, inherent_order_group, rev_group", {
       n = rep(10, 9),
       stat = rep('percent', 9),
       result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-    ) %>%
+    ) |>
       order_label(
         group_var = group_var,
         stacked = 'gg',
@@ -108,7 +107,7 @@ test_that("Output structure", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .15, .15, .2, .4)
-  ) %>%
+  ) |>
     order_label(
       label_var = value
     )
@@ -136,12 +135,12 @@ test_that("Adds values", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .2, .3, .4, .5)
-  ) %>%
+  ) |>
     order_label(
       label_var = value
     )
   expect_equal(
-    frequencies %>% dplyr::pull(value),
+    frequencies |> dplyr::pull(value),
     c(5, 4, 3, 2, 1)
   )
 })
@@ -154,7 +153,7 @@ test_that("label_var", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .15, .15, .2, .4)
-  ) %>%
+  ) |>
     order_label(
       label_var = value
     )
@@ -179,15 +178,15 @@ test_that("Ungrouped, no arguments", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label()
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'Two', 'One', 'Four', 'Five')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% levels(),
+    frequencies |> dplyr::pull(label) |> levels(),
     c('Three', 'Two', 'One', 'Four', 'Five')
   )
 })
@@ -202,15 +201,15 @@ test_that("Ungrouped, inherent_order_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(inherent_order_label = TRUE)
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Two', 'Three', 'Four', 'Five')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% levels(),
+    frequencies |> dplyr::pull(label) |> levels(),
     c('One', 'Two', 'Three', 'Four', 'Five')
   )
 })
@@ -223,11 +222,11 @@ test_that("Ungrouped, label_first", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(label_first = 'Two')
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Three', 'One', 'Four', 'Five')
   )
 })
@@ -241,11 +240,11 @@ test_that("Ungrouped, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(rev_label = TRUE)
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Five', 'Four', 'One', 'Two', 'Three')
   )
 })
@@ -259,11 +258,11 @@ test_that("Ungrouped, label_last", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(label_last = 'Two')
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'One', 'Four', 'Five', 'Two')
   )
 })
@@ -277,11 +276,11 @@ test_that("Ungrouped, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(direction = 'horizontal')
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Five', 'Four', 'One', 'Two', 'Three')
   )
 })
@@ -298,7 +297,10 @@ test_that("Ungrouped, stacked gg", {
   )
 
   expect_snapshot(
-    frequencies %>% order_label(stacked = 'gg') |> dplyr::pull(label) %>% as.character()
+    frequencies |>
+      order_label(stacked = 'gg') |>
+      dplyr::pull(label) |>
+      as.character()
   )
 })
 
@@ -314,7 +316,10 @@ test_that("Ungrouped, stacked ms", {
   )
 
   expect_snapshot(
-    frequencies %>% order_label(stacked = 'ms') |> dplyr::pull(label) %>% as.character()
+    frequencies |>
+      order_label(stacked = 'ms') |>
+      dplyr::pull(label) |>
+      as.character()
   )
 })
 
@@ -329,17 +334,17 @@ test_that("Ungrouped, none_other", {
     result = c(.1, .3, .4, .31, .9)
   )
 
-  freqs_other_true <- frequencies %>%
+  freqs_other_true <- frequencies |>
     order_label(none_other = TRUE)
   expect_equal(
-    freqs_other_true %>% dplyr::pull(label) %>% as.character(),
+    freqs_other_true |> dplyr::pull(label) |> as.character(),
     c('Three', 'Two', 'One', 'Other', 'None of the above')
   )
 
-  freqs_other_false <- frequencies %>%
+  freqs_other_false <- frequencies |>
     order_label(none_other = FALSE)
   expect_equal(
-    freqs_other_false %>% dplyr::pull(label) %>% as.character(),
+    freqs_other_false |> dplyr::pull(label) |> as.character(),
     c('None of the above', 'Three', 'Other', 'Two', 'One')
   )
 })
@@ -355,17 +360,17 @@ test_that("Ungrouped, num_fmt", {
     result = c(.1, .3, .4, .31, .9)
   )
 
-  freqs_numfmt_true <- frequencies %>%
+  freqs_numfmt_true <- frequencies |>
     order_label(num_fmt = 'percent')
   expect_equal(
-    freqs_numfmt_true %>% dplyr::pull(percent_label),
+    freqs_numfmt_true |> dplyr::pull(percent_label),
     c('90%', '40', '31', '30', '10')
   )
 
-  freqs_numfmt_false <- frequencies %>%
+  freqs_numfmt_false <- frequencies |>
     order_label(num_fmt = 'general')
   expect_equal(
-    freqs_numfmt_false %>% dplyr::pull(percent_label),
+    freqs_numfmt_false |> dplyr::pull(percent_label),
     c('0.9', '0.4', '0.31', '0.3', '0.1')
   )
 })
@@ -378,15 +383,14 @@ test_that("Ungrouped, percent_all", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .31, .9)
-  ) %>%
+  ) |>
     order_label(percent_all = TRUE)
 
   expect_equal(
-    frequencies %>% dplyr::pull(percent_label),
+    frequencies |> dplyr::pull(percent_label),
     c('90%', '40%', '31%', '30%', '10%')
   )
 })
-
 
 
 # Ungrouped Data - descending, 2 arguments -------------------------------
@@ -400,14 +404,14 @@ test_that("Ungrouped, label_first, label_last", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Four'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Three', 'One', 'Five', 'Four')
   )
 })
@@ -421,14 +425,14 @@ test_that("Ungrouped, label_first, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       rev_label = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Five', 'Four', 'One', 'Three')
   )
 })
@@ -441,14 +445,14 @@ test_that("Ungrouped, label_first, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       direction = 'horizontal'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Five', 'Four', 'One', 'Three', 'Two')
   )
   expect_equal(
@@ -466,14 +470,14 @@ test_that("Ungrouped, label_first, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       none_other = FALSE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'None of the above', 'Three', 'Other', 'One')
   )
 })
@@ -487,14 +491,14 @@ test_that("Ungrouped, label_last, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       rev_label = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Five', 'Four', 'One', 'Three', 'Two')
   )
 })
@@ -508,14 +512,14 @@ test_that("Ungrouped, label_last, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       direction = 'horizontal'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Five', 'Four', 'One', 'Three')
   )
 })
@@ -529,14 +533,14 @@ test_that("Ungrouped, rev_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       rev_label = TRUE,
       direction = 'horizontal'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'Two', 'One', 'Four', 'Five')
   )
 })
@@ -550,14 +554,14 @@ test_that("Ungrouped, rev_label, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       rev_label = TRUE,
       none_other = FALSE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Other', 'Two', 'Three', 'None of the above')
   )
 })
@@ -571,18 +575,17 @@ test_that("Ungrouped, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       direction = 'horizontal',
       none_other = FALSE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Other', 'Two', 'Three', 'None of the above')
   )
 })
-
 
 
 # Ungrouped Data - descending, 3 arguments -------------------------------
@@ -596,7 +599,7 @@ test_that("Ungrouped, label_first, label_last, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Four',
@@ -604,7 +607,7 @@ test_that("Ungrouped, label_first, label_last, rev_label", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Five', 'One', 'Three', 'Four')
   )
 })
@@ -618,7 +621,7 @@ test_that("Ungrouped, label_first, label_last, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Four',
@@ -626,7 +629,7 @@ test_that("Ungrouped, label_first, label_last, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Four', 'Five', 'One', 'Three', 'Two')
   )
 })
@@ -640,7 +643,7 @@ test_that("Ungrouped, label_first, label_last, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Other',
@@ -648,7 +651,7 @@ test_that("Ungrouped, label_first, label_last, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'None of the above', 'Three', 'One', 'Other')
   )
 })
@@ -662,7 +665,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       rev_label = TRUE,
@@ -670,7 +673,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'One', 'Four', 'Five', 'Two')
   )
 })
@@ -684,7 +687,7 @@ test_that("Ungrouped, label_first, rev_label, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       rev_label = TRUE,
@@ -692,7 +695,7 @@ test_that("Ungrouped, label_first, rev_label, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'One', 'Other', 'Three', 'None of the above')
   )
 })
@@ -706,7 +709,7 @@ test_that("Ungrouped, label_first, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       direction = 'horizontal',
@@ -714,7 +717,7 @@ test_that("Ungrouped, label_first, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Other', 'Three', 'None of the above', 'Two')
   )
 })
@@ -728,7 +731,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       rev_label = TRUE,
@@ -736,7 +739,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'Three', 'One', 'Four', 'Five')
   )
 })
@@ -750,7 +753,7 @@ test_that("Ungrouped, label_last, rev_label, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       rev_label = TRUE,
@@ -758,7 +761,7 @@ test_that("Ungrouped, label_last, rev_label, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Other', 'Three', 'None of the above', 'Two')
   )
 })
@@ -772,7 +775,7 @@ test_that("Ungrouped, label_last, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       direction = 'horizontal',
@@ -780,7 +783,7 @@ test_that("Ungrouped, label_last, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Two', 'One', 'Other', 'Three', 'None of the above')
   )
 })
@@ -794,7 +797,7 @@ test_that("Ungrouped, rev_label, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       rev_label = TRUE,
       direction = 'horizontal',
@@ -802,11 +805,10 @@ test_that("Ungrouped, rev_label, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('None of the above', 'Three', 'Two', 'Other', 'One')
   )
 })
-
 
 
 # Ungrouped Data - descending, 4-5 arguments -------------------------------
@@ -820,7 +822,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Four',
@@ -829,7 +831,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Four', 'Three', 'One', 'Five', 'Two')
   )
 })
@@ -843,7 +845,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Other',
@@ -852,8 +854,8 @@ test_that("Ungrouped, label_first, label_last, rev_label, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
-    c('Two','One', 'Three', 'None of the above', 'Other')
+    frequencies |> dplyr::pull(label) |> as.character(),
+    c('Two', 'One', 'Three', 'None of the above', 'Other')
   )
 })
 
@@ -866,7 +868,7 @@ test_that("Ungrouped, label_first, label_last, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Other',
@@ -875,7 +877,7 @@ test_that("Ungrouped, label_first, label_last, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     rev(c('Two', 'None of the above', 'Three', 'One', 'Other'))
   )
 })
@@ -889,7 +891,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       rev_label = TRUE,
@@ -898,7 +900,7 @@ test_that("Ungrouped, label_first, rev_label, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('None of the above', 'Three', 'Other', 'One', 'Two')
   )
 })
@@ -912,7 +914,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_last = 'Two',
       rev_label = TRUE,
@@ -921,8 +923,8 @@ test_that("Ungrouped, label_last, rev_label, horizontal, none_other", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
-    c( 'Two', 'None of the above', 'Three', 'Other', 'One')
+    frequencies |> dplyr::pull(label) |> as.character(),
+    c('Two', 'None of the above', 'Three', 'Other', 'One')
   )
 })
 
@@ -936,7 +938,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal, none_other
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .29, .9)
-  ) %>%
+  ) |>
     order_label(
       label_first = 'Two',
       label_last = 'Other',
@@ -946,7 +948,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, horizontal, none_other
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Other', 'None of the above', 'Three', 'One', 'Two')
   )
 })
@@ -966,14 +968,14 @@ test_that("Ungrouped, inherent_order_label, label_first", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three'
-      )
+    )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'One', 'Two', 'Four', 'Five')
   )
 })
@@ -987,14 +989,14 @@ test_that("Ungrouped, inherent_order_label, label_last", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_last = 'Three'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Two', 'Four', 'Five', 'Three')
   )
 })
@@ -1008,14 +1010,14 @@ test_that("Ungrouped, inherent_order_label, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       rev_label = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     rev(c('One', 'Two', 'Three', 'Four', 'Five'))
   )
 })
@@ -1029,14 +1031,14 @@ test_that("Ungrouped, inherent_order_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       direction = 'horizontal'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     rev(c('One', 'Two', 'Three', 'Four', 'Five'))
   )
 })
@@ -1050,18 +1052,17 @@ test_that("Ungrouped, inherent_order_label, none_other", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .5)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       none_other = FALSE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Two', 'Three', 'Four', 'None of the above')
   )
 })
-
 
 
 # Ungrouped Data - inherent_order, 3 arguments -------------------------
@@ -1075,7 +1076,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1083,7 +1084,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'One', 'Two', 'Five', 'Four')
   )
 })
@@ -1097,7 +1098,7 @@ test_that("Ungrouped, inherent_order_label, label_first, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1105,7 +1106,7 @@ test_that("Ungrouped, inherent_order_label, label_first, rev_label", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'Five', 'Four', 'Two', 'One')
   )
 })
@@ -1119,7 +1120,7 @@ test_that("Ungrouped, inherent_order_label, label_first, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1127,7 +1128,7 @@ test_that("Ungrouped, inherent_order_label, label_first, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     rev(c('Three', 'One', 'Two', 'Four', 'Five'))
   )
 })
@@ -1141,7 +1142,7 @@ test_that("Ungrouped, inherent_order_label, label_last, rev_label", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_last = 'Three',
@@ -1149,7 +1150,7 @@ test_that("Ungrouped, inherent_order_label, label_last, rev_label", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Five', 'Four', 'Two', 'One', 'Three')
   )
 })
@@ -1163,7 +1164,7 @@ test_that("Ungrouped, inherent_order_label, label_last, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_last = 'Three',
@@ -1171,7 +1172,7 @@ test_that("Ungrouped, inherent_order_label, label_last, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'Five', 'Four', 'Two', 'One')
   )
 })
@@ -1185,7 +1186,7 @@ test_that("Ungrouped, inherent_order_label, rev_label, horizontal", {
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       rev_label = TRUE,
@@ -1193,7 +1194,7 @@ test_that("Ungrouped, inherent_order_label, rev_label, horizontal", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     rev(c('Five', 'Four', 'Three', 'Two', 'One'))
   )
 })
@@ -1210,7 +1211,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label",
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1219,7 +1220,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label",
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Three', 'Five', 'Two', 'One', 'Four')
   )
 })
@@ -1233,7 +1234,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, horizontal"
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1242,7 +1243,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, horizontal"
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Four', 'Five', 'Two', 'One', 'Three')
   )
 })
@@ -1256,7 +1257,7 @@ test_that("Ungrouped, inherent_order_label, label_last, rev_label, horizontal", 
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1265,7 +1266,7 @@ test_that("Ungrouped, inherent_order_label, label_last, rev_label, horizontal", 
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('One', 'Two', 'Four', 'Five', 'Three')
   )
 })
@@ -1280,7 +1281,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label, 
     n = c(10, 15, 15, 20, 40),
     stat = rep('percent', 5),
     result = c(.1, .3, .4, .05, .01)
-  ) %>%
+  ) |>
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three',
@@ -1290,7 +1291,7 @@ test_that("Ungrouped, inherent_order_label, label_first, label_last, rev_label, 
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character(),
+    frequencies |> dplyr::pull(label) |> as.character(),
     c('Four', 'One', 'Two', 'Five', 'Three')
   )
 })
@@ -1308,17 +1309,17 @@ test_that("Grouped, no other arguments", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
-    c( 'Two', 'One', 'Three')
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
+    c('Two', 'One', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1334,18 +1335,18 @@ test_that("Grouped, inherent_order_label", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       inherent_order_label = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('One', 'Two', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1360,18 +1361,18 @@ test_that("Grouped, inherent_order_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       inherent_order_group = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('Three', 'Two', 'One')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1386,18 +1387,18 @@ test_that("Grouped, label_first", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       label_first = 'Three'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('Three', 'Two', 'One')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1412,18 +1413,18 @@ test_that("Grouped, label_last", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       label_last = 'Three'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
-    c( 'Two', 'One', 'Three')
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
+    c('Two', 'One', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1438,18 +1439,18 @@ test_that("Grouped, group_first", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       group_first = 'Group 3'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
-    c( 'Two', 'One', 'Three')
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
+    c('Two', 'One', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1464,18 +1465,18 @@ test_that("Grouped, group_last", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       group_last = 'Group 3'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
-    c( 'Two', 'One', 'Three')
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
+    c('Two', 'One', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1490,18 +1491,18 @@ test_that("Grouped, rev_label", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       rev_label = TRUE
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('Three', 'One', 'Two')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1516,7 +1517,7 @@ test_that("Grouped, rev_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       rev_group = TRUE
@@ -1526,11 +1527,11 @@ test_that("Grouped, rev_group", {
   # Or do labels order after the originally first group, which is now last?
   # Or do they order after overall highest numbers, no matter which group
   # expect_equal(
-  #   frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+  #   frequencies |> dplyr::pull(label) |> as.character() |> unique(),
   #   c('Three', 'One', 'Two')
   # )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 1', 'Group 3')
   )
 })
@@ -1545,18 +1546,18 @@ test_that("Grouped, horizontal", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       direction = 'horizontal'
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('Three', 'One', 'Two')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 1', 'Group 3')
   )
 })
@@ -1572,17 +1573,17 @@ test_that("Grouped, none_other", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       none_other = TRUE
     )
-    expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+  expect_equal(
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('One', 'Three', 'Other')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 
@@ -1595,17 +1596,17 @@ test_that("Grouped, none_other", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       none_other = FALSE
     )
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('Other', 'One', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1614,7 +1615,6 @@ test_that("Grouped, none_other", {
 # Grouped Data - descending, 2 arguments ---------------------------------------
 
 # TWO ARGUMENTS *******************************************************
-
 
 # Stacked data, gg - one argument only ----------------------------------------
 
@@ -1630,7 +1630,7 @@ test_that("Grouped, stacked gg", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg'
@@ -1638,11 +1638,11 @@ test_that("Grouped, stacked gg", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 1', 'Group 3')
   )
 })
@@ -1657,7 +1657,7 @@ test_that("Grouped, stacked gg, inherent_order_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1666,11 +1666,11 @@ test_that("Grouped, stacked gg, inherent_order_group", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 2', 'Group 1')
   )
 })
@@ -1685,7 +1685,7 @@ test_that("Grouped, stacked gg, group_first", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1694,11 +1694,11 @@ test_that("Grouped, stacked gg, group_first", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 3', 'Group 1')
   )
 })
@@ -1713,7 +1713,7 @@ test_that("Grouped, stacked gg, group_last", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1722,11 +1722,11 @@ test_that("Grouped, stacked gg, group_last", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1741,7 +1741,7 @@ test_that("Grouped, stacked gg, rev_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1750,11 +1750,11 @@ test_that("Grouped, stacked gg, rev_group", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1769,7 +1769,7 @@ test_that("Grouped, stacked gg, topbox", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .4, .4, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1778,15 +1778,14 @@ test_that("Grouped, stacked gg, topbox", {
 
   # Stacked gg is like horizontal in that bottom of table is first on chart
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     rev(c('One', 'Two', 'Three'))
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
-
 
 
 # Stacked data, gg - 2 arguments ----------------------------------------------
@@ -1794,7 +1793,6 @@ test_that("Grouped, stacked gg, topbox", {
 # TWO ARGUMENTS *********************************************************
 # For stacked, arguments to test are:
 # inherent_order_group, group_first, group_last, rev_group, topbox
-
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first", {
   frequencies <- tibble::tibble(
@@ -1805,7 +1803,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1814,7 +1812,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 1', 'Group 2')
   )
 })
@@ -1829,7 +1827,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_last", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1838,7 +1836,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_last", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 3', 'Group 2')
   )
 })
@@ -1853,7 +1851,7 @@ test_that("Grouped, stacked gg, inherent_order_group, rev_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1862,7 +1860,7 @@ test_that("Grouped, stacked gg, inherent_order_group, rev_group", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1877,7 +1875,7 @@ test_that("Grouped, stacked gg, group_first, group_last", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1886,7 +1884,7 @@ test_that("Grouped, stacked gg, group_first, group_last", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 2', 'Group 1')
   )
 })
@@ -1901,7 +1899,7 @@ test_that("Grouped, stacked gg, group_first, rev_group", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1910,7 +1908,7 @@ test_that("Grouped, stacked gg, group_first, rev_group", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 3', 'Group 2', 'Group 1')
   )
 })
@@ -1925,7 +1923,7 @@ test_that("Grouped, stacked gg, group_first, topbox", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1935,7 +1933,7 @@ test_that("Grouped, stacked gg, group_first, topbox", {
 
   # Come back to this
   # expect_equal(
-  #   frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+  #   frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
   #   c('Group 3', 'Group 2', 'Group 1')
   # )
 })
@@ -1950,7 +1948,7 @@ test_that("Grouped, stacked gg, group_last, rev_label", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1959,7 +1957,7 @@ test_that("Grouped, stacked gg, group_last, rev_label", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 3')
   )
 })
@@ -1974,7 +1972,7 @@ test_that("Grouped, stacked gg, group_last, topbox", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -1983,7 +1981,7 @@ test_that("Grouped, stacked gg, group_last, topbox", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 1', 'Group 3')
   )
 })
@@ -1998,7 +1996,7 @@ test_that("Grouped, stacked gg, rev_group, topbox", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -2007,7 +2005,7 @@ test_that("Grouped, stacked gg, rev_group, topbox", {
     )
 
   # expect_equal(
-  #   frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+  #   frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
   #   c('Group 2', 'Group 1', 'Group 3')
   # )
 })
@@ -2021,14 +2019,19 @@ test_that("Grouped, stacked gg, rev_group, topbox", {
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
     n = rep(10, 12),
     stat = rep('percent', 12),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -2038,7 +2041,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", 
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 4', 'Group 2', 'Group 3')
   )
 })
@@ -2046,14 +2049,19 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", 
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
     n = rep(10, 12),
     stat = rep('percent', 12),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -2063,7 +2071,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 4', 'Group 3')
   )
 })
@@ -2071,14 +2079,19 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
 
 test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
     n = rep(10, 12),
     stat = rep('percent', 12),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -2088,7 +2101,7 @@ test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 4', 'Group 2', 'Group 3')
   )
 })
@@ -2097,14 +2110,19 @@ test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
 # FOUR ARGUMENTS *********************************************************
 test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
     n = rep(10, 12),
     stat = rep('percent', 12),
     result = c(.25, .25, .5, .2, .5, .3, .33, .33, .33, .4, .4, .2)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'gg',
@@ -2115,7 +2133,7 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last, r
     )
 
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 1', 'Group 2', 'Group 4', 'Group 3')
   )
 })
@@ -2144,7 +2162,7 @@ test_that("Grouped, stacked ms", {
     n = rep(10, 9),
     stat = rep('percent', 9),
     result = c(.1, .2, .3, .01, .02, .03, .5, .8, .01)
-  ) %>%
+  ) |>
     order_label(
       group_var = group_var,
       stacked = 'ms'
@@ -2152,15 +2170,14 @@ test_that("Grouped, stacked ms", {
 
   # Stacked ms has groups reversed but labels descending
   expect_equal(
-    frequencies %>% dplyr::pull(label) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('One', 'Two', 'Three')
   )
   expect_equal(
-    frequencies %>% dplyr::pull(group_var) %>% as.character() %>% unique(),
+    frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
     c('Group 2', 'Group 1', 'Group 3')
   )
 })
-
 
 
 # MS TESTING
@@ -2174,7 +2191,7 @@ test_that("Grouped, stacked ms", {
 
 # Testing deprication ---------
 test_that('horizontal = TRUE is deprecated', {
-   frequencies <- tibble::tibble(
+  frequencies <- tibble::tibble(
     group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
     variable = rep('s_test', 9),
     value = rep(c('1', '2', '3'), 3),
@@ -2190,7 +2207,6 @@ test_that('horizontal = TRUE is deprecated', {
       group_var = group_var,
       horizontal = TRUE,
       stacked = 'ms'
-    ))
+    )
+  )
 })
-
-

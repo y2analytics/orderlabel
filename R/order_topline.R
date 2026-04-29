@@ -15,75 +15,85 @@
 #' order_topline(frequencies, 'mpg|cyl|disp')
 #' }
 
-
 order_topline <- function(
   dataset,
   whole_numbers = 'place your variable names here with a | (OR sign) between them'
 ) {
-  dataset <- dataset %>%
-    var_sep() %>%
-    add_percent() %>%
-    add_lessthan() %>%
+  dataset <- dataset |>
+    var_sep() |>
+    add_percent() |>
+    add_lessthan() |>
     whole_numbers(whole_numbers)
 
   return(dataset)
 }
 
 
-
 #### ***** Hidden order_topline Functions ***** ####
 #### var_sep ####
 var_sep <- function(dataset) {
-  dataset %>%
+  dataset |>
     dplyr::mutate(
       var = .data$variable
-    ) %>%
+    ) |>
     tidyr::separate(
       .data$var,
       into = stringr::str_c('variable', 1:4),
       sep = "_"
-    ) %>%
+    ) |>
     dplyr::mutate(
       variable3 = dplyr::case_when(
-        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == FALSE ~ NA_character_,
-        TRUE ~ variable3
+        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == FALSE ~
+          NA_character_,
+        .default = variable3
       ),
       variable2 = dplyr::case_when(
-        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == FALSE ~ NA_character_,
-        TRUE ~ variable2
+        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == FALSE ~
+          NA_character_,
+        .default = variable2
       ),
       sort_var = dplyr::case_when(
         is.na(variable2) ~ variable1,
         is.na(variable3) ~ stringr::str_c(variable1, "_", variable2),
-        is.na(variable4) ~ stringr::str_c(variable1, "_", variable2, '_', variable3),
-        TRUE ~ stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
+        is.na(variable4) ~
+          stringr::str_c(variable1, "_", variable2, '_', variable3),
+        .default = stringr::str_c(
+          variable1,
+          "_",
+          variable2,
+          '_',
+          variable3,
+          '_',
+          variable4
+        )
       )
     )
 }
 
 #### add_percent ####
 add_percent <- function(dataset) {
-  dataset %>%
-    dplyr::group_by(.data$sort_var) %>%
+  dataset |>
+    dplyr::group_by(.data$sort_var) |>
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        label == label[1] & variable == variable[1] ~ stringr::str_c(.data$result * 100, '%'),
-        TRUE ~ stringr::str_c(.data$result * 100)
+        label == label[1] & variable == variable[1] ~
+          stringr::str_c(.data$result * 100, '%'),
+        .default = stringr::str_c(.data$result * 100)
       )
     )
 }
 
 #### add_lessthan ####
 add_lessthan <- function(dataset) {
-  dataset %>%
+  dataset |>
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        .data$percent_label =='0%' & .data$n >= 1 ~ '<1%',
+        .data$percent_label == '0%' & .data$n >= 1 ~ '<1%',
         .data$percent_label == '0' & .data$n >= 1 ~ '<1',
-        TRUE ~ .data$percent_label
+        .default = .data$percent_label
       )
-    ) %>%
-    dplyr::ungroup() %>%
+    ) |>
+    dplyr::ungroup() |>
     dplyr::select(
       -'variable1',
       -'variable2',
@@ -98,12 +108,11 @@ whole_numbers <- function(
   dataset,
   whole_numbers
 ) {
-  dataset %>%
+  dataset |>
     dplyr::mutate(
       percent_label = dplyr::case_when(
         stringr::str_detect(variable, whole_numbers) ~ as.character(result),
-        TRUE ~ percent_label
+        .default = percent_label
       )
     )
 }
-

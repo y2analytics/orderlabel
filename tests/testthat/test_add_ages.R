@@ -1,4 +1,3 @@
-
 test_that("add_ages - gets current year", {
   test <- get_current_year(0)
   is_year <- class(test)
@@ -56,7 +55,11 @@ test_that("add_ages - year_var_specified", {
     survey_year = c(2021, 2021, 2022, 2023)
   )
 
-  test <- year_born_var_specified(responses, year_born_var = year, calculated_year = 2020)
+  test <- year_born_var_specified(
+    responses,
+    year_born_var = year,
+    calculated_year = 2020
+  )
   expect_equal(test$year_born_numeric[1], 2000)
   expect_equal(test$age_numeric[1], 20)
 })
@@ -115,7 +118,11 @@ test_that("add_ages - survey_date_var with year_born_var", {
     survey_year = c(2021, 2021, 2022, 2023)
   )
 
-  test <- add_ages(responses, year_born_var = year, survey_date_var = survey_date)
+  test <- add_ages(
+    responses,
+    year_born_var = year,
+    survey_date_var = survey_date
+  )
   expect_error(test, NA)
   expect_equal(test$age_numeric, c(21, 20, NA, 21))
 })
@@ -155,7 +162,8 @@ test_that("add_ages - use only age_var OR year_var", {
 
   expect_error(
     add_ages(responses, age_var = age, year_born_var = year),
-    "You specified both year_born_var and age_var, please specify only one")
+    "You specified both year_born_var and age_var, please specify only one"
+  )
 })
 
 
@@ -173,8 +181,14 @@ test_that("add_ages - use only year_of_survey OR survey_date_var", {
   )
 
   expect_error(
-    add_ages(responses, age_var = age, year_of_survey = 2022, survey_date_var = survey_date),
-    "You specified both year_of_survey and survey_date_var, please specify only one")
+    add_ages(
+      responses,
+      age_var = age,
+      year_of_survey = 2022,
+      survey_date_var = survey_date
+    ),
+    "You specified both year_of_survey and survey_date_var, please specify only one"
+  )
 })
 
 test_that("add_ages - survey_date_var not a date type", {
@@ -192,5 +206,6 @@ test_that("add_ages - survey_date_var not a date type", {
 
   expect_error(
     add_ages(responses, age_var = age, survey_date_var = survey_year),
-    "survey_date_var must be a type of date variable, not a numeric")
+    "survey_date_var must be a type of date variable, not a numeric"
+  )
 })
