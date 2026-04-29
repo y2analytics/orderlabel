@@ -16,7 +16,8 @@ order_label(
   rev_group = FALSE,
   label_last = NA,
   group_last = NA,
-  horizontal = FALSE,
+  horizontal = lifecycle::deprecated(),
+  direction = c("vertical", "horizontal"),
   stacked = c("NULL", "ms", "gg"),
   topbox = NULL,
   none_other = TRUE,
@@ -47,7 +48,9 @@ order_label(
 
 \item{group_last}{DEFAULT = NA; If specified, puts the specified group last ex: 'brand1' would put group called brand1 after all other groups}
 
-\item{horizontal}{DEFAULT = FALSE; For horizontal charts (grouped or ungrouped), use horizontal = TRUE. Specifying stacked = 'gg' or 'ms' automatically makes horizontal = TRUE}
+\item{horizontal}{(Deprecated) Use direction instead.}
+
+\item{direction}{DEFAULT = "vertical"; Use "vertical" (default) or "horizontal". Replaces the deprecated `horizontal` argument.}
 
 \item{stacked}{DEFAULT = 'NULL'; For stacked barcharts, use stacked = 'gg' for ggplot and 'ms' for mschart}
 
