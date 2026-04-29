@@ -24,7 +24,7 @@
       order_label(frequencies, group_var = group_var, horizontal = TRUE, stacked = "ms")
     Condition
       Warning:
-      The `horizontal` argument of `order_label()` is deprecated as of orderlabel 0.4.2.
+      The `horizontal` argument of `order_label()` is deprecated as of orderlabel 0.4.3.
       i Please use the `direction` argument instead.
     Output
       # A tibble: 9 x 8

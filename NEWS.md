@@ -1,3 +1,8 @@
+# orderlabel 0.4.3
+## Changes
+* The `horizontal` argument of `order_label()` is now deprecated, being replaced by `direction`.
+
+
 # orderlabel 0.4.2
 ## New feautres
 * `order_label` - new error messages added, documentation updated

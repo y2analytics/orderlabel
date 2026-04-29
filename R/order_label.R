@@ -76,7 +76,7 @@ order_label <- function(
   # Soft-deprecate `horizontal` if user supplied it, mapping to `direction`.
   if (lifecycle::is_present(horizontal)) {
     lifecycle::deprecate_warn(
-      when = "0.4.2",
+      when = "0.4.3",
       what = "order_label(horizontal)",
       with = "order_label(direction = 'horizontal')"
     )
