@@ -15,7 +15,6 @@
 #' order_topline(frequencies, 'mpg|cyl|disp')
 #' }
 
-
 order_topline <- function(
   dataset,
   whole_numbers = 'place your variable names here with a | (OR sign) between them'
@@ -28,7 +27,6 @@ order_topline <- function(
 
   return(dataset)
 }
-
 
 
 #### ***** Hidden order_topline Functions ***** ####
@@ -45,18 +43,29 @@ var_sep <- function(dataset) {
     ) |>
     dplyr::mutate(
       variable3 = dplyr::case_when(
-        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == FALSE ~ NA_character_,
+        is.na(variable4) & stringr::str_detect(variable3, "[A-Za-z]") == FALSE ~
+          NA_character_,
         .default = variable3
       ),
       variable2 = dplyr::case_when(
-        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == FALSE ~ NA_character_,
+        is.na(variable3) & stringr::str_detect(variable2, "[A-Za-z]") == FALSE ~
+          NA_character_,
         .default = variable2
       ),
       sort_var = dplyr::case_when(
         is.na(variable2) ~ variable1,
         is.na(variable3) ~ stringr::str_c(variable1, "_", variable2),
-        is.na(variable4) ~ stringr::str_c(variable1, "_", variable2, '_', variable3),
-        .default = stringr::str_c(variable1, "_", variable2, '_', variable3, '_', variable4)
+        is.na(variable4) ~
+          stringr::str_c(variable1, "_", variable2, '_', variable3),
+        .default = stringr::str_c(
+          variable1,
+          "_",
+          variable2,
+          '_',
+          variable3,
+          '_',
+          variable4
+        )
       )
     )
 }
@@ -67,7 +76,8 @@ add_percent <- function(dataset) {
     dplyr::group_by(.data$sort_var) |>
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        label == label[1] & variable == variable[1] ~ stringr::str_c(.data$result * 100, '%'),
+        label == label[1] & variable == variable[1] ~
+          stringr::str_c(.data$result * 100, '%'),
         .default = stringr::str_c(.data$result * 100)
       )
     )
@@ -78,7 +88,7 @@ add_lessthan <- function(dataset) {
   dataset |>
     dplyr::mutate(
       percent_label = dplyr::case_when(
-        .data$percent_label =='0%' & .data$n >= 1 ~ '<1%',
+        .data$percent_label == '0%' & .data$n >= 1 ~ '<1%',
         .data$percent_label == '0' & .data$n >= 1 ~ '<1',
         .default = .data$percent_label
       )
@@ -106,4 +116,3 @@ whole_numbers <- function(
       )
     )
 }
-

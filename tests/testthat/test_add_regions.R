@@ -1,4 +1,3 @@
-
 test_that("add_regions - upper/lower case", {
   responses <- tibble::tibble(
     state = c(
@@ -9,7 +8,7 @@ test_that("add_regions - upper/lower case", {
       'Washington DC',
       'Puerto Rico'
     ),
-    abbreviations= c(
+    abbreviations = c(
       'VA',
       'UT',
       'NY',
@@ -40,7 +39,7 @@ test_that("add_regions - abbreviations", {
       'Washington DC',
       'Puerto Rico'
     ),
-    abbreviations= c(
+    abbreviations = c(
       'VA',
       'UT',
       'NY',
@@ -70,7 +69,7 @@ test_that("add_regions - rename variable", {
       'Washington DC',
       'Puerto Rico'
     ),
-    abbreviations= c(
+    abbreviations = c(
       'VA',
       'UT',
       'NY',
@@ -80,7 +79,10 @@ test_that("add_regions - rename variable", {
     )
   )
 
-  test <- add_regions(responses, state_var = abbreviations, new_name = testy_test)
+  test <- add_regions(
+    responses,
+    state_var = abbreviations,
+    new_name = testy_test
+  )
   expect_equal(names(test)[3], "testy_test")
 })
-

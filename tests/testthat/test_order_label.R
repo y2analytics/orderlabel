@@ -1,4 +1,3 @@
-
 # Errors and Warnings -----------------------------------------------------
 
 test_that("Errors and Warnings on grouped data", {
@@ -59,7 +58,7 @@ test_that("Error num_fmt not percent/general", {
 
   expect_error(
     df_stat |> order_label(num_fmt = "gnral")
-    )
+  )
 })
 
 
@@ -298,7 +297,10 @@ test_that("Ungrouped, stacked gg", {
   )
 
   expect_snapshot(
-    frequencies |> order_label(stacked = 'gg') |> dplyr::pull(label) |> as.character()
+    frequencies |>
+      order_label(stacked = 'gg') |>
+      dplyr::pull(label) |>
+      as.character()
   )
 })
 
@@ -314,7 +316,10 @@ test_that("Ungrouped, stacked ms", {
   )
 
   expect_snapshot(
-    frequencies |> order_label(stacked = 'ms') |> dplyr::pull(label) |> as.character()
+    frequencies |>
+      order_label(stacked = 'ms') |>
+      dplyr::pull(label) |>
+      as.character()
   )
 })
 
@@ -386,7 +391,6 @@ test_that("Ungrouped, percent_all", {
     c('90%', '40%', '31%', '30%', '10%')
   )
 })
-
 
 
 # Ungrouped Data - descending, 2 arguments -------------------------------
@@ -582,7 +586,6 @@ test_that("Ungrouped, horizontal, none_other", {
     c('One', 'Other', 'Two', 'Three', 'None of the above')
   )
 })
-
 
 
 # Ungrouped Data - descending, 3 arguments -------------------------------
@@ -808,7 +811,6 @@ test_that("Ungrouped, rev_label, horizontal, none_other", {
 })
 
 
-
 # Ungrouped Data - descending, 4-5 arguments -------------------------------
 
 # FOUR ARGUMENTS **********************************************
@@ -853,7 +855,7 @@ test_that("Ungrouped, label_first, label_last, rev_label, none_other", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character(),
-    c('Two','One', 'Three', 'None of the above', 'Other')
+    c('Two', 'One', 'Three', 'None of the above', 'Other')
   )
 })
 
@@ -922,7 +924,7 @@ test_that("Ungrouped, label_last, rev_label, horizontal, none_other", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character(),
-    c( 'Two', 'None of the above', 'Three', 'Other', 'One')
+    c('Two', 'None of the above', 'Three', 'Other', 'One')
   )
 })
 
@@ -970,7 +972,7 @@ test_that("Ungrouped, inherent_order_label, label_first", {
     order_label(
       inherent_order_label = TRUE,
       label_first = 'Three'
-      )
+    )
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character(),
@@ -1061,7 +1063,6 @@ test_that("Ungrouped, inherent_order_label, none_other", {
     c('One', 'Two', 'Three', 'Four', 'None of the above')
   )
 })
-
 
 
 # Ungrouped Data - inherent_order, 3 arguments -------------------------
@@ -1315,7 +1316,7 @@ test_that("Grouped, no other arguments", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character() |> unique(),
-    c( 'Two', 'One', 'Three')
+    c('Two', 'One', 'Three')
   )
   expect_equal(
     frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
@@ -1420,7 +1421,7 @@ test_that("Grouped, label_last", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character() |> unique(),
-    c( 'Two', 'One', 'Three')
+    c('Two', 'One', 'Three')
   )
   expect_equal(
     frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
@@ -1446,7 +1447,7 @@ test_that("Grouped, group_first", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character() |> unique(),
-    c( 'Two', 'One', 'Three')
+    c('Two', 'One', 'Three')
   )
   expect_equal(
     frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
@@ -1472,7 +1473,7 @@ test_that("Grouped, group_last", {
 
   expect_equal(
     frequencies |> dplyr::pull(label) |> as.character() |> unique(),
-    c( 'Two', 'One', 'Three')
+    c('Two', 'One', 'Three')
   )
   expect_equal(
     frequencies |> dplyr::pull(group_var) |> as.character() |> unique(),
@@ -1577,7 +1578,7 @@ test_that("Grouped, none_other", {
       group_var = group_var,
       none_other = TRUE
     )
-    expect_equal(
+  expect_equal(
     frequencies |> dplyr::pull(label) |> as.character() |> unique(),
     c('One', 'Three', 'Other')
   )
@@ -1614,7 +1615,6 @@ test_that("Grouped, none_other", {
 # Grouped Data - descending, 2 arguments ---------------------------------------
 
 # TWO ARGUMENTS *******************************************************
-
 
 # Stacked data, gg - one argument only ----------------------------------------
 
@@ -1788,13 +1788,11 @@ test_that("Grouped, stacked gg, topbox", {
 })
 
 
-
 # Stacked data, gg - 2 arguments ----------------------------------------------
 
 # TWO ARGUMENTS *********************************************************
 # For stacked, arguments to test are:
 # inherent_order_group, group_first, group_last, rev_group, topbox
-
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first", {
   frequencies <- tibble::tibble(
@@ -2021,7 +2019,12 @@ test_that("Grouped, stacked gg, rev_group, topbox", {
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
@@ -2046,7 +2049,12 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last", 
 
 test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
@@ -2071,7 +2079,12 @@ test_that("Grouped, stacked gg, inherent_order_group, group_first, rev_group", {
 
 test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
@@ -2097,7 +2110,12 @@ test_that("Grouped, stacked gg, group_first, group_last, rev_group", {
 # FOUR ARGUMENTS *********************************************************
 test_that("Grouped, stacked gg, inherent_order_group, group_first, group_last, rev_group", {
   frequencies <- tibble::tibble(
-    group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3), rep('Group 4', 3)),
+    group_var = c(
+      rep('Group 1', 3),
+      rep('Group 2', 3),
+      rep('Group 3', 3),
+      rep('Group 4', 3)
+    ),
     variable = rep('s_test', 12),
     value = rep(c('1', '2', '3'), 4),
     label = rep(c('One', 'Two', 'Three'), 4),
@@ -2162,7 +2180,6 @@ test_that("Grouped, stacked ms", {
 })
 
 
-
 # MS TESTING
 # text_settings_stacked <- set_text_settings_y2()
 # color_settings_stacked <- set_color_settings_y2('blue', 'yellow', 'red')
@@ -2174,7 +2191,7 @@ test_that("Grouped, stacked ms", {
 
 # Testing deprication ---------
 test_that('horizontal = TRUE is deprecated', {
-   frequencies <- tibble::tibble(
+  frequencies <- tibble::tibble(
     group_var = c(rep('Group 1', 3), rep('Group 2', 3), rep('Group 3', 3)),
     variable = rep('s_test', 9),
     value = rep(c('1', '2', '3'), 3),
@@ -2190,7 +2207,6 @@ test_that('horizontal = TRUE is deprecated', {
       group_var = group_var,
       horizontal = TRUE,
       stacked = 'ms'
-    ))
+    )
+  )
 })
-
-

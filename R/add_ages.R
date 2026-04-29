@@ -39,68 +39,78 @@ add_ages <- function(
   variable_char <- rlang::quo_name(variable_quoed)
 
   # Error #1
-  if(variable_char != 'NULL') {
-  class_of_survey_date_var <- dataset |>
-    dplyr::pull({{ survey_date_var }}) |>
-    class()
+  if (variable_char != 'NULL') {
+    class_of_survey_date_var <- dataset |>
+      dplyr::pull({{ survey_date_var }}) |>
+      class()
 
-  if(
-    class_of_survey_date_var[1] != 'Date' &
-    class_of_survey_date_var[1] != 'POSIXct' &
-    class_of_survey_date_var[1] != 'POSIXt'
+    if (
+      class_of_survey_date_var[1] != 'Date' &
+        class_of_survey_date_var[1] != 'POSIXct' &
+        class_of_survey_date_var[1] != 'POSIXt'
     )
-    stop(stringr::str_c('survey_date_var must be a type of date variable, not a ', class_of_survey_date_var[1]))
+      stop(stringr::str_c(
+        'survey_date_var must be a type of date variable, not a ',
+        class_of_survey_date_var[1]
+      ))
   }
 
   # Error #2
-  if(!missing(year_born_var) & !missing(age_var))
-    stop('You specified both year_born_var and age_var, please specify only one')
+  if (!missing(year_born_var) & !missing(age_var))
+    stop(
+      'You specified both year_born_var and age_var, please specify only one'
+    )
 
   # Error #3
-  if(year_of_survey != 0 & variable_char != 'NULL')
-    stop('You specified both year_of_survey and survey_date_var, please specify only one')
+  if (year_of_survey != 0 & variable_char != 'NULL')
+    stop(
+      'You specified both year_of_survey and survey_date_var, please specify only one'
+    )
 
   calculated_year <- calculate_current_v_survey_date(
     dataset,
     variable_char,
     year_of_survey,
     {{ survey_date_var }}
-    )
+  )
 
   # User specified year_born_var
-  if(!missing(year_born_var)){
-    dataset <- year_born_var_specified(dataset, {{ year_born_var }}, calculated_year)
-    }
+  if (!missing(year_born_var)) {
+    dataset <- year_born_var_specified(
+      dataset,
+      {{ year_born_var }},
+      calculated_year
+    )
+  }
 
   # User specified age_var
-  if(!missing(age_var)){
+  if (!missing(age_var)) {
     dataset <- age_var_specified(dataset, {{ age_var }}, calculated_year)
-    }
+  }
 
   dataset <- create_age_groups(dataset)
   return(dataset)
 }
 
 
-
 # private functions -------------------------------------------------------
 ### Step 1 - get current date or date of survey
-get_current_year <- function(year_of_survey){
+get_current_year <- function(year_of_survey) {
   if (year_of_survey == 0) {
-  date <- Sys.Date()
-  current_year <- stringr::str_remove_all(date, '-.*') |> as.numeric()
+    date <- Sys.Date()
+    current_year <- stringr::str_remove_all(date, '-.*') |> as.numeric()
   } else {
-  current_year <- year_of_survey
+    current_year <- year_of_survey
   }
 }
 
 calculate_current_v_survey_date <- function(
-    dataset,
-    variable_char,
-    year_of_survey,
-    survey_date_var
-  ) {
-  if(variable_char == 'NULL') {
+  dataset,
+  variable_char,
+  year_of_survey,
+  survey_date_var
+) {
+  if (variable_char == 'NULL') {
     calculated_year <- get_current_year(year_of_survey)
   } else {
     calculated_year <- dataset |>
@@ -115,7 +125,7 @@ year_born_var_specified <- function(
   dataset,
   year_born_var,
   calculated_year
-){
+) {
   dataset <- dataset |>
     dplyr::mutate(
       year_born_numeric = forcats::as_factor({{ year_born_var }}) |>
@@ -129,7 +139,7 @@ age_var_specified <- function(
   dataset,
   age_var,
   calculated_year
-){
+) {
   dataset <- dataset |>
     dplyr::mutate(
       age_numeric = forcats::as_factor({{ age_var }}) |>
@@ -141,7 +151,7 @@ age_var_specified <- function(
 
 
 ### Step 3 - census_age_groups
-create_age_groups <- function(dataset){
+create_age_groups <- function(dataset) {
   dataset <- dataset |>
     dplyr::mutate(
       census_age_groups = dplyr::case_when(
@@ -158,11 +168,11 @@ create_age_groups <- function(dataset){
         # suppressWarnings added for trivial missing levels
         suppressWarnings(
           forcats::fct_relevel(
-          '18-34',
-          '35-44',
-          '45-54',
-          '55-64',
-          '65+'
+            '18-34',
+            '35-44',
+            '45-54',
+            '55-64',
+            '65+'
           )
         ),
       census_age_groups_6 = dplyr::case_when(
@@ -177,14 +187,13 @@ create_age_groups <- function(dataset){
         # suppressWarnings added for trivial missing levels
         suppressWarnings(
           forcats::fct_relevel(
-          '18-24',
-          '25-34',
-          '35-44',
-          '45-54',
-          '55-64',
-          '65+'
+            '18-24',
+            '25-34',
+            '35-44',
+            '45-54',
+            '55-64',
+            '65+'
           )
         )
     )
 }
-

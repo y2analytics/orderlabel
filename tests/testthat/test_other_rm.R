@@ -112,7 +112,6 @@ test_that("other_rm - no variable, no group_var", {
 })
 
 
-
 # Arguments ---------------------------------------------------------------
 
 test_that("other_rm - remove argument", {
@@ -141,7 +140,8 @@ test_that("other_rm - remove argument", {
     dplyr::mutate(
       dplyr::across(
         dplyr::everything(),
-        \(x) dplyr::if_else(
+        \(x)
+          dplyr::if_else(
             stringr::str_detect(x, "7"),
             "Brand 7",
             as.character(x)
@@ -149,7 +149,6 @@ test_that("other_rm - remove argument", {
       )
     ) |>
     dplyr::mutate(result = as.numeric(result))
-
 
   test <- other_rm(df, remove = TRUE)
   expect_equal(test, filtered_df)
@@ -182,5 +181,3 @@ test_that("other_rm - var argument", {
   expect_equal(test$other_var[8], 'None of the above')
   expect_equal(test$other_var[10], 'Brand 7')
 })
-
-

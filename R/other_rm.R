@@ -24,15 +24,15 @@
 #' frequencies |> other_rm(var = other_var)
 
 other_rm <- function(
-    dataset,
-    var = NULL,
-    remove = FALSE
+  dataset,
+  var = NULL,
+  remove = FALSE
 ) {
   variable_quoed <- dplyr::enquo(var)
   variable_char <- dplyr::quo_name(variable_quoed)
   vars_to_edit <- c('variable', 'prompt', 'group_var', 'label', variable_char)
 
-  for(i in vars_to_edit) {
+  for (i in vars_to_edit) {
     if (any(names(dataset) == i) == TRUE) {
       symb_var <- rlang::sym(i)
       dataset <- dataset |>
@@ -42,9 +42,24 @@ other_rm <- function(
           '{{symb_var}}' := stringr::str_squish({{ symb_var }}),
           '{{symb_var}}' := stringr::str_remove_all({{ symb_var }}, '/n'),
           '{{symb_var}}' := dplyr::case_when(
-            stringr::str_detect({{ symb_var }}, stringr::regex('prefer not to', ignore_case = TRUE)) == TRUE ~ 'Prefer not to say',
-            stringr::str_detect({{ symb_var }}, stringr::regex('please specify', ignore_case = TRUE)) == TRUE ~ 'Other',
-            stringr::str_detect({{ symb_var }}, stringr::regex('none of the', ignore_case = TRUE)) == TRUE ~ 'None of the above',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('prefer not to', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'Prefer not to say',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('please specify', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'Other',
+            stringr::str_detect(
+              {{ symb_var }},
+              stringr::regex('none of the', ignore_case = TRUE)
+            ) ==
+              TRUE ~
+              'None of the above',
             {{ symb_var }} == 'None' ~ 'None of the above',
             .default = {{ symb_var }}
           ),

@@ -26,36 +26,47 @@
 #' ) |> order_same()
 
 order_same <- function(
-    dataset,
-    orders = ordered_df,
-    group_var = 'NULL'
+  dataset,
+  orders = ordered_df,
+  group_var = 'NULL'
 ) {
   label_orders <- levels(orders$label)
   group_quoed <- rlang::enquo(group_var)
   group_character <- rlang::quo_name(group_quoed)
 
   if (is.null(label_orders)) {
-    stop('The "label" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')
+    stop(
+      'The "label" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.'
+    )
   }
 
   # run ordering functions
-  if (any(names(orders) == 'group_var') == TRUE |
+  if (
+    any(names(orders) == 'group_var') == TRUE |
       group_character != 'NULL'
   ) {
-
     if (any(names(orders) == 'group_var') == FALSE) {
-      stop('If using the group_var argument, the data frame from the "orders" argument must have a column named "group_var". This will be the column by which your new data frame is ordered.')
+      stop(
+        'If using the group_var argument, the data frame from the "orders" argument must have a column named "group_var". This will be the column by which your new data frame is ordered.'
+      )
     }
 
     dataset <- create_group_var(dataset, group_quoed, group_character)
     group_orders <- levels(orders$group_var)
 
     if (is.null(group_orders)) {
-      stop('The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.')
+      stop(
+        'The "group_var" variable in your "orders" data frame is not factored in a specific order. Please order your "orders" data frame before proceeding.'
+      )
     }
 
-    dataset <- grouped_vector(dataset, label_flag1 = label_orders, group_flag1 = group_orders)
-  } else{ # NOT grouped
+    dataset <- grouped_vector(
+      dataset,
+      label_flag1 = label_orders,
+      group_flag1 = group_orders
+    )
+  } else {
+    # NOT grouped
     dataset <- ungrouped_vector(dataset, label_flag1 = label_orders)
   }
   return(dataset)
@@ -65,15 +76,15 @@ order_same <- function(
 #### ***** Hidden Functions ***** ####
 #### Create group_var ####
 create_group_var <- function(
-    dataset,
-    group_quoed,
-    group_character
-    ) {
+  dataset,
+  group_quoed,
+  group_character
+) {
   if (group_character != 'NULL' & group_character != 'group_var') {
-  dataset <- dataset |>
-    dplyr::rename(
-      group_var = !!group_quoed
-    )
+    dataset <- dataset |>
+      dplyr::rename(
+        group_var = !!group_quoed
+      )
   }
   dataset <- dataset
 }
@@ -106,7 +117,7 @@ grouped_vector <- function(
       group_var = forcats::fct_inorder(.data$group_var)
     ) |>
     dplyr::mutate(
-      percent_label =  stringr::str_c(.data$result * 100)
+      percent_label = stringr::str_c(.data$result * 100)
     )
 }
 
@@ -130,5 +141,3 @@ ungrouped_vector <- function(
       percent_label = stringr::str_c(.data$result * 100)
     )
 }
-
-

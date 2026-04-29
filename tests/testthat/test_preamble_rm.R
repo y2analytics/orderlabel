@@ -1,7 +1,6 @@
-
 test_that("preamble_rm - all defaults", {
   frequencies <- tibble::tibble(
-    label = c('Selected','Selected','Selected','Selected','Selected'),
+    label = c('Selected', 'Selected', 'Selected', 'Selected', 'Selected'),
     result = c(.25, .15, .20, .10, .30),
     prompt = c(
       'What is your favorite color? - Blue',
@@ -22,7 +21,7 @@ test_that("preamble_rm - all defaults", {
 
 test_that("preamble_rm - different symbols", {
   frequencies <- tibble::tibble(
-    label = c('Selected','Selected','Selected','Selected','Selected'),
+    label = c('Selected', 'Selected', 'Selected', 'Selected', 'Selected'),
     result = c(.25, .15, .20, .10, .30),
     prompt = c(
       'What is your favorite color? ... Blue',
@@ -43,7 +42,7 @@ test_that("preamble_rm - different symbols", {
 
 test_that("preamble_rm - different variable", {
   frequencies <- tibble::tibble(
-    label = c('Selected','Selected','Selected','Selected','Selected'),
+    label = c('Selected', 'Selected', 'Selected', 'Selected', 'Selected'),
     result = c(.25, .15, .20, .10, .30),
     prompt2 = c(
       'What is your favorite color? - Blue',
