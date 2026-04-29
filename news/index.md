@@ -1,5 +1,13 @@
 # Changelog
 
+## orderlabel 0.4.3
+
+### Changes
+
+- The `horizontal` argument of
+  [`order_label()`](https://y2analytics.github.io/orderlabel/reference/order_label.md)
+  is now deprecated, being replaced by `direction`.
+
 ## orderlabel 0.4.2
 
 ### New feautres
