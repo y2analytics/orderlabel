@@ -5,6 +5,8 @@
 #' @param dataset The name of the data frame for the function to modify, usually piped in after running freqs
 #' @param label_var DEFAULT = label; name of variable to be ordered
 #' @param group_var DEFAULT = 'NULL'; Add the unquoted name of the grouping variable if your data is grouped
+#' @param percent_var DEFAULT = NULL; Unquoted name of a variable in the dataset (e.g., `group_var` or `country`) that controls where the \% symbol appears. Be sure to specify "group_var = group_var" when using this argument. By default, the \% is placed on the highest result of each percent_var value. When inherent_order_label is set to TRUE, the \% sign is assigned to each unique group_var where value = 1. Useful for grouped charts where you want one \% per group rather than just one \% overall. Pass `percent_var = "All"` (the string) to put a \% next to every row \(replaces the deprecated `percent_all` argument\). Ignored when `num_fmt = "general"`.
+#' @param percent_filter DEFAULT = NULL; Optional unquoted dplyr-style expression (e.g., `group_var == 1`) restricting which rows are eligible to receive the \%. For example, if your data was grouped by country and gender, with the percent_var equal to country, but you only wanted the \% sign to go with men, then you could set percent_filter to "Male". If there is no eligible row for that percent_var, then it will be skipped. The "top" row within each `percent_var` level is selected only from rows where this evaluates to TRUE. Levels with no eligible rows get no \%. Has no effect unless `percent_var` is also set.
 #' @param inherent_order_label DEFAULT = FALSE; If FALSE, puts labels in descending order. If TRUE, puts labels in the inherent order from survey (e.g., Strongly agree to strongly disagree). Specifying stacked = 'gg' or 'ms' automatically makes inherent_order_label = TRUE
 #' @param inherent_order_group DEFAULT = FALSE; If FALSE, puts groups in descending order. If TRUE, puts groups in the order they are factored (e.g., District 1, District 2...)
 #' @param label_first DEFAULT = NA; If specified, puts the specified label first. ex: 'brand1' would put label called brand1 before all other labels
@@ -19,7 +21,7 @@
 #' @param topbox DEFAULT = NULL; Can be set to a numeric value, ex: topbox = 2 to order by top2box instead of topbox
 #' @param none_other DEFAULT = TRUE; Automatically puts "Other", "None of the above", and "Prefer not to say" options at the bottom. Change to FALSE to let them stay ordered elsewhere in the chart
 #' @param num_fmt DEFAULT = "percent"; Other option is "general", use this when working with whole numbers rather than percents/proportions
-#' @param percent_all DEFAULT = FALSE; When FALSE, will put a \% next to only the first number label on the chart. If set to TRUE, will put \%s next to all numbers labels
+#' @param percent_all (Deprecated) Use `percent_var = "All"` instead.
 #' @keywords order label arrange
 #' @importFrom rlang .data
 #' @examples
@@ -57,6 +59,8 @@ order_label <- function(
   dataset, # will likely be frequencies
   label_var = label,
   group_var = 'NULL',
+  percent_var = NULL,
+  percent_filter = NULL,
   inherent_order_label = FALSE,
   inherent_order_group = FALSE,
   label_first = NA,
@@ -71,7 +75,7 @@ order_label <- function(
   topbox = NULL,
   none_other = TRUE,
   num_fmt = c("percent", "general"),
-  percent_all = FALSE
+  percent_all = lifecycle::deprecated()
 ) {
   # Soft-deprecate `horizontal` if user supplied it, mapping to `direction`.
   if (lifecycle::is_present(horizontal)) {
@@ -91,6 +95,19 @@ order_label <- function(
     }
   }
 
+  # Soft-deprecate `percent_all` if user supplied it, mapping to
+  # `percent_var = "All"`.
+  if (lifecycle::is_present(percent_all)) {
+    lifecycle::deprecate_warn(
+      when = "0.4.3",
+      what = "order_label(percent_all)",
+      with = 'order_label(percent_var = "All")'
+    )
+    if (percent_all == TRUE) {
+      percent_var <- "All"
+    }
+  }
+
   ### Test matching arguments
   num_fmt <- rlang::arg_match(num_fmt)
   stacked <- rlang::arg_match(stacked)
@@ -102,6 +119,20 @@ order_label <- function(
   label_var_flag <- dplyr::enquo(label_var)
   group_var_flag <- dplyr::enquo(group_var)
   group_var_char <- rlang::as_name(group_var_flag)
+  percent_var_flag <- dplyr::enquo(percent_var)
+  percent_filter_flag <- dplyr::enquo(percent_filter)
+  # `percent_var = "All"` is a magic string meaning "% on every row" — same
+  # behavior as the deprecated `percent_all = TRUE`. Decode it here so the
+  # rest of the function only has to deal with the boolean.
+  percent_var_expr <- rlang::quo_get_expr(percent_var_flag)
+  if (
+    is.character(percent_var_expr) &&
+      length(percent_var_expr) == 1 &&
+      percent_var_expr == "All"
+  ) {
+    percent_all <- TRUE
+    percent_var_flag <- rlang::quo(NULL)
+  }
   # Stacked flags: bars always inherently ordered
   inherent_order_label <- ifelse(
     stacked != 'NULL',
@@ -251,6 +282,15 @@ order_label <- function(
   dataset <- num_fmt_orderlabel(dataset, num_fmt, percent_all)
   ### arrange_by_factor
   dataset <- arrange_by_factor(dataset, grouped)
+  ### percent_var override (after final arrange so row 1 per group is the visual top)
+  dataset <- percent_var_fun(
+    dataset,
+    percent_var_flag,
+    percent_filter_flag,
+    percent_all,
+    num_fmt,
+    inherent_order_label
+  )
   return(dataset)
 }
 
@@ -338,10 +378,15 @@ factors <- function(
       length(unique(dataset$value)) == 1 |
       dataset$value[1] != '1'
   ) {
-    max_lab <- length(unique(dataset$label))
+    # Assign each label a consistent integer based on factor order of appearance.
+    # Done ungrouped so groups with different row counts (e.g., multi-select
+    # freqs across countries with different option presence) don't fail.
     dataset <- dataset |>
+      dplyr::ungroup() |>
       dplyr::mutate(
-        value = 1:max_lab
+        value = as.integer(
+          forcats::fct_inorder(as.character(.data$label))
+        )
       )
   } else {
     dataset <- dataset
@@ -2036,6 +2081,108 @@ num_fmt_orderlabel <- function(
     dataset <- dataset |>
       dplyr::mutate(percent_label = as.character(.data$result))
   }
+}
+
+
+#### percent_var ####
+# Override percent_label so % appears on the "top" row within each level of
+# percent_var, where "top" honors the same ordering criterion as the rest of
+# the function: largest `result` by default, or smallest `value` when
+# inherent_order_label = TRUE. No-op when percent_var isn't set, when
+# percent_all = TRUE (full % override wins), or when num_fmt = "general".
+percent_var_fun <- function(
+  dataset,
+  percent_var_flag,
+  percent_filter_flag,
+  percent_all,
+  num_fmt,
+  inherent_order_label
+) {
+  if (
+    rlang::quo_is_null(percent_var_flag) ||
+      isTRUE(percent_all) ||
+      num_fmt != "percent"
+  ) {
+    return(dataset)
+  }
+
+  existing_groups <- dplyr::groups(dataset)
+  has_filter <- !rlang::quo_is_null(percent_filter_flag)
+
+  dataset <- dataset |>
+    dplyr::ungroup() |>
+    dplyr::group_by(!!percent_var_flag)
+
+  # Eligibility mask: TRUE for rows that may receive the %. When no filter is
+  # provided, every row is eligible.
+  if (has_filter) {
+    dataset <- dataset |>
+      dplyr::mutate(
+        .pct_eligible = dplyr::coalesce(!!percent_filter_flag, FALSE)
+      )
+  } else {
+    dataset <- dataset |>
+      dplyr::mutate(.pct_eligible = TRUE)
+  }
+
+  if (isTRUE(inherent_order_label)) {
+    # Among eligible rows in each percent_var level, pick the smallest value,
+    # breaking ties by largest result.
+    dataset <- dataset |>
+      dplyr::mutate(
+        .pct_target_val = suppressWarnings(min(
+          ifelse(.data$.pct_eligible, .data$value, NA_real_),
+          na.rm = TRUE
+        )),
+        .pct_target_result = suppressWarnings(max(
+          ifelse(
+            .data$.pct_eligible &
+              .data$value == .data$.pct_target_val,
+            .data$result,
+            NA_real_
+          ),
+          na.rm = TRUE
+        )),
+        .pct_is_top = dplyr::coalesce(
+          .data$.pct_eligible &
+            .data$value == .data$.pct_target_val &
+            .data$result == .data$.pct_target_result,
+          FALSE
+        ),
+        .pct_rank = cumsum(.data$.pct_is_top)
+      )
+  } else {
+    # Among eligible rows in each percent_var level, pick the largest result.
+    dataset <- dataset |>
+      dplyr::mutate(
+        .pct_target_result = suppressWarnings(max(
+          ifelse(.data$.pct_eligible, .data$result, NA_real_),
+          na.rm = TRUE
+        )),
+        .pct_is_top = dplyr::coalesce(
+          .data$.pct_eligible &
+            .data$result == .data$.pct_target_result,
+          FALSE
+        ),
+        .pct_rank = cumsum(.data$.pct_is_top)
+      )
+  }
+
+  dataset <- dataset |>
+    dplyr::mutate(
+      percent_label = ifelse(
+        .data$.pct_is_top & .data$.pct_rank == 1,
+        stringr::str_c(.data$result * 100, '%'),
+        stringr::str_c(.data$result * 100)
+      )
+    ) |>
+    dplyr::select(-tidyselect::starts_with(".pct_")) |>
+    dplyr::ungroup()
+
+  if (length(existing_groups) > 0) {
+    dataset <- dataset |> dplyr::group_by(!!!existing_groups)
+  }
+  dataset
 }
 
 
