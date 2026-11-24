@@ -42,12 +42,14 @@ You can install the released version of orderlabel from
 [CRAN](https://CRAN.R-project.org) with:
 
 ``` r
+
 install.packages("orderlabel")
 ```
 
 And the development version from [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("devtools")
 devtools::install_github("nick-moffitt/orderlabel")
 ```
@@ -59,6 +61,7 @@ order your frequencies table with
 [`order_label()`](https://y2analytics.github.io/orderlabel/reference/order_label.md):
 
 ``` r
+
 library(orderlabel)
 library(dplyr)
 #> 

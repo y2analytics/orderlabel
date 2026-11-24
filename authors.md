@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/nick-moffitt/orderlabel/blob/master/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/nick-moffitt/orderlabel/blob/rc-0.5.0/DESCRIPTION)
 
 Moffitt N (2026). *orderlabel: Order Your Tables and Add Percent
 Labels*. R package version 0.4.3,
